@@ -1,0 +1,71 @@
+stage:
+  name: stage3_redocking_crossdocking
+  version: 0.1.0
+
+inputs:
+  receptor_ensemble: data/processed/stage2/receptor_ensemble_v1.parquet
+  receptor_holdout: data/processed/stage2/receptor_holdout_v1.parquet
+  receptor_features: data/processed/stage2/receptor_features.parquet
+  pocket_mapping: data/processed/stage2/pocket_residue_mapping.parquet
+  stage1_rejected: data/interim/stage1/rejected_complexes.parquet
+
+paths:
+  processed: data/processed/stage3
+  docking_receptors: data/processed/stage3/docking_receptors
+  docking_ligands: data/processed/stage3/docking_ligands
+  native_reference_poses: data/processed/stage3/native_reference_poses
+  docking_boxes: data/processed/stage3/docking_boxes
+  reference_transforms: data/processed/stage3/reference_transforms
+  docking_outputs_raw: data/processed/stage3/docking_outputs/raw
+  docking_outputs_poses: data/processed/stage3/docking_outputs/poses
+  docking_outputs_logs: data/processed/stage3/docking_outputs/logs
+  reports: reports
+
+docking:
+  enabled_engines:
+    - unidock
+  primary_engine: unidock
+  baseline_engine: unidock
+  optional_ai_comparator: null
+  exhaustiveness: 8
+  num_modes: 20
+  seed_list:
+    - 13
+  retries: 0
+  timeout_seconds: 1800
+  engine_executable_path:
+    vina: vina
+    # Set to the UniDock executable on your machine (or leave on PATH as "unidock").
+    unidock: unidock
+  container_image:
+    vina: null
+    unidock: null
+  dry_run_if_engine_missing: false
+
+prep:
+  ph_target: 7.4
+  ph_window: 1.0
+  max_protonation_tautomer_states_per_ligand: 3
+  max_conformers_per_state: 20
+  retained_waters_default: false
+  receptor_prep_tool: openbabel_pdbqt
+  ligand_prep_tool: openbabel_pdbqt
+  # Set to the OpenBabel executable on your machine (or leave on PATH as "obabel").
+  obabel_path: obabel
+  charge_model: not_assigned_stage3_copy
+
+task_matrix:
+  include_crossdocking: true
+  include_holdout_crossdocking: false
+  max_crossdock_tasks: null
+  smoke_test_limit: null
+
+rmsd:
+  strict_threshold_angstrom: 2.0
+  relaxed_threshold_angstrom: 3.0
+  top_n_sampling: 20
+  symmetry_corrected_attempted: true
+
+sanity:
+  severe_clash_distance_angstrom: 1.2
+  outside_box_tolerance_angstrom: 2.0

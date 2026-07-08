@@ -1,0 +1,41 @@
+stage:
+  name: stage10_ablation_benchmark
+  version: 0.1.0
+
+inputs:
+  stage9_seeds: data/processed/stage9/analog_seed_scaffolds.parquet
+  stage9_iterations: data/processed/stage9/agent_iterations.parquet
+  stage9_candidates: data/processed/stage9/analog_candidates.parquet
+  stage9_validation: data/processed/stage9/analog_validation.parquet
+  stage9_screening: data/processed/stage9/analog_screening_results.parquet
+  stage9_acceptance: data/processed/stage9/analog_acceptance.parquet
+  stage9_strategy_benchmark: data/processed/stage9/analog_strategy_benchmark.parquet
+  stage8_parent_scores: data/processed/stage8/candidate_aggregate_scores.parquet
+  stage7_master: data/processed/stage7/candidate_library_master.parquet
+  stage11_md_metrics: data/processed/stage11/md_metrics.parquet
+  stage11_md_interaction_persistence: data/processed/stage11/md_interaction_persistence.parquet
+  stage11_md_pose_stability_labels: data/processed/stage11/md_pose_stability_labels.parquet
+
+paths:
+  processed: data/processed/stage10
+  reports: reports
+  figures: figures/stage10
+
+benchmark:
+  seed_set_id: stage9_seed_set_v1
+  generation_budget: 6
+  screening_budget: 3
+  bootstrap_iterations: 1000
+  random_seed: 1010
+  primary_method: council_plus_prolif_pose_confidence
+
+acceptance:
+  min_pose_confidence: 0.30
+  max_medchem_risk: 0.40
+  # Must match Stage 9 analog_acceptance tolerances so the ablation reflects the
+  # same accepted analogs.
+  min_delta_candidate_score: -0.02
+  min_delta_ligand_efficiency: -0.10
+  require_binding_mode_preserved: true
+  require_ligand_efficiency_preserved: true
+  md_interaction_persistence_threshold: 0.50

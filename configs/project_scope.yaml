@@ -1,0 +1,149 @@
+project:
+  name: EGFR DockingForge
+  version: 0.1.0
+  stage: stage0_scope_definition
+  main_scientific_question: >
+    Can an interaction-constrained computational workflow optimize noncovalent ATP-site
+    EGFR analogs while preserving validated EGFR binding modes better than
+    docking-score-only optimization?
+  strongest_claim: >
+    A reproducible computational workflow for structure-constrained EGFR analog
+    optimization, not experimentally confirmed inhibitor discovery.
+  decision_sources:
+    - klifs_2021
+    - rcsb_search_api
+    - posebusters_2023
+
+target:
+  name: epidermal growth factor receptor kinase domain
+  gene: EGFR
+  protein_family: receptor tyrosine kinase
+  organism: Homo sapiens
+  uniprot_accession: P00533
+  aliases:
+    - EGFR
+    - ERBB1
+    - HER1
+  binding_site: orthosteric ATP site
+  scope_boundary: kinase-domain structure-based design only
+  decision_sources:
+    - klifs_site
+    - klifs_2021
+    - rcsb_search_api
+    - pdb_1m17
+
+ligand_scope:
+  included:
+    - reversible noncovalent ATP-site small-molecule inhibitors
+    - Type I ATP-site binding modes where classifiable
+    - Type I.5 ATP-site binding modes where classifiable
+    - native ligands from experimental EGFR kinase-domain holo structures
+  excluded:
+    - covalent inhibitors
+    - reversible covalent inhibitors
+    - irreversible covalent inhibitors
+    - acrylamide Cys797-targeting warheads
+    - propiolamide Cys797-targeting warheads
+    - Michael-acceptor Cys797-targeting warheads
+    - allosteric inhibitors
+    - peptides
+    - protein binders
+    - macrocycles in v1
+    - fragment-only ligands in v1 except optional pocket-mapping references
+    - ATP-only structures except optional reference structures
+    - ADP-only structures except optional reference structures
+    - cofactor-only structures except optional reference structures
+    - ligands not located in the ATP pocket
+    - ligands with unusable identity, coordinates, or geometry
+  warhead_policy: exclude Cys797-targeting covalent/reactive warheads in v1
+  pocket_policy: require ATP-site binding for benchmark inclusion
+  decision_sources:
+    - pdb_1m17
+    - pdb_1xkk
+    - pdb_4zau
+    - posebusters_2023
+
+receptor_scope:
+  included:
+    - Homo sapiens EGFR / ERBB1 kinase-domain structures
+    - experimental holo structures from RCSB PDB
+    - experimental holo structures from KLIFS where available
+    - active-like EGFR receptor states
+    - inactive-like EGFR receptor states
+    - WT structures
+    - mutant structures with mutation status tracked as metadata only
+  excluded:
+    - non-human EGFR structures unless explicitly approved as external controls
+    - apo-only structures except optional references
+    - AlphaFold/computed structures as primary v1 receptors
+    - structures with severe missing active-site residues
+    - structures with unresolved or unusable ATP-pocket ligand geometry
+    - structures where the ligand is outside the ATP pocket
+  mutation_policy:
+    include_wt: true
+    include_mutants: true
+    use_mutation_status_as: metadata_only
+    selectivity_claim_allowed_v1: false
+  receptor_state_metadata_required:
+    - receptor_state_label
+    - DFG_state_if_available
+    - C_helix_or_saltbridge_state_if_available
+    - activation_loop_state_if_available
+    - mutation_status
+    - ligand_resname
+    - ligand_binding_mode_class_if_available
+    - resolution
+    - source_database
+    - pdb_id
+  decision_sources:
+    - rcsb_search_api
+    - klifs_site
+    - klifs_2021
+    - pdb_1m17
+    - pdb_1xkk
+    - kincore_site
+    - kincore_2019
+    - kinase_msa_2019
+    - pdb_2ity
+    - pdb_2itz
+    - af2_rave_2024
+
+validation_scope:
+  computational_only: true
+  stage0_validates:
+    - scope completeness
+    - inclusion and exclusion logic
+    - source traceability
+    - claim boundaries
+  stage0_does_not_validate:
+    - docking performance
+    - GNINA rescoring
+    - ProLIF fingerprints
+    - MD stability
+    - analog-generation quality
+    - experimental potency
+  future_validation_layers:
+    - redocking and cross-docking pose recovery
+    - interaction recovery
+    - pose-confidence modeling
+    - baseline and ablation comparison
+    - short MD pose-stability stress testing
+  decision_sources:
+    - posebusters_2023
+    - klifs_2021
+    - rcsb_search_api
+
+non_claims:
+  no_wet_lab_validation: true
+  no_experimental_activity_claim: true
+  no_experimentally_confirmed_inhibitor_discovery: true
+  no_mutant_selectivity_claim_v1: true
+  no_covalent_inhibitor_design_v1: true
+  no_allosteric_inhibitor_design_v1: true
+  no_clinical_or_therapeutic_claim: true
+  decision_sources:
+    - pdb_2ity
+    - pdb_2itz
+    - pdb_4zau
+    - af2_rave_2024
+

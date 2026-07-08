@@ -1,0 +1,68 @@
+stage:
+  name: stage8_candidate_screening
+  version: 0.1.0
+
+inputs:
+  receptor_ensemble: data/processed/stage2/receptor_ensemble_v1.parquet
+  receptor_docking_prep: data/processed/stage3/receptor_docking_prep.parquet
+  stage7_screening_input: data/processed/stage7/stage8_screening_input.parquet
+  candidate_library_master: data/processed/stage7/candidate_library_master.parquet
+  residue_map: data/processed/stage5/interaction_residue_map.parquet
+  key_interactions: data/processed/stage5/key_egfr_interactions.parquet
+  native_fingerprints: data/processed/stage5/native_interaction_fingerprints.parquet
+  stage6_model: models/stage6/pose_ranker.pkl
+  stage6_feature_schema: models/stage6/feature_schema.json
+
+paths:
+  processed: data/processed/stage8
+  reports: reports
+
+screening:
+  mode: smoke_test
+  max_known_controls: 5
+  max_candidates: 1000
+  receptor_limit: 1
+  require_prospective_candidates: false
+
+docking:
+  engine: unidock
+  # Set to the UniDock/OpenBabel executables on your machine (or leave on PATH).
+  executable: unidock
+  obabel: obabel
+  exhaustiveness: 8
+  num_modes: 3
+  seed: 807
+  timeout_seconds: 1800
+
+gnina:
+  # GNINA can be run via Docker instead of a local binary:
+  #   docker run --rm --gpus all -v $PWD:/work gnina/gnina:latest gnina <args>
+  # Set `use_docker: true` and `docker_image: gnina/gnina:latest` to use it.
+  use_docker: true
+  docker_image: gnina/gnina:latest
+  # Only used when use_docker: false; set to your local GNINA binary or leave on PATH.
+  executable: gnina
+  model_name: default
+  timeout_seconds: 900
+
+triage:
+  top_n_per_molecule_receptor: 3
+  confidence_threshold: 0.30
+  interaction_f1_threshold: 0.20
+  cnnscore_percentile_threshold: 0.30
+
+interactions:
+  enabled_interactions:
+    - Hydrophobic
+    - ImplicitHBDonor
+    - ImplicitHBAcceptor
+    - Anionic
+    - Cationic
+    - CationPi
+    - PiCation
+    - VdWContact
+  distance_cutoffs:
+    hydrophobic: 4.5
+    hydrogen_bond: 3.6
+    ionic: 4.5
+    vdw: 4.0

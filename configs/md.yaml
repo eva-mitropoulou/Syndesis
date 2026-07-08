@@ -1,0 +1,6 @@
+stage: md_validation
+status: planned
+engine: openmm
+replicates: 3
+short_md_ns: 10
+

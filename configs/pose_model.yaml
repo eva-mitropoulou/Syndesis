@@ -1,0 +1,8 @@
+stage: pose_confidence_model
+status: planned
+model_family: xgboost
+validation:
+  split_strategy:
+    - held_out_ligands
+    - held_out_receptors
+

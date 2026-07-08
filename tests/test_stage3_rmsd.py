@@ -1,0 +1,17 @@
+from __future__ import annotations
+
+import numpy as np
+import pytest
+
+from egfr_dockingforge.stage3.rmsd import mapped_rmsd
+
+
+def test_mapped_rmsd_refuses_mismatched_atom_counts() -> None:
+    with pytest.raises(ValueError):
+        mapped_rmsd(np.zeros((2, 3)), np.zeros((3, 3)))
+
+
+def test_mapped_rmsd_zero_for_identical_coordinates() -> None:
+    coords = np.array([[0, 0, 0], [1, 0, 0]], dtype=float)
+    assert mapped_rmsd(coords, coords) == 0.0
+

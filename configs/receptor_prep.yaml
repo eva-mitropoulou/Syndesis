@@ -1,0 +1,11 @@
+stage: receptor_preparation
+status: planned
+inputs:
+  structures_table: data/processed/stage1/structures.parquet
+outputs:
+  prepared_receptors: data/processed/stage2/receptors
+policy:
+  keep_protein_only_pdb_from_stage1: true
+  protonation_ph: 7.4
+  review_missing_residues: true
+

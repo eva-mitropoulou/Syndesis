@@ -1,0 +1,27 @@
+project:
+  name: EGFR DockingForge
+  target: EGFR kinase domain
+  uniprot_accession: P00533
+  scope: noncovalent ATP-site inhibitors
+  claim_boundary: validated computational workflow, not experimentally confirmed inhibitors
+
+compute:
+  # Reference hardware only; edit for your environment. Nothing here is required
+  # to reproduce results and no host is contacted by the pipeline.
+  local:
+    cpus: 12
+    gpu: NVIDIA RTX 4090
+  remote_vm:
+    # Optional CPU-only worker for parallel CPU-heavy stages; configure per site.
+    host: "<optional-cpu-worker-host>"
+    user: "<user>"
+    cpus: 64
+    memory_gb: 128
+  default_local_workers: 8
+
+paths:
+  raw_structures: data/raw/structures
+  chemical_components: data/external/chemical_components
+  processed_stage1: data/processed/stage1
+  reports: reports
+  models: models

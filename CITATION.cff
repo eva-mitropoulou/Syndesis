@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Syndesis: an evidence-concordant, interaction-constrained workflow for EGFR ATP-site analog design"
+abstract: >-
+  Syndesis is a reproducible, leakage-audited, structure-based cheminformatics
+  workflow for EGFR ATP-site analog design that accepts a candidate only when
+  independent structural evidence (docked pose, ProLIF interaction fingerprint,
+  a leakage-controlled pose-confidence model, and short molecular-dynamics
+  pose-stability) agrees on the validated binding mode, operationalizing and
+  detecting docking-score hacking. Includes a feasibility comparison of an
+  LLM-agent analog-design loop against a deterministic rule-based baseline.
+type: software
+authors:
+  - given-names: Evangelia
+    family-names: Mitropoulou
+    affiliation: "University of Patras"
+  - given-names: Dimitris
+    family-names: Giannopoulos
+    affiliation: "University of Patras"
+keywords:
+  - cheminformatics
+  - structure-based drug design
+  - EGFR
+  - molecular docking
+  - interaction fingerprints
+  - molecular dynamics
+  - score hacking
+license: MIT
+version: 0.1.0
+date-released: "2026-07-08"

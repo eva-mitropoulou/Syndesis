@@ -1,0 +1,47 @@
+manual_pdb_ids:
+  # A starter set of EGFR kinase co-crystals with ATP-site ligands.
+  # Keep this explicit for reproducible MVP runs; clear this list to use RCSB search.
+  - 1M17
+  - 2ITX
+  - 2ITY
+  - 2J5F
+  - 3W2O
+  - 3W2P
+  - 4HJO
+  - 4I22
+  - 4I23
+  - 5CAV
+  - 5HG5
+  - 5HG7
+  - 5UG8
+  - 6DUK
+  - 6JXT
+
+rcsb_query:
+  uniprot_accession: P00533
+  experimental_method: X-RAY DIFFRACTION
+  max_resolution_angstrom: 3.0
+  search_rows: 250
+  max_structures: 40
+
+curation:
+  max_resolution_angstrom: 3.0
+  min_ligand_heavy_atoms: 12
+  max_ligand_protein_distance_angstrom: 5.0
+  max_ligands_per_structure: 1
+  excluded_ligand_resnames:
+    # Covalent/irreversible EGFR inhibitor residue names and common non-drug additives can be extended here.
+    - 03P
+    - 0WM
+    - 1C9
+    - 5P8
+    - 6JZ
+    - ANP
+    - EDO
+    - GOL
+    - PEG
+    - PO4
+    - SO4
+
+runtime:
+  workers: 8

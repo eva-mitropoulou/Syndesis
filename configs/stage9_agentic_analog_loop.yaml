@@ -1,0 +1,100 @@
+stage:
+  name: stage9_agentic_analog_loop
+  version: 0.1.0
+
+inputs:
+  stage8_config: configs/stage8_candidate_screening.yaml
+  ranked_candidates: data/processed/stage8/ranked_candidates.parquet
+  candidate_aggregate_scores: data/processed/stage8/candidate_aggregate_scores.parquet
+  screening_pose_decisions: data/processed/stage8/screening_pose_decisions.parquet
+  screening_interaction_features: data/processed/stage8/screening_interaction_features.parquet
+  stage7_master: data/processed/stage7/candidate_library_master.parquet
+  stage7_prepared_ligands: data/processed/stage7/candidate_ligand_preparation.parquet
+  key_interactions: data/processed/stage5/key_egfr_interactions.parquet
+  stage6_model: models/stage6/pose_ranker.pkl
+  stage6_feature_schema: models/stage6/feature_schema.json
+
+paths:
+  processed: data/processed/stage9
+  reports: reports
+  analog_sdf_dir: data/processed/stage9/prepared_analogs
+
+seed_selection:
+  min_seeds: 1
+  max_seeds: 3
+  min_pose_confidence: 0.30
+  min_key_interaction_recall: 0.20
+
+edit_sites:
+  max_sites_per_seed: 6
+  protect_key_interaction_atoms: true
+
+transforms:
+  max_analogs_per_seed_per_strategy: 6
+  enabled_classes:
+    - small_substituent_scan
+    - halogen_scan
+    - heteroatom_swap
+    - solubilizing_tail_tuning
+    - conservative_bioisostere
+    - brics_recombination
+
+llm:
+  provider: vllm
+  base_url: http://localhost:8000
+  model_name: Qwen/Qwen3-32B-AWQ
+  critic_model_name: DeepSeek-R1-Distill-Qwen-32B-quantized
+  api_key: local-token
+  quantization_note: local Qwen3 AWQ model served by vLLM from the host Docker image; not hardcoded in code
+  temperature: 0.2
+  top_p: 0.9
+  max_tokens: 2048
+  context_limit: 8192
+  timeout_seconds: 120
+  retry_count: 1
+  json_schema_enforced: true
+  chat_template_kwargs:
+    enable_thinking: false
+  system_prompt_path: docs/stage9_agent_roles.md
+  seed_if_supported: 909
+
+loop:
+  random_seed: 909
+  max_iterations: 1
+  proposals_per_seed_per_iteration: 6
+  strategies:
+    - rdkit_rule_based
+    - reinvent4_baseline
+    - single_agent
+    - council_no_feedback
+    - council_with_tool_feedback
+    - council_interaction_constrained
+
+screening:
+  enabled: true
+  # Screen the full validated analog set so every strategy (rule-based AND each
+  # agentic council) is represented for a fair per-strategy accepted-rate
+  # comparison. Previously capped at 3, which screened only the first few
+  # (baseline) molecules and starved the agentic arms.
+  max_analogs_to_screen: 30
+  stage8_mini_config: data/processed/stage9/stage8_analog_miniscreen.yaml
+  stage8_processed: data/processed/stage9/stage8_mini_screen
+  receptor_limit: 1
+  num_modes: 3
+
+acceptance:
+  min_pose_confidence: 0.30
+  min_key_interaction_recall: 0.20
+  require_binding_mode_preserved: true
+  require_ligand_efficiency_preserved: true
+  max_medchem_risk_delta: 0.40
+  # Composite-score tolerance: an accepted analog must not lose more than this
+  # vs its parent (kept tight; near-neutral or improving).
+  min_delta_candidate_score: -0.02
+  # Ligand-efficiency tolerance: a conservative single-atom/small-group addition
+  # lowers LE (-affinity/heavy_atoms) by ~affinity/N^2 at constant affinity, so a
+  # -0.02 floor rejects essentially all additive edits. -0.10 admits small,
+  # potency-neutral substituents that preserve the binding mode, while a genuine
+  # efficiency collapse (e.g. -0.15+) is still rejected. tier_1 still requires
+  # delta_le >= 0 (no efficiency loss at all).
+  min_delta_ligand_efficiency: -0.10

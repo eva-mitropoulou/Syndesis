@@ -1,0 +1,141 @@
+from __future__ import annotations
+
+import pandas as pd
+
+POCKET_MAPPING_COLUMNS = [
+    "receptor_id",
+    "pdb_id",
+    "auth_asym_id",
+    "uniprot_residue_number",
+    "auth_seq_id",
+    "residue_name",
+    "klifs_position",
+    "atom_names_present",
+    "residue_complete_flag",
+    "used_for_alignment_flag",
+    "warning",
+]
+
+FEATURE_COLUMNS = [
+    "receptor_id",
+    "complex_id",
+    "pdb_id",
+    "auth_asym_id",
+    "ligand_comp_id",
+    "quality_tier",
+    "quality_score",
+    "resolution_angstrom",
+    "mutation_flag",
+    "mutation_list",
+    "kincore_activity_label",
+    "dfg_state",
+    "dfg_dihedral_cluster",
+    "chelix_state",
+    "saltbridge_state",
+    "hrd_state",
+    "activation_loop_state",
+    "klifs_structure_id",
+    "klifs_pocket_id",
+    "ligand_class_if_known",
+    "pocket_ca_rmsd_to_reference",
+    "hinge_region_rmsd",
+    "dfg_region_rmsd",
+    "c_helix_proxy_distance",
+    "lys745_glu762_nz_oe_min_distance",
+    "dfg_phe856_position_x",
+    "dfg_phe856_position_y",
+    "dfg_phe856_position_z",
+    "gatekeeper_thr790_complete",
+    "hinge_met793_complete",
+    "asp855_complete",
+    "phe856_complete",
+    "pocket_volume_if_available",
+    "native_ligand_centroid_x",
+    "native_ligand_centroid_y",
+    "native_ligand_centroid_z",
+    "native_ligand_heavy_atom_count",
+    "native_ligand_radius_of_gyration",
+    "pocket_water_count_5a",
+    "active_site_completeness_score",
+    "receptor_preselection_score",
+    "state_stratum",
+    "receptor_file_path",
+    "native_complex_path",
+    "native_ligand_sdf_path",
+    "warnings_json",
+]
+
+ALIGNMENT_COLUMNS = [
+    "receptor_id",
+    "reference_receptor_id",
+    "pocket_ca_rmsd",
+    "pocket_backbone_rmsd",
+    "pocket_sidechain_rmsd",
+    "hinge_region_rmsd",
+    "dfg_region_rmsd",
+    "activation_loop_rmsd_if_available",
+    "alignment_residue_count",
+    "missing_alignment_residue_count",
+]
+
+CLUSTER_COLUMNS = [
+    "receptor_id",
+    "state_stratum",
+    "cluster_id",
+    "cluster_size",
+    "cluster_medoid_flag",
+    "distance_to_cluster_medoid",
+    "nearest_neighbor_receptor_id",
+    "nearest_neighbor_distance",
+    "cluster_quality_summary",
+    "cluster_warning",
+]
+
+ENSEMBLE_COLUMNS = [
+    "receptor_id",
+    "complex_id",
+    "pdb_id",
+    "auth_asym_id",
+    "ligand_comp_id",
+    "selected_flag",
+    "selected_role",
+    "selected_reason",
+    "state_stratum",
+    "cluster_id",
+    "cluster_medoid_flag",
+    "quality_tier",
+    "quality_score",
+    "resolution_angstrom",
+    "mutation_flag",
+    "mutation_list",
+    "kincore_activity_label",
+    "dfg_state",
+    "dfg_dihedral_cluster",
+    "chelix_state",
+    "saltbridge_state",
+    "hrd_state",
+    "activation_loop_state",
+    "klifs_structure_id",
+    "klifs_pocket_id",
+    "receptor_file_path",
+    "aligned_receptor_file_path",
+    "native_complex_path",
+    "native_ligand_sdf_path",
+    "native_ligand_centroid",
+    "suggested_docking_box_center",
+    "suggested_docking_box_size",
+    "pocket_water_count_5a",
+    "active_site_completeness_score",
+    "receptor_preselection_score",
+    "stage3_validation_status",
+    "warnings_json",
+]
+
+
+def empty_features_frame() -> pd.DataFrame:
+    return pd.DataFrame(columns=FEATURE_COLUMNS)
+
+
+def empty_ensemble_frame() -> pd.DataFrame:
+    return pd.DataFrame(columns=ENSEMBLE_COLUMNS)
+

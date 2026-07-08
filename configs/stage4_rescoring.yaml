@@ -1,0 +1,66 @@
+stage:
+  name: stage4_ml_rescoring
+  version: 0.1.0
+
+inputs:
+  docked_poses: data/processed/stage3/docked_poses.parquet
+  docking_runs: data/processed/stage3/docking_runs.parquet
+  pose_rmsd: data/processed/stage3/pose_rmsd.parquet
+  pose_sanity: data/processed/stage3/pose_sanity.parquet
+  stage3_pose_labels: data/processed/stage3/stage3_pose_labels.parquet
+  docking_task_metrics: data/processed/stage3/docking_task_metrics.parquet
+  docking_task_matrix: data/processed/stage3/docking_task_matrix.parquet
+  receptor_features: data/processed/stage2/receptor_features.parquet
+
+paths:
+  processed: data/processed/stage4
+  logs: data/processed/stage4/gnina_logs
+  reports: reports
+
+task_matrix:
+  top_n_per_docking_task: 20
+  include_invalid_poses: false
+  diagnostic_score_invalid_poses: false
+
+gnina:
+  enabled: true
+  # GNINA can be run via Docker instead of a local binary:
+  #   docker run --rm --gpus all -v $PWD:/work gnina/gnina:latest gnina <args>
+  # Set `use_docker: true` and `docker_image: gnina/gnina:latest` to use it.
+  use_docker: true
+  docker_image: gnina/gnina:latest
+  # Only used when use_docker: false; set to your local GNINA binary or leave on PATH.
+  executable: gnina
+  container_image: gnina/gnina:latest
+  version_expected: "1.3"
+  model_name: default
+  model_version: null
+  score_only: true
+  minimize: false
+  rescore_only: true
+  use_gpu: true
+  batch_size: 1
+  timeout_seconds: 900
+  allowed_models:
+    - default
+    - ensemble
+    - fast
+
+empirical:
+  enabled: true
+  enabled_scores:
+    - original_docking_score
+  vina_executable: vina
+  vinardo_enabled: false
+
+ranking:
+  strict_rmsd_threshold_angstrom: 2.0
+  relaxed_rmsd_threshold_angstrom: 3.0
+  directions:
+    original_docking_score: lower
+    vina_rescore: lower
+    vinardo_rescore: lower
+    gnina_empirical_affinity: lower
+    cnnscore: higher
+    cnnaffinity: higher
+    cnn_vs: higher

@@ -1,0 +1,77 @@
+stage:
+  name: stage5_interaction_fingerprint_atlas
+  version: 0.1.0
+
+inputs:
+  cocrystal_benchmark: data/processed/stage1/egfr_cocrystal_benchmark.parquet
+  receptor_ensemble: data/processed/stage2/receptor_ensemble_v1.parquet
+  pocket_residue_mapping: data/processed/stage2/pocket_residue_mapping.parquet
+  docked_poses: data/processed/stage3/docked_poses.parquet
+  stage3_pose_labels: data/processed/stage3/stage3_pose_labels.parquet
+  pose_score_table: data/processed/stage4/pose_score_table.parquet
+  stage4_features: data/processed/stage4/stage6_pose_features_base.parquet
+
+paths:
+  processed: data/processed/stage5
+  reports: reports
+
+interactions:
+  engine: prolif
+  enabled_interactions:
+    - Hydrophobic
+    - HBDonor
+    - HBAcceptor
+    - PiStacking
+    - Anionic
+    - Cationic
+    - CationPi
+    - PiCation
+    - VdWContact
+  distance_cutoffs:
+    hydrophobic: 4.5
+    hydrogen_bond: 3.6
+    pi_stacking: 5.0
+    ionic: 4.5
+    vdw: 4.0
+  angle_cutoffs: {}
+  require_hydrogens: true
+  protonation_policy: preserve_stage3
+  use_klifs_positions: true
+  use_uniprot_positions: true
+
+key_interactions:
+  key_interaction_threshold_native_frequency: 0.25
+  minimum_native_count: 2
+  hydrophobic_frequency_threshold: 0.50
+  key_interaction_manual_overrides:
+    - residue_role: hinge
+      interaction_type: HBAcceptor
+      weight: 1.5
+    - residue_role: hinge
+      interaction_type: HBDonor
+      weight: 1.5
+    - residue_role: gatekeeper
+      interaction_type: Hydrophobic
+      weight: 1.2
+  interaction_recovery_weights:
+    hinge: 1.5
+    gatekeeper: 1.2
+    catalytic_lys: 1.0
+    catalytic_glu: 1.0
+    dfg_region: 1.0
+
+recovery:
+  high_tanimoto_threshold: 0.50
+  moderate_tanimoto_threshold: 0.30
+  high_key_recall_threshold: 0.75
+  moderate_key_recall_threshold: 0.50
+
+labeling:
+  strict_rmsd_threshold_angstrom: 2.0
+  relaxed_rmsd_threshold_angstrom: 3.0
+
+clustering:
+  distance_threshold: 0.65
+
+plip:
+  enabled: false

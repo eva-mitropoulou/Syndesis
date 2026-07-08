@@ -1,0 +1,33 @@
+name: egfr-dockingforge
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.11
+  - biopython
+  - click
+  - joblib
+  - numpy
+  - pandas
+  - pyarrow
+  - pyyaml
+  - requests
+  - tqdm
+  - rdkit
+  - openbabel
+  - meeko
+  - vina
+  - gnina
+  - prolif
+  - xgboost
+  - lightgbm
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - snakemake
+  - pytest
+  - mdanalysis
+  - openmm
+  - pdbfixer
+  - pip
+

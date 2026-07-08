@@ -1,0 +1,11 @@
+stage: agentic_analog_design
+status: planned
+roles:
+  - medicinal_chemist
+  - docking_scientist
+  - interaction_analyst
+  - admet_safety_critic
+  - skeptical_reviewer
+logging:
+  public_artifacts_only: true
+

@@ -1,0 +1,150 @@
+stage:
+  name: stage1_cocrystal_benchmark
+  version: 0.1.0
+  parser_version: egfr_dockingforge.stage1.v0.1
+
+target:
+  uniprot_accession: P00533
+  organism: Homo sapiens
+  gene_names:
+    - EGFR
+    - ERBB1
+  aliases:
+    - EGFR
+    - ERBB1
+    - HER1
+  kinase_domain_uniprot:
+    start: 712
+    end: 979
+
+controls:
+  required_reference_pdb_ids:
+    - 1M17
+    - 1XKK
+    - 4ZAU
+  expected_positive_controls:
+    - 1M17
+    - 1XKK
+  expected_scope_exclusion_controls:
+    - 4ZAU
+
+known_mutations:
+  2ITX:
+    - L858R
+  2ITY:
+    - L858R
+  4I22:
+    - T790M
+  4I23:
+    - T790M
+
+rcsb:
+  search_url: https://search.rcsb.org/rcsbsearch/v2/query
+  data_api_url: https://data.rcsb.org/rest/v1/core
+  mmcif_url_template: https://files.rcsb.org/download/{pdb_id}.cif
+  ccd_url_template: https://files.rcsb.org/ligands/view/{comp_id}.cif
+  validation_xml_url_template: https://files.rcsb.org/pub/pdb/validation_reports/{middle}/{pdb_id_lower}/{pdb_id_lower}_validation.xml.gz
+  validation_pdf_url_template: https://files.rcsb.org/pub/pdb/validation_reports/{middle}/{pdb_id_lower}/{pdb_id_lower}_validation.pdf
+  query:
+    use_manual_pdb_ids: true
+    manual_pdb_ids:
+      - 1M17
+      - 1XKK
+      - 2ITX
+      - 2ITY
+      - 2J5F
+      - 3W2O
+      - 3W2P
+      - 4HJO
+      - 4I22
+      - 4I23
+      - 4ZAU
+      - 5CAV
+      - 5HG5
+      - 5HG7
+      - 5UG8
+      - 6DUK
+      - 6JXT
+    max_structures: 80
+    max_resolution_angstrom: 3.5
+    experimental_methods:
+      - X-RAY DIFFRACTION
+    require_nonpolymer_ligand: true
+  downloads:
+    concurrent_downloads: 4
+    force: false
+    timeout_seconds: 30
+    optional_timeout_seconds: 8
+    fetch_validation_reports: true
+
+klifs:
+  enabled: true
+  base_url: https://klifs.net/api
+  fail_soft: true
+  timeout_seconds: 5
+
+kincore:
+  enabled: true
+  fail_soft: true
+
+filters:
+  min_ligand_heavy_atoms: 12
+  fragment_heavy_atom_cutoff: 12
+  max_primary_resolution_angstrom: 3.5
+  max_tier_b_resolution_angstrom: 3.0
+  max_tier_a_resolution_angstrom: 2.5
+  min_ligand_occupancy: 0.5
+  preferred_ligand_occupancy: 0.8
+  max_ligand_to_pocket_distance_angstrom: 5.0
+  pocket_water_cutoff_angstrom: 5.0
+  active_site_residues_uniprot:
+    - 745
+    - 762
+    - 790
+    - 793
+    - 797
+    - 855
+    - 856
+    - 857
+  excluded_ligand_comp_ids:
+    - ATP
+    - ADP
+    - AMP
+    - ANP
+    - ACP
+    - PO4
+    - SO4
+    - GOL
+    - EDO
+    - PEG
+    - HOH
+    - WAT
+  allosteric_ligand_comp_ids:
+    - EAI
+  known_covalent_ligand_comp_ids:
+    - 03P
+    - 0WM
+    - 1C9
+    - 5P8
+    - 6JZ
+    - AZD
+    - YY3
+  warhead_smarts:
+    acrylamide: "C=CC(=O)N"
+    propiolamide: "C#CC(=O)N"
+    michael_acceptor: "C=CC=O"
+
+paths:
+  raw_rcsb_mmcif: data/raw/stage1/rcsb/mmcif
+  raw_rcsb_metadata: data/raw/stage1/rcsb/metadata
+  raw_rcsb_validation: data/raw/stage1/rcsb/validation
+  raw_klifs: data/raw/stage1/klifs
+  raw_ligands: data/raw/stage1/rcsb/ligands
+  interim: data/interim/stage1
+  processed: data/processed/stage1
+  reference_complexes: data/processed/stage1/reference_complexes
+  reports: reports
+
+runtime:
+  download_workers: 4
+  parse_workers: 8
