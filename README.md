@@ -80,13 +80,6 @@ Finalists (three known controls plus the top three accepted analogs) are stress-
 
 Preliminary single-replicate results for the three known EGFR chemotypes show stable poses over 20 ns (median ligand RMSD ≈ 1.8–2.0 Å, pocket contact retained throughout). A methodological note worth flagging for anyone doing similar analysis: a naive lab-frame RMSD (without removing periodic-boundary translation and protein rotation) reports these same stable poses as 8–21 Å "failures"; the protein-frame analysis is what recovers the correct ≈ 2 Å. The full replicated finalist run, including the designed analogs, was in progress when this repository was published and the tables will be updated when it completes.
 
-## Related public work
-
-The repository also includes a compact showcase of CensorADMET, a separate
-cheminformatics benchmark for censored ADMET regression:
-
-- [CensorADMET results showcase](showcases/censoradmet/README.md)
-
 ## Scope and limits
 
 - Computational only; no experimental validation. No claim of potency, selectivity, PK, toxicity, or clinical relevance.
