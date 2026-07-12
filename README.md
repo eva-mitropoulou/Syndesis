@@ -80,15 +80,6 @@ Finalists (three known controls plus the top three accepted analogs) are stress-
 
 Preliminary single-replicate results for the three known EGFR chemotypes show stable poses over 20 ns (median ligand RMSD ≈ 1.8–2.0 Å, pocket contact retained throughout). A methodological note worth flagging for anyone doing similar analysis: a naive lab-frame RMSD (without removing periodic-boundary translation and protein rotation) reports these same stable poses as 8–21 Å "failures"; the protein-frame analysis is what recovers the correct ≈ 2 Å. The full replicated finalist run, including the designed analogs, was in progress when this repository was published and the tables will be updated when it completes.
 
-## Scope and limits
-
-- Computational only; no experimental validation. No claim of potency, selectivity, PK, toxicity, or clinical relevance.
-- Covalent (Cys797) inhibitors and non-ATP-site biology are out of scope.
-- The pose-confidence benchmark has limited scaffold diversity (~4 Bemis-Murcko scaffolds); cross-model differences are trends, not powered comparisons.
-- Screening and finalist MD use a single representative active-like receptor conformation; receptor-ensemble screening is future work.
-- The analog experiment uses three seed chemotypes; the LLM-vs-rule-based comparison is a feasibility demonstration, not a benchmark.
-- MD is a short pose-stability triage (20 ns × replicates), not a free-energy or residence-time estimate.
-
 ## Reproduce
 
 The pipeline is packaged as an installable CLI. External tools (docking engine, GNINA, GROMACS, OpenBabel, AmberTools) are system/conda binaries or Docker images and are not installed by pip — see `configs/tools.example.yaml` and `docs/reproducibility_notes.md`.
