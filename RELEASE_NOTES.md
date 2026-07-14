@@ -1,4 +1,4 @@
-# Syndesis v1.0.0-paper
+# Syndesis v1.0.1-paper
 
 This release is the reproducibility package for the Journal of Cheminformatics manuscript, *Pose-coupled native-interaction weighting for kinase ensemble docking: retrospective evaluation on EGFR and CDK2*.
 
@@ -19,7 +19,7 @@ This release is the reproducibility package for the Journal of Cheminformatics m
 - The deterministic 2,000-compound prospective input and corrected ranking.
 - Deterministic analog lineage.
 - Path-independent GAFF2 ligand parameters, GROMACS topologies and MDP files for all seven reported MD systems.
-- Replicate-level MD metrics, gates and final decisions.
+- Replicate-level MD metrics, gates and final decisions, plus 42 per-frame geometric and interaction time-series tables (42,021 trajectory frames and 588,294 interaction rows).
 - Publication figures, Quarto source and rendered PDF.
 
 The release contains computational ranking and pose-persistence evidence. It does not claim experimental activity, affinity, selectivity or current vendor availability.

@@ -4,7 +4,6 @@
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F855A.svg)](LICENSE)
-[![Preprint: ChemRxiv](https://img.shields.io/badge/preprint-ChemRxiv-8A1538.svg)](#citation)
 
 Syndesis is a structure-based cheminformatics workflow for testing whether interactions observed in native protein-ligand complexes add useful ranking information to neural docking scores. Its central rule is deliberately simple: combine GNINA CNNscore with recovery of a target-native interaction prior **on the same receptor-specific pose**, then maximize that coupled score across an ensemble.
 
@@ -69,7 +68,7 @@ The implementation is fail-closed:
 5. **Statistical controls:** paired bootstraps, three permutation nulls, formula sensitivity, and complete leave-one-out analyses.
 6. **Leakage audit:** exact identity, scaffold, and ECFP4 similarity between native ligands and benchmark actives.
 7. **Deterministic analog audit:** versioned RDKit transformations with complete parent-to-analog lineage.
-8. **Replicated MD:** 7 systems x 3 independent 20 ns trajectories using ff19SB, GAFF2/AM1-BCC, OPC3, and GROMACS.
+8. **Replicated MD:** 7 systems x 3 independent 20 ns trajectories using ff19SB, GAFF2/AM1-BCC, OPC3, and GROMACS, with frame-level geometric and interaction time series.
 
 The MD gate accepted four systems by majority replicate and rejected three, including a deliberately mis-docked negative control with median ligand RMSD 5.72 Å and key-interaction occupancy 0.008.
 
@@ -122,6 +121,9 @@ PYTHONPATH=src python scripts/submission_robustness_analysis.py
 PYTHONPATH=src python scripts/build_corrected_prospective_ranking.py
 PYTHONPATH=src python scripts/active_native_similarity_analysis.py
 
+# 3b. Re-export frame-level MD evidence from completed trajectories
+PYTHONPATH=src python scripts/export_md_timeseries.py --md-root /path/to/egfr_md_work
+
 # 4. Render the manuscript after regenerating figures
 python scripts/create_manuscript_figures.py
 quarto render manuscript/syndesis_jcheminformatics_v2.qmd --to typst
@@ -131,11 +133,11 @@ The complete docking campaigns require the source DUD-E and ZINC files described
 
 ## Citation
 
-Please cite the ChemRxiv preprint:
+Please cite the frozen software and data release until the ChemRxiv preprint is posted:
 
-> Mitropoulou E, Giannopoulos D. **Pose-coupled native-interaction weighting for kinase ensemble docking: retrospective evaluation on EGFR and CDK2.** ChemRxiv. 2026. DOI pending.
+> Mitropoulou E, Giannopoulos D. **Syndesis v1.0.1-paper: pose-coupled native-interaction weighting for kinase ensemble docking.** GitHub release, 2026.
 
-Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff). The reproducibility package is frozen in the `v1.0.0-paper` GitHub release; the ChemRxiv DOI will be inserted after the preprint service assigns it.
+Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff). The reproducibility package is frozen in the `v1.0.1-paper` GitHub release. ChemRxiv preprint metadata will be added after posting.
 
 ## Authors
 

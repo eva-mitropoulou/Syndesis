@@ -70,7 +70,7 @@ def enrichment() -> None:
         ax.grid(axis="y", color="#d9e0e3", lw=0.7, zorder=0)
     handles, legend_labels = axes[-1].get_legend_handles_labels()
     fig.legend(handles, legend_labels, loc="lower center", ncol=2, frameon=False, bbox_to_anchor=(0.5, -0.12))
-    fig.suptitle("Pose-coupled interaction weighting improves EGFR early enrichment", y=1.03, fontsize=11, fontweight="bold")
+    fig.suptitle("Pose-coupled interaction weighting across kinase benchmarks", y=1.03, fontsize=11, fontweight="bold")
     save(fig, "figure2_enrichment")
 
 
@@ -126,7 +126,7 @@ def permutation_nulls() -> None:
 def receptor_sensitivity() -> None:
     frame = pd.read_csv(ROBUSTNESS / "leave_one_receptor_out.csv")
     targets = ["EGFR", "CDK2"]
-    fig, axes = plt.subplots(1, 2, figsize=(10.2, 4.1))
+    fig, axes = plt.subplots(1, 2, figsize=(10.7, 4.1), constrained_layout=True)
     for ax, target in zip(axes, targets):
         data = frame[frame.target == target].sort_values("excluded_receptor")
         labels = [value.split("_")[0].upper() for value in data.excluded_receptor]
@@ -134,13 +134,13 @@ def receptor_sensitivity() -> None:
         image = ax.imshow(values, cmap="RdYlGn", norm=TwoSlopeNorm(vmin=-max(5, abs(values.min())), vcenter=0, vmax=max(5, abs(values.max()))), aspect="auto")
         for column, row in enumerate(data.itertuples()):
             ax.text(column, 0, f"{row.delta_ef1:+.2f}", ha="center", va="center",
-                    fontsize=9, fontweight="bold", color="#172126")
+                    fontsize=8.5, fontweight="bold", color="#172126")
         ax.set_xticks(np.arange(len(labels)), labels)
         ax.set_yticks([0], ["ΔEF1%"] if target == "EGFR" else [""])
         ax.set_title(target)
         ax.tick_params(axis="x", rotation=35)
         fig.colorbar(image, ax=ax, fraction=0.035, pad=0.03, label="EF1% difference")
-    fig.suptitle("Leave-one-receptor-out sensitivity", y=1.02, fontsize=11, fontweight="bold")
+    fig.suptitle("Leave-one-receptor-out sensitivity", fontsize=11, fontweight="bold")
     save(fig, "figure5_receptor_sensitivity")
 
 

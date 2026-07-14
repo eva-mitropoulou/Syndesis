@@ -24,7 +24,7 @@ keywords:
   - molecular dynamics
   - score hacking
 license: MIT
-version: 1.0.0
+version: 1.0.1
 date-released: "2026-07-14"
 preferred-citation:
   type: article
@@ -36,6 +36,5 @@ preferred-citation:
     - given-names: Dimitris
       family-names: Giannopoulos
       affiliation: "University of Patras"
-  journal: "ChemRxiv"
   year: 2026
-  notes: "Preprint; DOI pending."
+  notes: "Frozen GitHub paper release; ChemRxiv preprint metadata will be added after posting."
