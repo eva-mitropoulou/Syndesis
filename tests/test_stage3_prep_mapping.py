@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage3.task_matrix import ca_atoms
-from egfr_dockingforge.stage3.rmsd import mapped_rmsd, heavy_atom_coords
+from syndesis.stage3.task_matrix import ca_atoms
+from syndesis.stage3.rmsd import mapped_rmsd, heavy_atom_coords
 
 
 def test_stage3_ca_atoms_use_corrected_egfr_residue_mapping() -> None:

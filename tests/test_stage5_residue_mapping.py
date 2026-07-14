@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage5.residue_mapping import normalize_interaction_key, residue_role
+from syndesis.stage5.residue_mapping import normalize_interaction_key, residue_role
 
 
 def test_stage5_residue_roles_include_key_egfr_residues() -> None:

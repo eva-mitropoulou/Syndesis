@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from egfr_dockingforge.stage6.calibration import expected_calibration_error
+from syndesis.stage6.calibration import expected_calibration_error
 
 
 def test_expected_calibration_error_in_unit_interval() -> None:

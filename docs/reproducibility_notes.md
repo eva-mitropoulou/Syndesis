@@ -1,6 +1,6 @@
 # Reproducibility Notes
 
-Practical setup notes for reproducing the EGFR DockingForge pipeline. See
+Practical setup notes for reproducing the Syndesis pipeline. See
 `environment.yml`, `pyproject.toml`, and `configs/tools.example.yaml` for the
 canonical dependency lists.
 
@@ -12,7 +12,7 @@ editable install of this package:
 
 ```
 micromamba env create -f environment.yml
-micromamba activate egfr-dockingforge
+micromamba activate syndesis
 pip install -e .
 ```
 

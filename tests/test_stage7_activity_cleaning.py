@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage7.activity_cleaning import p_activity_from_nm, to_nm
+from syndesis.stage7.activity_cleaning import p_activity_from_nm, to_nm
 
 
 def test_units_convert_to_nm_and_pactivity() -> None:

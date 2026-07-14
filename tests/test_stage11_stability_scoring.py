@@ -1,6 +1,6 @@
 import pandas as pd
 
-from egfr_dockingforge.stage11.stability_scoring import score_md_stability
+from syndesis.stage11.stability_scoring import score_md_stability
 
 
 def test_missing_md_labels_failed_setup(tmp_path):

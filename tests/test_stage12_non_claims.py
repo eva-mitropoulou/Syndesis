@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from egfr_dockingforge.stage12.candidate_dossiers import run_stage12_all
-from egfr_dockingforge.stage12.nonclaim_generator import FORBIDDEN_PHRASES, REQUIRED_NON_CLAIMS
+from syndesis.stage12.candidate_dossiers import run_stage12_all
+from syndesis.stage12.nonclaim_generator import FORBIDDEN_PHRASES, REQUIRED_NON_CLAIMS
 
 
 CONFIG = Path("configs/stage12_candidate_dossiers.yaml")

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage7.similarity import novelty_bucket
+from syndesis.stage7.similarity import novelty_bucket
 
 
 def test_novelty_thresholds() -> None:

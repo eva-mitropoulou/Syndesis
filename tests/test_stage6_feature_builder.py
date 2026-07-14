@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage6.feature_builder import training_feature_columns
+from syndesis.stage6.feature_builder import training_feature_columns
 
 
 def test_training_feature_columns_excludes_metadata_and_json() -> None:

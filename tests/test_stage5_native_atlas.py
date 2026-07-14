@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage5.native_atlas import build_key_interaction_map
+from syndesis.stage5.native_atlas import build_key_interaction_map
 
 
 def test_stage5_key_interactions_require_native_support() -> None:

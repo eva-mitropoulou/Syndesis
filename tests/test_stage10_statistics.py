@@ -1,4 +1,4 @@
-from egfr_dockingforge.stage10.statistics import benjamini_hochberg, bootstrap_ci, paired_permutation_pvalue
+from syndesis.stage10.statistics import benjamini_hochberg, bootstrap_ci, paired_permutation_pvalue
 
 
 def test_bootstrap_ci_and_correction():

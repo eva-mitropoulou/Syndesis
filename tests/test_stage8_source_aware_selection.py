@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage8.source_aware_selection import rank_candidates
+from syndesis.stage8.source_aware_selection import rank_candidates
 
 
 def test_source_aware_ranking_outputs_known_control_bucket(tmp_path) -> None:

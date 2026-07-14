@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from egfr_dockingforge.stage1.schemas import BENCHMARK_COLUMNS, QUALITY_TIERS, empty_benchmark_frame
+from syndesis.stage1.schemas import BENCHMARK_COLUMNS, QUALITY_TIERS, empty_benchmark_frame
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]

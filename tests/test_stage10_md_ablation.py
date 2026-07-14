@@ -2,7 +2,7 @@ import json
 
 import pandas as pd
 
-from egfr_dockingforge.stage10.ablation_tables import _stage11_md_ablation_row
+from syndesis.stage10.ablation_tables import _stage11_md_ablation_row
 
 
 def test_stage11_md_ablation_uses_completed_labels():

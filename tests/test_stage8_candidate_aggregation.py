@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage8.candidate_aggregation import pose_decisions
+from syndesis.stage8.candidate_aggregation import pose_decisions
 
 
 def test_pose_decision_does_not_use_docking_score_alone(tmp_path) -> None:

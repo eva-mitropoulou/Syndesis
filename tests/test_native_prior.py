@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from egfr_dockingforge.enrichment.native_prior import jaccard, native_union, parse_fingerprint, recall
+from syndesis.enrichment.native_prior import jaccard, native_union, parse_fingerprint, recall
 
 
 def test_native_union_excludes_allosteric_receptor() -> None:

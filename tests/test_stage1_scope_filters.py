@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage1.complex_classification import smiles_has_warhead
-from egfr_dockingforge.stage1.rcsb_client import search_pdb_ids
-from egfr_dockingforge.stage0.scope_schema import load_yaml_mapping
+from syndesis.stage1.complex_classification import smiles_has_warhead
+from syndesis.stage1.rcsb_client import search_pdb_ids
+from syndesis.stage0.scope_schema import load_yaml_mapping
 
 
 def test_covalent_warhead_smiles_are_detected() -> None:

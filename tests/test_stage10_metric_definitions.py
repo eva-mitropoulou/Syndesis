@@ -1,4 +1,4 @@
-from egfr_dockingforge.stage10.metric_definitions import accepted_pre_md
+from syndesis.stage10.metric_definitions import accepted_pre_md
 
 
 def test_accepted_pre_md_requires_binding_mode():

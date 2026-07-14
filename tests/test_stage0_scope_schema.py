@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from egfr_dockingforge.stage0.scope_schema import (
+from syndesis.stage0.scope_schema import (
     REQUIRED_TOP_LEVEL_KEYS,
     load_yaml_mapping,
     validate_scope_files,

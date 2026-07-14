@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage7.standardize import standardize_smiles
+from syndesis.stage7.standardize import standardize_smiles
 
 
 def test_standardization_invalid_smiles_fails_explicitly() -> None:

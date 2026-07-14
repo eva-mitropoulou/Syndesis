@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from egfr_dockingforge.stage12.report_stage12 import REQUIRED_FIGURES, render_final_figures
+from syndesis.stage12.report_stage12 import REQUIRED_FIGURES, render_final_figures
 
 
 CONFIG = Path("configs/stage12_candidate_dossiers.yaml")

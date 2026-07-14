@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage7.schemas import ALLOWED_SOURCES
+from syndesis.stage7.schemas import ALLOWED_SOURCES
 
 
 def test_source_tags_keep_vendor_and_known_separate() -> None:

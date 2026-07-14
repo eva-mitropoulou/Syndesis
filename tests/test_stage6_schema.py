@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage6 import schemas
+from syndesis.stage6 import schemas
 
 
 def test_stage6_schema_exports_required_columns() -> None:

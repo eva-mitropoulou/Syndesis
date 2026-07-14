@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "egfr-dockingforge"
+name = "syndesis"
 version = "0.1.0"
-description = "Syndesis: evidence-concordant, interaction-constrained EGFR ATP-site analog design workflow."
+description = "Syndesis: pose-coupled native-interaction weighting for auditable kinase ensemble docking."
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
@@ -54,7 +54,7 @@ dev = [
 ]
 
 [project.scripts]
-egfrforge = "egfr_dockingforge.cli:main"
+syndesis = "syndesis.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

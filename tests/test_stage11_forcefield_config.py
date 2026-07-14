@@ -1,4 +1,4 @@
-from egfr_dockingforge.stage11.forcefield_config import validate_forcefield_stack
+from syndesis.stage11.forcefield_config import validate_forcefield_stack
 
 
 def test_default_forcefield_stack_has_no_warning():

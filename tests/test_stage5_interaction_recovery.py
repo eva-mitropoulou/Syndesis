@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from egfr_dockingforge.stage5.interaction_recovery import compute_interaction_recovery
+from syndesis.stage5.interaction_recovery import compute_interaction_recovery
 
 
 def test_stage5_interaction_recovery_calculates_metrics(tmp_path: Path) -> None:

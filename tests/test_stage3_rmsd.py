@@ -3,8 +3,8 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from egfr_dockingforge.stage3 import rmsd
-from egfr_dockingforge.stage3.rmsd import mapped_rmsd
+from syndesis.stage3 import rmsd
+from syndesis.stage3.rmsd import mapped_rmsd
 
 
 def test_mapped_rmsd_refuses_mismatched_atom_counts() -> None:

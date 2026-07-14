@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage7.filtering import flags
+from syndesis.stage7.filtering import flags
 
 
 def test_covalent_warhead_excluded() -> None:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage6.label_builder import RELEVANCE
+from syndesis.stage6.label_builder import RELEVANCE
 
 
 def test_rank_relevance_values_are_valid() -> None:

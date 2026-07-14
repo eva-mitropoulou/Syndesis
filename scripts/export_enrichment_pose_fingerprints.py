@@ -11,9 +11,9 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
-from egfr_dockingforge.stage5.prolif_engine import fingerprint_from_interactions
-from egfr_dockingforge.stage5.pose_reconstruction import reconstruct_pose_sdf
-from egfr_dockingforge.stage8.screening_interactions import _compute_interactions_rdkit
+from syndesis.stage5.prolif_engine import fingerprint_from_interactions
+from syndesis.stage5.pose_reconstruction import reconstruct_pose_sdf
+from syndesis.stage8.screening_interactions import _compute_interactions_rdkit
 
 
 def reconstructed_pose_sdf(ligand_id: str, posed_pdb: str, template_root: str) -> Path:

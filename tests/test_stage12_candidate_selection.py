@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from egfr_dockingforge.stage12.final_candidate_selection import build_final_candidate_table
+from syndesis.stage12.final_candidate_selection import build_final_candidate_table
 
 
 CONFIG = Path("configs/stage12_candidate_dossiers.yaml")

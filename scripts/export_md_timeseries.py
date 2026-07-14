@@ -16,7 +16,7 @@ import pandas as pd
 from MDAnalysis.analysis import align, rms
 from MDAnalysis.lib.distances import distance_array
 
-from egfr_dockingforge.stage11.interaction_persistence import (
+from syndesis.stage11.interaction_persistence import (
     _interaction_cutoff,
     _select_residue,
 )

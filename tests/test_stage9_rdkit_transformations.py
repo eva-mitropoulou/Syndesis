@@ -1,7 +1,7 @@
 import pandas as pd
 from rdkit import Chem
 
-from egfr_dockingforge.stage9.rdkit_transformations import enumerate_rule_based_analogs, write_transformation_library
+from syndesis.stage9.rdkit_transformations import enumerate_rule_based_analogs, write_transformation_library
 
 
 def test_rdkit_transformations_make_valid_nonduplicate_molecules(tmp_path):

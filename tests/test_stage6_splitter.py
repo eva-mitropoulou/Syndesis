@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage6.splitter import build_ranking_groups
+from syndesis.stage6.splitter import build_ranking_groups
 
 
 def test_ranking_groups_exclude_no_variation_groups(tmp_path) -> None:

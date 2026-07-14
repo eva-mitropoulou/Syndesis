@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage1.kincore_metadata import infer_kincore_metadata
+from syndesis.stage1.kincore_metadata import infer_kincore_metadata
 
 
 def test_stage1_uses_klifs_dfg_ac_helix_for_active_state() -> None:

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from egfr_dockingforge.stage9.edit_site_detection import detect_edit_sites
+from syndesis.stage9.edit_site_detection import detect_edit_sites
 
 
 def test_edit_sites_exist_and_protected_sites_have_no_allowed_classes(tmp_path):

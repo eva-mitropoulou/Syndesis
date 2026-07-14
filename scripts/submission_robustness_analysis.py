@@ -12,8 +12,8 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from egfr_dockingforge.enrichment.metrics import bedroc, enrichment_factor, roc_auc  # noqa: E402
-from egfr_dockingforge.enrichment.native_prior import (  # noqa: E402
+from syndesis.enrichment.metrics import bedroc, enrichment_factor, roc_auc  # noqa: E402
+from syndesis.enrichment.native_prior import (  # noqa: E402
     jaccard,
     native_union,
     parse_fingerprint,

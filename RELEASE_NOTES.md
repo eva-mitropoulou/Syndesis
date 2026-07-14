@@ -1,6 +1,10 @@
-# Syndesis v1.0.2-paper
+# Syndesis v1.1.0-paper
 
 This release is the reproducibility package for the Journal of Cheminformatics manuscript, *Pose-coupled native-interaction weighting for kinase ensemble docking: retrospective evaluation on EGFR and CDK2*.
+
+This release standardizes the project, Python package, command-line interface, and
+environment name as `Syndesis`. The EGFR primary case study and CDK2 transfer analysis
+are unchanged.
 
 ## Scientific scope
 

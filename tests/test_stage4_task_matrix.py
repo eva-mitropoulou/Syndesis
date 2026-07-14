@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from egfr_dockingforge.stage4.scoring_task_matrix import build_rescoring_tasks
+from syndesis.stage4.scoring_task_matrix import build_rescoring_tasks
 
 
 def test_rescoring_task_matrix_skips_missing_pose(tmp_path: Path) -> None:

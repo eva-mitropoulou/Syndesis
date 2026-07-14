@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage8.score_normalization import percentile
+from syndesis.stage8.score_normalization import percentile
 
 
 def test_percentile_direction() -> None:

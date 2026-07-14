@@ -1,5 +1,5 @@
 project:
-  name: EGFR DockingForge
+  name: Syndesis
   target: EGFR kinase domain
   uniprot_accession: P00533
   scope: noncovalent ATP-site inhibitors

@@ -12,7 +12,7 @@ from rdkit.Chem import AllChem
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from egfr_dockingforge.stage5.pose_reconstruction import reconstruct_pose_sdf  # noqa: E402
+from syndesis.stage5.pose_reconstruction import reconstruct_pose_sdf  # noqa: E402
 
 OUTPUT = ROOT / "results" / "robustness" / "pose_graph_mapping_validation.csv"
 CASES = {

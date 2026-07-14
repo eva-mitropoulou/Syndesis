@@ -16,7 +16,7 @@ export PYTHONPATH=src
 export PATH="$PATH:/usr/lib/wsl/lib"
 log(){ echo "$(date -Is) $*" | tee -a "$LOG"; }
 
-run(){ log "RUN $*"; if "$PY" -m egfr_dockingforge.cli "$@" >>"$LOG" 2>&1; then log "OK  $1"; else log "FAIL $1 (exit $?)"; fi; }
+run(){ log "RUN $*"; if "$PY" -m syndesis.cli "$@" >>"$LOG" 2>&1; then log "OK  $1"; else log "FAIL $1 (exit $?)"; fi; }
 
 log "==== finalize_all_reports start ===="
 

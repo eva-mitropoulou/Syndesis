@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from egfr_dockingforge.stage5.prolif_engine import (
+from syndesis.stage5.prolif_engine import (
     compute_interactions,
     fingerprint_from_interactions,
     interaction_config_hash,

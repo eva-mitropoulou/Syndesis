@@ -1,5 +1,5 @@
 project:
-  name: EGFR DockingForge
+  name: Syndesis
   version: 0.1.0
   stage: stage0_scope_definition
   main_scientific_question: >

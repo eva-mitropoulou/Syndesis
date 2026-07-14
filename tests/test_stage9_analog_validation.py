@@ -1,6 +1,6 @@
 import pandas as pd
 
-from egfr_dockingforge.stage9.analog_validation import validate_analog_batch
+from syndesis.stage9.analog_validation import validate_analog_batch
 
 
 def test_invalid_smiles_rejected_and_scope_flags_stored(tmp_path):

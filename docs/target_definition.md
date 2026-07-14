@@ -2,7 +2,9 @@
 
 ## Target
 
-EGFR DockingForge targets the human epidermal growth factor receptor kinase domain:
+Syndesis is a kinase-docking methodology evaluated here on the human epidermal growth
+factor receptor kinase domain as its primary case study. CDK2 provides a separate
+target-transfer analysis. The EGFR case-study scope is:
 
 - Primary target: human EGFR / ERBB1 / HER1 kinase domain
 - Organism: Homo sapiens
@@ -91,4 +93,3 @@ The project will not claim:
 - covalent inhibitor design in v1
 - allosteric inhibitor design in v1
 - clinical, cellular, or biochemical activity unless external data are explicitly modeled later
-

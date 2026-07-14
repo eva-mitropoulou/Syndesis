@@ -4,7 +4,7 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from egfr_dockingforge.stage5.pose_reconstruction import reconstruct_pose_sdf
+from syndesis.stage5.pose_reconstruction import reconstruct_pose_sdf
 
 
 def _write_pdbqt(path: Path, atoms: list[tuple[str, tuple[float, float, float]]]) -> None:

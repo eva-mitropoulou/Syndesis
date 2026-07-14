@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage4.schemas import GNINA_SCORE_COLUMNS, POSE_SCORE_COLUMNS, RESCORING_TASK_COLUMNS, TASK_METRIC_COLUMNS
+from syndesis.stage4.schemas import GNINA_SCORE_COLUMNS, POSE_SCORE_COLUMNS, RESCORING_TASK_COLUMNS, TASK_METRIC_COLUMNS
 
 
 def test_stage4_required_schema_columns_exist() -> None:

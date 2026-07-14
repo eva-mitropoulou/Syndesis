@@ -1,4 +1,4 @@
-from egfr_dockingforge.stage11.mdp_templates import production_mdp
+from syndesis.stage11.mdp_templates import production_mdp
 
 
 def test_production_mdp_is_npt_and_unrestrained_ligand():

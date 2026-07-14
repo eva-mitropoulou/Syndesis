@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ---------------------------------------------------------------------------
-# Resilient finalist MD driver for EGFR DockingForge (Stage 11).
+# Resilient finalist MD driver for Syndesis (Stage 11).
 #
 # Runs the full finalist MD pipeline sequentially and is safe to re-run after a
 # power outage or reboot: every step is idempotent (GROMACS phases skip when
@@ -83,24 +83,24 @@ run_step() {
 }
 
 # 1. Select finalists (controls + top-K accepted analogs). Cheap, always safe.
-run_step select_candidates      "$PY" -m egfr_dockingforge.cli select-md-candidates --config "$CONFIG" || exit 1
+run_step select_candidates      "$PY" -m syndesis.cli select-md-candidates --config "$CONFIG" || exit 1
 # 2. Parameterize finalist ligands (ACPYPE/GAFF2/AM1-BCC; convergence-gated).
-run_step parameterize_ligands   "$PY" -m egfr_dockingforge.cli parameterize-md-ligands --config "$CONFIG" || exit 1
+run_step parameterize_ligands   "$PY" -m syndesis.cli parameterize-md-ligands --config "$CONFIG" || exit 1
 # 3. Build solvated/ionized systems for finalists.
-run_step build_systems          "$PY" -m egfr_dockingforge.cli build-md-systems --config "$CONFIG" || exit 1
+run_step build_systems          "$PY" -m syndesis.cli build-md-systems --config "$CONFIG" || exit 1
 require_disk   # guard before the heavy, disk-hungry production phase
 # 4. Run minimization + equilibration + 3 production replicates per finalist.
 #    Internally resumable (skips complete phases; -cpi resumes interrupted runs).
 #    NOT marked done until it fully completes, so an outage mid-production simply
 #    re-enters and continues.
-run_step run_md                 "$PY" -m egfr_dockingforge.cli run-md-production --config "$CONFIG" || exit 1
+run_step run_md                 "$PY" -m syndesis.cli run-md-production --config "$CONFIG" || exit 1
 # 5. Analysis (PBC + backbone-superposition RMSD, min-image interactions).
-run_step analyze_trajectories   "$PY" -m egfr_dockingforge.cli analyze-md-trajectories --config "$CONFIG" || exit 1
-run_step interaction_persistence "$PY" -m egfr_dockingforge.cli compute-md-interaction-persistence --config "$CONFIG" || exit 1
-run_step score_stability        "$PY" -m egfr_dockingforge.cli score-md-stability --config "$CONFIG" || exit 1
-run_step report_stage11         "$PY" -m egfr_dockingforge.cli report-stage11 --config "$CONFIG" || exit 1
+run_step analyze_trajectories   "$PY" -m syndesis.cli analyze-md-trajectories --config "$CONFIG" || exit 1
+run_step interaction_persistence "$PY" -m syndesis.cli compute-md-interaction-persistence --config "$CONFIG" || exit 1
+run_step score_stability        "$PY" -m syndesis.cli score-md-stability --config "$CONFIG" || exit 1
+run_step report_stage11         "$PY" -m syndesis.cli report-stage11 --config "$CONFIG" || exit 1
 # 6. Refresh final dossiers with the new MD evidence.
-run_step run_stage12            "$PY" -m egfr_dockingforge.cli run-stage12 --config configs/stage12_candidate_dossiers.yaml || exit 1
+run_step run_stage12            "$PY" -m syndesis.cli run-stage12 --config configs/stage12_candidate_dossiers.yaml || exit 1
 
 # 7. Auto-finalize: regenerate EVERY stage report (5,6,9,10,11,12) from the
 #    corrected pipeline so no on-disk artifact contradicts the manuscript. This

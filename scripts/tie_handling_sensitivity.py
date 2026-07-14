@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from submission_robustness_analysis import TARGETS, load_target  # noqa: E402
-from egfr_dockingforge.enrichment.metrics import enrichment_factor  # noqa: E402
+from syndesis.enrichment.metrics import enrichment_factor  # noqa: E402
 
 
 def audit_arm(labels: np.ndarray, scores: np.ndarray, *, seed: int = 807) -> dict[str, float | int]:

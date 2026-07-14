@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from egfr_dockingforge.stage0.scope_schema import load_yaml_mapping
+from syndesis.stage0.scope_schema import load_yaml_mapping
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]

@@ -14,7 +14,7 @@ rule stage1_structures:
         "data/processed/stage1/egfr_cocrystal_benchmark.parquet",
         "reports/01_cocrystal_benchmark.html"
     shell:
-        "egfrforge build-cocrystal-benchmark --config configs/stage1_cocrystal_benchmark.yaml"
+        "syndesis build-cocrystal-benchmark --config configs/stage1_cocrystal_benchmark.yaml"
 
 rule stage2_receptor_ensemble:
     input:
@@ -23,10 +23,10 @@ rule stage2_receptor_ensemble:
         "data/processed/stage2/receptor_ensemble_v1.parquet",
         "reports/02_receptor_ensemble.html"
     shell:
-        "egfrforge build-receptor-features --config configs/stage2_receptor_ensemble.yaml && "
-        "egfrforge cluster-receptors --config configs/stage2_receptor_ensemble.yaml && "
-        "egfrforge select-receptor-ensemble --config configs/stage2_receptor_ensemble.yaml && "
-        "egfrforge report-stage2 --config configs/stage2_receptor_ensemble.yaml"
+        "syndesis build-receptor-features --config configs/stage2_receptor_ensemble.yaml && "
+        "syndesis cluster-receptors --config configs/stage2_receptor_ensemble.yaml && "
+        "syndesis select-receptor-ensemble --config configs/stage2_receptor_ensemble.yaml && "
+        "syndesis report-stage2 --config configs/stage2_receptor_ensemble.yaml"
 
 rule stage3_redocking_crossdocking:
     input:
@@ -35,10 +35,10 @@ rule stage3_redocking_crossdocking:
         "data/processed/stage3/docking_task_metrics.parquet",
         "reports/03_redocking_crossdocking.html"
     shell:
-        "egfrforge prepare-docking-inputs --config configs/stage3_redocking_crossdocking.yaml && "
-        "egfrforge build-docking-task-matrix --config configs/stage3_redocking_crossdocking.yaml && "
-        "egfrforge run-redocking --config configs/stage3_redocking_crossdocking.yaml && "
-        "egfrforge compute-docking-rmsd --config configs/stage3_redocking_crossdocking.yaml && "
-        "egfrforge run-pose-sanity-checks --config configs/stage3_redocking_crossdocking.yaml && "
-        "egfrforge label-stage3-poses --config configs/stage3_redocking_crossdocking.yaml && "
-        "egfrforge report-stage3 --config configs/stage3_redocking_crossdocking.yaml"
+        "syndesis prepare-docking-inputs --config configs/stage3_redocking_crossdocking.yaml && "
+        "syndesis build-docking-task-matrix --config configs/stage3_redocking_crossdocking.yaml && "
+        "syndesis run-redocking --config configs/stage3_redocking_crossdocking.yaml && "
+        "syndesis compute-docking-rmsd --config configs/stage3_redocking_crossdocking.yaml && "
+        "syndesis run-pose-sanity-checks --config configs/stage3_redocking_crossdocking.yaml && "
+        "syndesis label-stage3-poses --config configs/stage3_redocking_crossdocking.yaml && "
+        "syndesis report-stage3 --config configs/stage3_redocking_crossdocking.yaml"

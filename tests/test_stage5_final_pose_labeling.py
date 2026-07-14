@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage5.final_pose_labeling import classify_final_pose
+from syndesis.stage5.final_pose_labeling import classify_final_pose
 
 
 def test_stage5_high_confidence_requires_rmsd_sanity_and_recovery() -> None:

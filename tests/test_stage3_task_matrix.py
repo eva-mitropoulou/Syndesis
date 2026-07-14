@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage3.task_matrix import task_type
+from syndesis.stage3.task_matrix import task_type
 
 
 def test_task_type_distinguishes_redocking_and_crossdocking() -> None:

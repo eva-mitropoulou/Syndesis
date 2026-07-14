@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage6.model_selection import prepare_model_matrix
-from egfr_dockingforge.stage6.xgb_ranker import make_xgb_ranker
+from syndesis.stage6.model_selection import prepare_model_matrix
+from syndesis.stage6.xgb_ranker import make_xgb_ranker
 
 
 def test_prepare_model_matrix_encodes_categoricals() -> None:

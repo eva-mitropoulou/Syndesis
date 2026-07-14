@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from egfr_dockingforge.stage6.leakage_audit import assert_no_leakage, classify_feature
+from syndesis.stage6.leakage_audit import assert_no_leakage, classify_feature
 
 
 def test_forbidden_native_features_are_rejected() -> None:

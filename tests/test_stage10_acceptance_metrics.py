@@ -1,4 +1,4 @@
-from egfr_dockingforge.stage10.metric_definitions import accepted_pre_md
+from syndesis.stage10.metric_definitions import accepted_pre_md
 
 
 def test_hard_scope_failure_cannot_be_accepted():

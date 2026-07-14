@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage2.pocket_mapping import mapping_frame
+from syndesis.stage2.pocket_mapping import mapping_frame
 
 
 def test_missing_pocket_mapping_records_warning() -> None:

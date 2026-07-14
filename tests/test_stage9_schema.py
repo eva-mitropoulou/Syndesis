@@ -1,4 +1,4 @@
-from egfr_dockingforge.stage9.schemas import TABLE_SCHEMAS
+from syndesis.stage9.schemas import TABLE_SCHEMAS
 
 
 def test_stage9_required_table_schemas_exist():

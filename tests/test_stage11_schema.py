@@ -1,4 +1,4 @@
-from egfr_dockingforge.stage11.schemas import TABLE_SCHEMAS
+from syndesis.stage11.schemas import TABLE_SCHEMAS
 
 
 def test_stage11_schemas_exist():

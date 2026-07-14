@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage3.schemas import LABEL_COLUMNS, RECEPTOR_PREP_COLUMNS, TASK_COLUMNS
+from syndesis.stage3.schemas import LABEL_COLUMNS, RECEPTOR_PREP_COLUMNS, TASK_COLUMNS
 
 
 def test_stage3_required_schema_columns_exist() -> None:

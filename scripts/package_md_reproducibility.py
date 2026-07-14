@@ -78,7 +78,7 @@ def main() -> int:
             shutil.copy2(parameter_source / f"{row.molecule_id}{suffix}", system_target / target_name)
         log_text = (parameter_source / "acpype.log").read_text(errors="replace")
         log_text = re.sub(
-            r"/home/[^\s]+/egfr-dockingforge",
+            r"/home/[^\s]+/[A-Za-z0-9_.-]+",
             "${PROJECT_ROOT}",
             log_text,
         )

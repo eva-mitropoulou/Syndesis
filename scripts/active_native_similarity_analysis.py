@@ -12,8 +12,8 @@ from rdkit.Chem import rdFingerprintGenerator
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from egfr_dockingforge.enrichment.metrics import enrichment_factor  # noqa: E402
-from egfr_dockingforge.enrichment.native_prior import native_union, parse_fingerprint, recall  # noqa: E402
+from syndesis.enrichment.metrics import enrichment_factor  # noqa: E402
+from syndesis.enrichment.native_prior import native_union, parse_fingerprint, recall  # noqa: E402
 
 INPUTS = ROOT / "results" / "analysis_inputs"
 OUTPUT = ROOT / "results" / "robustness"

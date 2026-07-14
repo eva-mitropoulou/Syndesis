@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from egfr_dockingforge.stage4.gnina_runner import _prepare_ligand_for_gnina
-from egfr_dockingforge.stage4.score_parser import parse_gnina_output
-from egfr_dockingforge.stage4.scoring_engines import parse_gnina_version
+from syndesis.stage4.gnina_runner import _prepare_ligand_for_gnina
+from syndesis.stage4.score_parser import parse_gnina_output
+from syndesis.stage4.scoring_engines import parse_gnina_version
 
 
 def test_gnina_parser_extracts_core_scores() -> None:

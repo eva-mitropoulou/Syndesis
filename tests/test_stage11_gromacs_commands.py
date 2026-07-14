@@ -1,6 +1,6 @@
 import pandas as pd
 
-from egfr_dockingforge.stage11.gromacs_runner import make_gromacs_runs
+from syndesis.stage11.gromacs_runner import make_gromacs_runs
 
 
 def test_gromacs_command_rows_record_blocked_status(tmp_path):

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from egfr_dockingforge.stage9.baseline_benchmark import benchmark_strategies
+from syndesis.stage9.baseline_benchmark import benchmark_strategies
 
 
 def test_benchmark_computes_accepted_rate(tmp_path):

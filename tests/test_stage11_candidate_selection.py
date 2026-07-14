@@ -1,6 +1,6 @@
 import pandas as pd
 
-from egfr_dockingforge.stage11.candidate_selection import select_md_candidates
+from syndesis.stage11.candidate_selection import select_md_candidates
 
 
 def test_candidate_selection_uses_top_ranked(tmp_path):

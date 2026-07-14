@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from egfr_dockingforge.stage12.candidate_dossiers import run_stage12_all
+from syndesis.stage12.candidate_dossiers import run_stage12_all
 
 
 CONFIG = Path("configs/stage12_candidate_dossiers.yaml")

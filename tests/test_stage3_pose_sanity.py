@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage3.pose_sanity import sanity_for_poses
+from syndesis.stage3.pose_sanity import sanity_for_poses
 
 
 def test_missing_pose_file_triggers_atom_loss(tmp_path) -> None:

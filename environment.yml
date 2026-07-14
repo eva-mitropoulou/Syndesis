@@ -1,4 +1,4 @@
-name: egfr-dockingforge
+name: syndesis
 channels:
   - conda-forge
   - bioconda

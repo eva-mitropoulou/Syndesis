@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from egfr_dockingforge.stage11.ligand_parameterization import parameterize_ligands
+from syndesis.stage11.ligand_parameterization import parameterize_ligands
 
 
 def test_missing_cgenff_str_fails_explicitly_when_cgenff_backend_selected(tmp_path):

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from egfr_dockingforge.stage10.benchmark_manifest import build_budget_audit
+from syndesis.stage10.benchmark_manifest import build_budget_audit
 
 
 def test_budget_violation_recorded_for_under_generation(tmp_path):

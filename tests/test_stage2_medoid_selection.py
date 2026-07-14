@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage2.medoid_selection import select_ensemble
+from syndesis.stage2.medoid_selection import select_ensemble
 
 
 def test_medoid_selection_is_reproducible() -> None:

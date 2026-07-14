@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage2.schemas import ENSEMBLE_COLUMNS, FEATURE_COLUMNS, empty_ensemble_frame, empty_features_frame
+from syndesis.stage2.schemas import ENSEMBLE_COLUMNS, FEATURE_COLUMNS, empty_ensemble_frame, empty_features_frame
 
 
 def test_stage2_feature_schema_contains_required_columns() -> None:

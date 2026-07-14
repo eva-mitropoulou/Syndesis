@@ -1,4 +1,4 @@
-from egfr_dockingforge.stage10.metric_definitions import score_hacking
+from syndesis.stage10.metric_definitions import score_hacking
 
 
 def test_score_improves_and_pose_confidence_worsens_is_hacking():

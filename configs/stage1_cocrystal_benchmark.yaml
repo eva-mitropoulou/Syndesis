@@ -1,7 +1,7 @@
 stage:
   name: stage1_cocrystal_benchmark
   version: 0.1.0
-  parser_version: egfr_dockingforge.stage1.v0.1
+  parser_version: syndesis.stage1.v0.1
 
 target:
   uniprot_accession: P00533

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage0.scope_schema import load_yaml_mapping
+from syndesis.stage0.scope_schema import load_yaml_mapping
 
 
 def test_stage3_source_registry_entries_have_doi_or_url() -> None:

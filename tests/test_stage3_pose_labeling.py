@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage3.pose_labeling import label_one
+from syndesis.stage3.pose_labeling import label_one
 
 
 def test_strict_native_like_requires_rmsd_and_sanity_pass() -> None:

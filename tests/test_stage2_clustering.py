@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage2.pocket_clustering import cluster_receptors
+from syndesis.stage2.pocket_clustering import cluster_receptors
 
 
 def test_singleton_cluster_has_medoid() -> None:

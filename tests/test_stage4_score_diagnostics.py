@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from egfr_dockingforge.stage4.score_diagnostics import failure_table, rescoring_task_metrics
+from syndesis.stage4.score_diagnostics import failure_table, rescoring_task_metrics
 
 
 def test_ranking_directions_are_respected(tmp_path: Path) -> None:

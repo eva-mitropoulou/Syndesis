@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage2.state_labels import normalize_state_label
+from syndesis.stage2.state_labels import normalize_state_label
 
 
 def test_active_like_state_label_normalization() -> None:

@@ -6,9 +6,9 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from egfr_dockingforge.stage12.candidate_card_schema import validate_candidate_card
-from egfr_dockingforge.stage12.candidate_dossiers import run_stage12_all
-from egfr_dockingforge.stage12.schemas import FINAL_CANDIDATE_COLUMNS, FINAL_RANKED_COLUMNS
+from syndesis.stage12.candidate_card_schema import validate_candidate_card
+from syndesis.stage12.candidate_dossiers import run_stage12_all
+from syndesis.stage12.schemas import FINAL_CANDIDATE_COLUMNS, FINAL_RANKED_COLUMNS
 
 
 CONFIG = Path("configs/stage12_candidate_dossiers.yaml")

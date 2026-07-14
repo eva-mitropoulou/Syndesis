@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from egfr_dockingforge.stage1.ligand_extraction import ligand_stats
+from syndesis.stage1.ligand_extraction import ligand_stats
 
 
 class FakeAtom:

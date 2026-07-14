@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from egfr_dockingforge.stage7.diversity_selection import select_subsets
+from syndesis.stage7.diversity_selection import select_subsets
 
 
 def test_diversity_selection_keeps_known_controls_separate() -> None:

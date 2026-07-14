@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from Bio.PDB import PDBParser
 
-from egfr_dockingforge.stage2.pocket_mapping import resolve_uniprot_residue, residue_by_auth_seq
+from syndesis.stage2.pocket_mapping import resolve_uniprot_residue, residue_by_auth_seq
 
 
 def test_resolve_uniprot_residue_handles_egfr_auth_seq_offset() -> None:

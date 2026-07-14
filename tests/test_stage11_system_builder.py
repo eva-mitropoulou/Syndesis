@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from egfr_dockingforge.stage11.system_builder import _ionized_system_counts
+from syndesis.stage11.system_builder import _ionized_system_counts
 
 
 def test_ionized_system_counts_are_read_from_topology(tmp_path: Path) -> None:

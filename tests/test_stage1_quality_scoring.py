@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from egfr_dockingforge.stage1.quality_scoring import assign_quality
-from egfr_dockingforge.stage0.scope_schema import load_yaml_mapping
+from syndesis.stage1.quality_scoring import assign_quality
+from syndesis.stage0.scope_schema import load_yaml_mapping
 
 
 def test_tier_a_quality_assignment_for_good_complex() -> None:
