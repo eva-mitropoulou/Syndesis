@@ -50,6 +50,7 @@ manuscript/*_media/
 !data/processed/stage3/docking_outputs/poses/run__5cav_a_4zq_1101_4zq__5cav_a_4zq_1101__unidock__seed13__pose01.pdbqt
 *.parquet
 !results/analysis_inputs/*.parquet
+!results/md/timeseries/**/*.parquet
 results/robustness/interim_*
 
 # Local tool config (copied from configs/tools.example.yaml)
