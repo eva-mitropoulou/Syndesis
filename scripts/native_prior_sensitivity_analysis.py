@@ -34,13 +34,16 @@ TARGETS = {
         "master": ROOT / "results/analysis_inputs/cdk2_master.parquet",
         "native": ROOT / "results/analysis_inputs/cdk2_native_interaction_fingerprints.parquet",
         "exact_overlap_receptors": ["2a4l_a_rrc", "1aq1_a_stu"],
-        "primary_excluded_receptors": [],
+        # Match the primary four-receptor CDK2 analysis. 1QMZ is not used as a
+        # docking state because the extractor loses TPO160, so it must not
+        # contribute an interaction prior to that primary analysis.
+        "primary_excluded_receptors": ["1qmz_a_atp"],
         "distinct_ligand_exclusions": {
             "ATP": ["1qmz_a_atp", "1fin_a_atp"],
         },
         "descriptors": ROOT / "results/analysis_inputs/cdk2_ligand_descriptors.csv",
         "docking_receptors": [
-            "1qmz_a_atp", "1fin_a_atp", "2a4l_a_rrc", "1aq1_a_stu", "1pxn_a_ck6",
+            "1fin_a_atp", "2a4l_a_rrc", "1aq1_a_stu", "1pxn_a_ck6",
         ],
     },
 }
@@ -220,7 +223,7 @@ def analyze_target(name: str, config: dict, out: Path) -> None:
             "prior_definition": definition,
             "excluded_native_receptor": "",
             "excluded_native_ligand": "",
-            **evaluate(merged, term),
+            **evaluate(merged, term, bootstrap=True),
         })
 
     for excluded in native_sets:

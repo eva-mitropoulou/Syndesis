@@ -1,19 +1,20 @@
 {
   "target": "CDK2",
   "n_deposited_native_complexes": 5,
-  "n_primary_native_complexes": 5,
+  "n_primary_native_complexes": 4,
   "primary_native_receptors": [
     "1aq1_a_stu",
     "1fin_a_atp",
     "1pxn_a_ck6",
-    "1qmz_a_atp",
     "2a4l_a_rrc"
   ],
-  "excluded_primary_native_receptors": [],
-  "primary_union_size": 47,
-  "core_60pct_size": 22,
-  "n_pose_rows": 141480,
-  "n_fingerprint_success": 141110,
+  "excluded_primary_native_receptors": [
+    "1qmz_a_atp"
+  ],
+  "primary_union_size": 38,
+  "core_60pct_size": 21,
+  "n_pose_rows": 113184,
+  "n_fingerprint_success": 112814,
   "n_no_scored_pose": 370,
   "n_fingerprint_failure": 0,
   "failure_policy": "Fail closed for every scored pose; rows without a docked/scored pose remain explicitly non-applicable and are not imputed."

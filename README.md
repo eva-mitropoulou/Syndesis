@@ -34,11 +34,13 @@ The result was tested against three different 1,000-permutation nulls:
 
 Every leave-one-primary-receptor-out EGFR analysis preserved a positive paired effect. Excluding the exact-overlap FMM complex retained EF1% 15.29, and removing both duplicate AQ4 complexes together retained EF1% 15.66; both paired intervals excluded zero. Among the 369 actives with ECFP4 similarity below 0.30 to every distinct ATP-site native ligand, the coupled score recovered 54 in the global top 1%, compared with 39 for GNINA.
 
-CDK2 defined the boundary of the claim. Its primary ensemble excludes 1QMZ,
-whose extracted receptor lacks deposited phosphothreonine TPO160. Across 1FIN,
-2A4L, 1AQ1, and 1PXN, the fixed rule increased EF1% from 11.39 to 14.13.
-Its paired EF1% difference was 2.74 (95% CI 0.00 to 5.06); overlap sensitivities
-remain unresolved, so the result is not presented as an independent replication.
+CDK2 defined the boundary of the claim. Its primary receptor ensemble and
+native-interaction prior both exclude 1QMZ because the extracted receptor loses
+deposited phosphothreonine TPO160. Across 1FIN, 2A4L, 1AQ1, and 1PXN, the fixed
+rule increased EF1% from 11.39 to 13.50. Its paired EF1% difference was 2.109
+(95% CI -0.633 to 4.641; bootstrap proportion above zero 0.928), so the transfer
+result is favourable but unresolved. The five-receptor/five-native-complex
+1QMZ-inclusive analysis is retained only as a sensitivity.
 
 ## What Is Different
 
@@ -62,7 +64,7 @@ The implementation is fail-closed:
 ## Evidence Layers
 
 1. **Structural curation:** ATP-site kinase complexes, normalized residue maps, and receptor-state metadata.
-2. **Ensemble docking:** four primary EGFR receptor conformations (five only in the 6DUK sensitivity analysis) or five CDK2 receptor conformations, with reproducible seeds and boxes.
+2. **Ensemble docking:** four primary EGFR receptor conformations (five only in the 6DUK sensitivity analysis) and four primary CDK2 receptor conformations, with reproducible seeds and boxes.
 3. **Neural rescoring:** GNINA score-only evaluation of one pose per ligand-receptor pair.
 4. **Interaction analysis:** ProLIF fingerprints using prepared ligand graphs and docked coordinates.
 5. **Statistical controls:** paired bootstraps, three permutation nulls, formula sensitivity, and complete leave-one-out analyses.
@@ -135,9 +137,9 @@ The complete docking campaigns require the source DUD-E and ZINC files described
 
 Please cite the frozen software and data release until the ChemRxiv preprint is posted:
 
-> Mitropoulou E, Giannopoulos D. **Syndesis v1.1.5-paper: pose-coupled native-interaction weighting for kinase ensemble docking.** GitHub release, 2026.
+> Mitropoulou E, Giannopoulos D. **Syndesis v1.1.6-paper: pose-coupled native-interaction weighting for kinase ensemble docking.** GitHub release, 2026.
 
-Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff). The reproducibility package is frozen in the `v1.1.5-paper` GitHub release. ChemRxiv preprint metadata will be added after posting.
+Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff). The reproducibility package is frozen in the `v1.1.6-paper` GitHub release. ChemRxiv preprint metadata will be added after posting.
 
 ## Authors
 

@@ -62,11 +62,15 @@ TARGETS = {
         "master": ROOT / "results/analysis_inputs/cdk2_master.parquet",
         "native": ROOT / "results/analysis_inputs/cdk2_native_interaction_fingerprints.parquet",
         "descriptors": ROOT / "results/analysis_inputs/cdk2_ligand_descriptors.csv",
-        "excluded_native_receptors": [],
+        # 1QMZ is excluded from the primary receptor ensemble because the
+        # extraction path loses phosphothreonine TPO160. Exclude its native
+        # fingerprint as well; retaining an altered-receptor fingerprint would
+        # make the primary docking and prior chemistry inconsistent.
+        "excluded_native_receptors": ["1qmz_a_atp"],
         "docking_receptors": [
             "1fin_a_atp", "2a4l_a_rrc", "1aq1_a_stu", "1pxn_a_ck6",
         ],
-        "analysis_role": "primary_four_receptor_excluding_unphosphorylated_1qmz",
+        "analysis_role": "primary_four_receptor_and_four_native_complexes_excluding_1qmz",
     },
 }
 
