@@ -90,3 +90,45 @@ def test_reconstruct_pose_makes_stereo_defining_hydrogen_implicit(tmp_path: Path
     assert reconstructed.GetNumAtoms() == heavy.GetNumAtoms()
     assert Chem.MolToSmiles(reconstructed) == Chem.MolToSmiles(heavy)
     assert sum(atom.GetTotalNumHs() for atom in reconstructed.GetAtoms()) > 0
+
+
+@pytest.mark.parametrize(
+    "smiles",
+    [
+        "C[N+](C)(C)CC(=O)[O-]",
+        "N[C@@H](C)C(=O)O",
+        "C/C=C\\C(=O)N",
+    ],
+)
+def test_reconstruct_pose_preserves_charge_bonds_and_stereochemistry(
+    tmp_path: Path, smiles: str
+) -> None:
+    molecule = Chem.AddHs(Chem.MolFromSmiles(smiles))
+    assert AllChem.EmbedMolecule(molecule, randomSeed=807) == 0
+    molecule = Chem.RemoveAllHs(molecule)
+    template = tmp_path / "template.sdf"
+    writer = Chem.SDWriter(str(template))
+    writer.write(molecule)
+    writer.close()
+    coordinates = molecule.GetConformer().GetPositions()
+    elements = [atom.GetSymbol().upper() for atom in molecule.GetAtoms()]
+    order = list(reversed(range(molecule.GetNumAtoms())))
+    prepared_atoms = [(elements[index], tuple(coordinates[index])) for index in order]
+    prepared = tmp_path / "prepared.pdbqt"
+    pose = tmp_path / "pose.pdbqt"
+    _write_pdbqt(prepared, prepared_atoms)
+    _write_pdbqt(
+        pose,
+        [(element, (xyz[0] + 1.0, xyz[1] + 2.0, xyz[2] + 3.0)) for element, xyz in prepared_atoms],
+    )
+
+    output = reconstruct_pose_sdf(pose, template, prepared, tmp_path / "pose.sdf")
+    reconstructed = Chem.SDMolSupplier(str(output), removeHs=False)[0]
+
+    assert Chem.MolToSmiles(reconstructed, isomericSmiles=True) == Chem.MolToSmiles(
+        molecule, isomericSmiles=True
+    )
+    assert Chem.GetFormalCharge(reconstructed) == Chem.GetFormalCharge(molecule)
+    assert [str(bond.GetBondType()) for bond in reconstructed.GetBonds()] == [
+        str(bond.GetBondType()) for bond in molecule.GetBonds()
+    ]

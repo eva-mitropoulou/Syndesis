@@ -13,6 +13,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from egfr_dockingforge.enrichment.metrics import bedroc, enrichment_factor, roc_auc  # noqa: E402
+from egfr_dockingforge.enrichment.native_prior import (  # noqa: E402
+    jaccard,
+    native_union,
+    parse_fingerprint,
+    recall,
+)
 
 OUT = ROOT / "results" / "robustness"
 OUT.mkdir(parents=True, exist_ok=True)
@@ -23,13 +29,15 @@ N_BOOT = 2000
 TARGETS = {
     "EGFR": {
         "master": ROOT / "results/analysis_inputs/egfr_master.parquet",
+        "native": ROOT / "results/analysis_inputs/egfr_native_interaction_fingerprints.parquet",
         "descriptors": ROOT / "results/analysis_inputs/egfr_ligand_descriptors.csv",
-        "target_size": 76,
+        "excluded_native_receptors": ["6duk_c_jbj_1103"],
     },
     "CDK2": {
         "master": ROOT / "results/analysis_inputs/cdk2_master.parquet",
+        "native": ROOT / "results/analysis_inputs/cdk2_native_interaction_fingerprints.parquet",
         "descriptors": ROOT / "results/analysis_inputs/cdk2_ligand_descriptors.csv",
-        "target_size": 47,
+        "excluded_native_receptors": [],
     },
 }
 
@@ -38,19 +46,32 @@ def ef(labels: np.ndarray, scores: np.ndarray, fraction: float = 0.01) -> float:
     return enrichment_factor(labels, scores, fraction)
 
 
-def load_target(config: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
+def load_target(config: dict) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
     raw = pd.read_parquet(config["master"])
     raw = raw.sort_values("cnnscore", ascending=False).drop_duplicates(
         ["lit_pcba_id", "target_receptor_id"]
     )
-    raw["recall"] = raw["key_interaction_recall_consensus"]
-    raw["tanimoto"] = raw["ifp_tanimoto_to_consensus"]
+    allowed = raw["status"].isin(["ok", "no_scored_pose"])
+    if not allowed.all():
+        raise RuntimeError(f"{int((~allowed).sum())} scored poses have failed fingerprints")
+    native = pd.read_parquet(config["native"])
+    target, included = native_union(native, config["excluded_native_receptors"])
+    raw["pose_bits"] = None
+    scored = raw["status"].eq("ok")
+    raw.loc[scored, "pose_bits"] = raw.loc[scored, "fingerprint_sparse_json"].map(parse_fingerprint)
+    raw["recall"] = raw["pose_bits"].map(
+        lambda value: recall(value, target) if isinstance(value, set) else np.nan
+    )
+    raw["tanimoto"] = raw["pose_bits"].map(
+        lambda value: jaccard(value, target) if isinstance(value, set) else np.nan
+    )
 
     if "num_interactions" not in raw:
         raise RuntimeError("Corrected enrichment master must contain num_interactions")
 
-    target_size = config["target_size"]
-    intersection = (raw["recall"] * target_size).round().clip(lower=0)
+    intersection = raw["pose_bits"].map(
+        lambda value: len(value & target) if isinstance(value, set) else np.nan
+    )
     raw["precision"] = np.where(raw["num_interactions"] > 0, intersection / raw["num_interactions"], 0.0)
     denom = raw["precision"] + raw["recall"]
     raw["f1"] = np.where(denom > 0, 2 * raw["precision"] * raw["recall"] / denom, 0.0)
@@ -61,7 +82,12 @@ def load_target(config: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
     per["coupled"] = raw.assign(score=raw["cnnscore"] * (1 + raw["recall"])).groupby(
         "lit_pcba_id"
     )["score"].max()
-    return raw, per.reset_index()
+    prior = {
+        "included_native_receptors": included,
+        "excluded_native_receptors": config["excluded_native_receptors"],
+        "interaction_bit_count": len(target),
+    }
+    return raw, per.reset_index(), prior
 
 
 def aligned_vectors(raw: pd.DataFrame):
@@ -339,7 +365,7 @@ def main() -> int:
     }
     for name in selected:
         config = TARGETS[name]
-        raw, per = load_target(config)
+        raw, per, prior = load_target(config)
         summary, draws = run_nulls(name, raw, config)
         frames = {
             "permutation_null_summary": summary,
@@ -359,6 +385,7 @@ def main() -> int:
             else:
                 frame.to_csv(path, index=False)
         print(summary.to_string(index=False), flush=True)
+        config["primary_prior_metadata"] = prior
 
     for stem, extension in output_names.items():
         paths = [OUT / f"interim_{name.lower()}_{stem}.{extension}" for name in TARGETS]
@@ -368,6 +395,11 @@ def main() -> int:
         combined = pd.concat(frames, ignore_index=True)
         if extension == "parquet":
             combined.to_parquet(OUT / f"{stem}.{extension}", index=False)
+            if stem == "permutation_null_draws":
+                combined.to_parquet(
+                    ROOT / "results/analysis_inputs/permutation_null_draws.parquet",
+                    index=False,
+                )
         else:
             combined.to_csv(OUT / f"{stem}.{extension}", index=False)
     prospective_audit().to_csv(OUT / "prospective_gate_audit.csv", index=False)
@@ -378,6 +410,10 @@ def main() -> int:
         "n_bootstrap": N_BOOT,
         "ef_top_set_rounding": "round(N * fraction), minimum 1",
         "tie_handling": "stable mergesort descending",
+        "primary_native_priors": {
+            name: config.get("primary_prior_metadata") for name, config in TARGETS.items()
+        },
+        "paper_analysis_config": "configs/paper_analysis.yaml",
     }
     (OUT / "analysis_metadata.json").write_text(json.dumps(metadata, indent=2) + "\n")
     print(prospective_audit().to_string(index=False))

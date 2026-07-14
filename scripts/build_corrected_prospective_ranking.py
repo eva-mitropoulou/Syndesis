@@ -1,38 +1,34 @@
 """Build the prospective ranking from strict, pose-coupled ProLIF fingerprints."""
 from __future__ import annotations
 
-import json
+import sys
 from pathlib import Path
 
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-FP_ROOT = ROOT / "data/processed/pose_fingerprints/prospective"
-MASTER = ROOT / "data/external/prospective/enrichment_master_scores.parquet"
-LIBRARY = ROOT / "data/external/prospective/prospective_library.parquet"
-OUTPUT = ROOT / "data/processed/prospective/prospective_ranked_corrected.parquet"
+sys.path.insert(0, str(ROOT / "src"))
 
+from egfr_dockingforge.enrichment.native_prior import native_union, parse_fingerprint
 
-def parse_bits(value: str) -> set[str]:
-    return set(json.loads(value))
+INPUTS = ROOT / "results/analysis_inputs"
+FINGERPRINTS = INPUTS / "prospective_pose_fingerprints.parquet"
+MASTER = INPUTS / "prospective_master_scores.parquet"
+LIBRARY = INPUTS / "prospective_library.parquet"
+OUTPUT = INPUTS / "prospective_ranked_corrected.parquet"
 
 
 def main() -> int:
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    paths = sorted(FP_ROOT.glob("pose_fingerprints_*.parquet"))
-    if len(paths) != 5:
-        raise RuntimeError(f"Expected five prospective fingerprint checkpoints, found {len(paths)}")
-    fingerprints = pd.concat((pd.read_parquet(path) for path in paths), ignore_index=True)
+    fingerprints = pd.read_parquet(FINGERPRINTS)
     failures = fingerprints[~fingerprints["status"].eq("ok")]
     if not failures.empty:
         raise RuntimeError(f"Prospective ranking blocked by {len(failures)} strict ProLIF failures")
 
-    native = pd.read_parquet(ROOT / "data/processed/stage5/native_interaction_fingerprints.parquet")
-    native_union: set[str] = set()
-    for value in native["fingerprint_sparse_json"]:
-        native_union.update(parse_bits(value))
+    native = pd.read_parquet(INPUTS / "egfr_native_interaction_fingerprints.parquet")
+    target, included_receptors = native_union(native, ["6duk_c_jbj_1103"])
     fingerprints["native_union_recall"] = fingerprints["fingerprint_sparse_json"].map(
-        lambda value: len(parse_bits(value) & native_union) / len(native_union)
+        lambda value: len(parse_fingerprint(value) & target) / len(target)
     )
     fingerprints["zinc_id"] = fingerprints["ligand_id"].astype(str)
 
@@ -66,6 +62,8 @@ def main() -> int:
         "cnn_threshold": float(ranked["cnn_top_decile_threshold"].iloc[0]),
         "recall_threshold": float(ranked["recall_median_threshold"].iloc[0]),
         "top_zinc_id": ranked.iloc[0]["zinc_id"],
+        "native_prior_receptors": included_receptors,
+        "native_prior_bit_count": len(target),
     })
     return 0
 
