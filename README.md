@@ -34,11 +34,11 @@ The result was tested against three different 1,000-permutation nulls:
 
 Every leave-one-primary-receptor-out EGFR analysis preserved a positive paired effect. Excluding the exact-overlap FMM complex retained EF1% 15.29, and removing both duplicate AQ4 complexes together retained EF1% 15.66; both paired intervals excluded zero. Among the 369 actives with ECFP4 similarity below 0.30 to every distinct ATP-site native ligand, the coupled score recovered 54 in the global top 1%, compared with 39 for GNINA.
 
-CDK2 defined the boundary of the claim. The same fixed rule increased EF1% from
-10.97 to 13.08, retrieving 62 rather than 52 actives among the first 283
-molecules. Its paired EF1% difference was 2.11 (95% CI -0.42 to 4.64), and
-leave-one-receptor-out effects were heterogeneous; the result is therefore
-reported as favorable but unresolved rather than as an independent replication.
+CDK2 defined the boundary of the claim. Its primary ensemble excludes 1QMZ,
+whose extracted receptor lacks deposited phosphothreonine TPO160. Across 1FIN,
+2A4L, 1AQ1, and 1PXN, the fixed rule increased EF1% from 11.39 to 14.13.
+Its paired EF1% difference was 2.74 (95% CI 0.00 to 5.06); overlap sensitivities
+remain unresolved, so the result is not presented as an independent replication.
 
 ## What Is Different
 
