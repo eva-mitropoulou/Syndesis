@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import importlib.metadata
 import json
+import os
 import warnings as py_warnings
 from dataclasses import dataclass
 from pathlib import Path
@@ -86,6 +87,11 @@ def has_hydrogens(path: str | Path) -> bool:
     return any(atom.element == "H" for atom in read_atoms(path))
 
 
+def _openbabel_environment(executable: str) -> dict[str, str] | None:
+    plugin_dir = Path(executable).parent.parent / "lib" / "openbabel" / "3.1.0"
+    return {**os.environ, "BABEL_LIBDIR": str(plugin_dir)} if plugin_dir.exists() else None
+
+
 def _autodock_element(line: str) -> str:
     atom_type = line[77:].strip().split()[0] if len(line) > 77 and line[77:].strip() else ""
     mapping = {
@@ -140,7 +146,7 @@ def prepare_ligand_for_prolif(ligand_file: str | Path, out_dir: str | Path) -> P
         "-p",
         "7.4",
     ]
-    proc = subprocess.run(command, text=True, capture_output=True, check=False)
+    proc = subprocess.run(command, text=True, capture_output=True, check=False, env=_openbabel_environment(obabel))
     if proc.returncode != 0:
         raise RuntimeError(f"OpenBabel failed to add ligand hydrogens for ProLIF: {source}\n{proc.stderr}")
     if not target.exists() or target.stat().st_size == 0:
@@ -157,15 +163,31 @@ def prepare_protein_for_prolif(protein_file: str | Path, out_dir: str | Path, ph
     target = target_dir / f"{source.parent.name}__{source.stem}.h.pdb"
     if target.exists() and target.stat().st_mtime >= source.stat().st_mtime:
         return target
+    # Docked-pose interaction analysis must use precisely the receptor heavy atoms
+    # supplied to docking. When the Stage 3 PDBQT sibling exists, it is the
+    # authoritative Open Babel-protonated representation. Converting it back to
+    # PDB retains its heavy-atom set for ProLIF; PDBFixer is deliberately not
+    # allowed to repair missing heavy atoms in this branch.
+    docking_pdbqt = source if source.suffix.lower() == ".pdbqt" else source.with_suffix(".pdbqt")
+    if docking_pdbqt.exists():
+        obabel = shutil.which("obabel") or str(Path(".tools/stage11_amber/bin/obabel").resolve())
+        if not Path(obabel).exists():
+            raise RuntimeError("OpenBabel `obabel` is required to derive the ProLIF receptor from docking PDBQT.")
+        command = [obabel, "-ipdbqt", str(docking_pdbqt), "-opdb", "-O", str(target), "-h"]
+        proc = subprocess.run(command, text=True, capture_output=True, check=False, env=_openbabel_environment(obabel))
+        if proc.returncode != 0 or not target.exists() or target.stat().st_size == 0:
+            raise RuntimeError(f"OpenBabel failed to derive ProLIF receptor from docking PDBQT: {docking_pdbqt}\n{proc.stderr}")
+        if not has_hydrogens(target):
+            raise RuntimeError(f"Docking-derived ProLIF receptor lacks explicit hydrogens: {target}")
+        return target
     fixer = PDBFixer(filename=str(source))
     try:
         fixer.addMissingHydrogens(ph)
-    except ValueError:
-        fixer.findMissingResidues()
-        fixer.missingResidues = {}
-        fixer.findMissingAtoms()
-        fixer.addMissingAtoms()
-        fixer.addMissingHydrogens(ph)
+    except ValueError as exc:
+        raise RuntimeError(
+            "PDBFixer could not add hydrogens without repairing missing protein heavy atoms; "
+            f"provide the docking PDBQT sibling or a complete receptor: {source}"
+        ) from exc
     with target.open("w", encoding="utf-8") as handle:
         PDBFile.writeFile(fixer.topology, fixer.positions, handle, keepIds=True)
     if not has_hydrogens(target):
