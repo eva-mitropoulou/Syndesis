@@ -95,7 +95,7 @@ Before evaluating ligand enrichment, we performed redocking as a methodological 
 
 ## Pose-coupled weighting improves early EGFR enrichment
 
-Table 3 and @fig-enrichment summarize the primary comparison between GNINA and the pose-coupled score on the four-receptor EGFR ensemble. The benchmark contained 542 actives and 35,010 decoys, and the top 1% of the ranking therefore comprised 356 molecules. GNINA recovered 65 actives in this subset, corresponding to an EF1% of 11.98, whereas the pose-coupled score recovered 89 actives and increased EF1% to 16.40. This represents 24 additional actives and a paired EF1% improvement of 4.42 units (95% CI 2.58–6.63). Improvements were also observed for ROC-AUC, EF5%, and BEDROC, although the largest practical effect occurred at the top of the ranking, consistent with the intended use of the method for early compound prioritization.
+Table 3 and @fig-enrichment summarize the primary comparison between GNINA and the pose-coupled score on the four-receptor EGFR ensemble. The benchmark contained 542 actives and 35,010 decoys, and the top 1% of the ranking therefore comprised 356 molecules. GNINA recovered 65 actives in this subset, corresponding to an EF1% of 11.98, whereas the pose-coupled score recovered 89 actives and increased EF1% to 16.40. This represents 24 additional actives and a paired EF1% improvement of 4.42 units (95% CI 2.58–6.63). Paired effects also favoured coupling for ROC-AUC (0.00497, 95% CI 0.00362–0.00639), EF5% (0.70, 0.30–1.07), and BEDROC (0.072, 0.054–0.090). The largest practical effect occurred at the top of the ranking, consistent with the intended use of the method for early compound prioritization.
 
 **Table 3.** EGFR enrichment across the four-receptor primary ensemble. Intervals are percentile 95% confidence intervals from 2,000 class-stratified bootstrap resamples.
 
@@ -144,7 +144,7 @@ Ensemble composition was examined separately by adding ligand-stripped 6DUK to t
 
 ## CDK2 defines a transfer boundary
 
-CDK2 was used to test transfer of the EGFR-developed scoring formula to a second kinase target. Across the primary four-receptor/four-native-complex analysis (1FIN, 2A4L, 1AQ1, and 1PXN), coupled scoring increased EF1% from 11.39 to 13.50, corresponding to a paired difference of 2.109 (95% CI −0.633 to 4.641; bootstrap proportion above zero 0.928). The paired interval did not exclude zero, so this result is favourable but unresolved. The observed EF1% also exceeded the unrestricted, heavy-atom-count-matched, and class-conditional assignment nulls: means 9.30, 11.70, and 11.73, observed-minus-null differences 4.20, 1.80, and 1.77, and empirical $p=0.0010$, 0.0300, and 0.0490, respectively. These permutation tests assess whether observed ligand--interaction assignments outperform randomised assignments, whereas the paired bootstrap assesses whether coupling reliably outperforms GNINA. The five-receptor/five-native-complex analysis including altered 1QMZ is retained only as a sensitivity analysis. Native-prior overlap also remained unresolved: rebuilding the four-complex prior without the remaining ATP complex 1FIN/ATP gave EF1% 13.08 (paired difference 1.69; 95% CI −1.05 to 4.01), while rebuilding it without exact-overlap inhibitor complexes 2A4L/RRC and 1AQ1/STU gave EF1% 13.08 (difference 1.69; −0.63 to 4.64). These sensitivity results reinforce that CDK2 transfer should be interpreted conservatively.
+CDK2 was used to test transfer of the EGFR-developed scoring formula to a second kinase target. Across the primary four-receptor/four-native-complex analysis (1FIN, 2A4L, 1AQ1, and 1PXN), coupled scoring increased EF1% from 11.39 to 13.50, corresponding to a paired difference of 2.109 (95% CI −0.633 to 4.641; bootstrap proportion above zero 0.928). The paired interval did not exclude zero, so this positive result remains unresolved. The observed EF1% also exceeded the unrestricted, heavy-atom-count-matched, and class-conditional assignment nulls: means 9.30, 11.70, and 11.73, observed-minus-null differences 4.20, 1.80, and 1.77, and empirical $p=0.0010$, 0.0300, and 0.0490, respectively. These permutation tests assess whether observed ligand--interaction assignments outperform randomised assignments, whereas the paired bootstrap assesses whether coupling reliably outperforms GNINA. The five-receptor/five-native-complex analysis including altered 1QMZ is retained only as a sensitivity analysis. Native-prior overlap also remained unresolved: rebuilding the four-complex prior without the remaining ATP complex 1FIN/ATP gave EF1% 13.08 (paired difference 1.69; 95% CI −1.05 to 4.01), while rebuilding it without exact-overlap inhibitor complexes 2A4L/RRC and 1AQ1/STU gave EF1% 13.08 (difference 1.69; −0.63 to 4.64). These sensitivity results reinforce that CDK2 transfer should be interpreted conservatively.
 
 **Table 6.** CDK2 four-receptor/four-native-complex transfer analysis. Intervals are percentile 95% confidence intervals from 2,000 class-stratified bootstrap resamples.
 
@@ -157,21 +157,33 @@ CDK2 was used to test transfer of the EGFR-developed scoring formula to a second
 
 ## Replicated MD distinguishes persistent and unstable poses
 
-All 21 planned production trajectories completed. The majority-replicate gate labelled two of three known-ligand controls and two of three deterministic analogues as MD-stable; the deliberately mis-docked control was unstable in all three replicates. The latter had a median ligand RMSD of 5.72 Å and median key-contact occupancy of 0.008, whereas accepted systems had median ligand RMSD of 1.80–2.30 Å and key-contact occupancy of 0.52–0.69. Control 001 was rejected in all three replicates despite a median RMSD of 1.99 Å because it retained the permissive pocket criterion but lost the hinge contact (occupancy 0.00–0.02) and mean core-contact occupancy (0.41–0.44); the rejection therefore reflects interaction loss from the docked starting pose, not ligand egress. Analogue 005 failed geometric criteria in two replicates and contact criteria in the remaining replicate. These labels assess persistence of the modelled binding mode and do not establish affinity or biological activity.
+All 21 planned production trajectories completed. The majority-replicate gate labeled two of three known-ligand controls and two of three deterministic analogs as MD-stable; the deliberately mis-docked control was unstable in all three replicates. The latter had a median ligand RMSD of 5.72 Å and median key-interaction occupancy of 0.008, whereas accepted systems had median ligand RMSD of 1.80–2.30 Å and key-interaction occupancy of 0.52–0.69. One known control and one analog were rejected despite low-to-moderate median RMSD because their hinge or aggregate key-interaction occupancy did not meet the predefined gate. These labels assess persistence of the modeled binding mode and do not establish affinity or biological activity.
 
-**Table 7.** Replicated 20 ns MD gate summary. Values are candidate-level medians except pocket retention, which is the minimum across replicates. The majority decision was computed from complete replicate-level values, not from these summaries alone. Ligand identities and provenance are in Table 2.
+**Table 4.** Replicated 20 ns MD stress-test outcomes. Values are medians across three independent production trajectories.
 
-| System | Stable reps | RMSD med./p95 (Å) | Pocket-contact | Hinge/key occupancy | Failed gate | Final label |
-|---|---:|---:|---:|---:|---|---|
-| Control 001 | 0/3 | 1.99 / 3.53 | 1.00 | 0.007 / 0.433 | Contacts, all reps | Unstable |
-| Control 002 | 3/3 | 1.80 / 2.44 | 1.00 | 0.774 / 0.618 | None | Stable |
-| Control 003 | 3/3 | 2.16 / 2.54 | 1.00 | 0.997 / 0.688 | None | Stable |
-| Analogue 004 | 2/3 | 1.87 / 3.11 | 1.00 | 0.905 / 0.519 | Contacts, one rep | Stable |
-| Analogue 005 | 0/3 | 3.43 / 4.07 | 1.00 | 0.941 / 0.550 | Geometry, two reps; contacts, one rep | Unstable |
-| Analogue 006 | 3/3 | 2.30 / 3.00 | 1.00 | 0.472 / 0.644 | None | Stable |
-| Mis-docked control | 0/3 | 5.72 / 8.43 | 1.00 | 0.000 / 0.008 | Geometry, all reps | Unstable |
+| System | Origin | Stable replicates | Ligand RMSD (Å) | Key-interaction occupancy | Decision |
+|---|---|---:|---:|---:|---|
+| Control 001 | Known ligand | 0/3 | 1.99 | 0.43 | Unstable |
+| Control 002 | Known ligand | 3/3 | 1.80 | 0.62 | Stable |
+| Control 003 | Known ligand | 3/3 | 2.16 | 0.69 | Stable |
+| Analog 004 | Deterministic analog | 2/3 | 1.87 | 0.52 | Stable |
+| Analog 005 | Deterministic analog | 0/3 | 3.43 | 0.55 | Unstable |
+| Analog 006 | Deterministic analog | 3/3 | 2.30 | 0.64 | Stable |
+| Mis-docked control | Deliberate negative control | 0/3 | 5.72 | 0.008 | Unstable |
 
-![MD pose-persistence stress test. Points summarise candidate-level median ligand RMSD with the range across three independent 20 ns replicates; bars show candidate-level median core-contact occupancy. Colours indicate the predeclared majority-replicate decision. The deliberately mis-docked control is separated from the majority-stable systems by both geometric and interaction evidence. Full-protein start/end coordinate renders for the stable and failed examples are retained in the public repository.](figures/figure6_md_stability.png){#fig-md width=100% fig-alt="Candidate-level ligand RMSD and core-contact occupancy for replicated MD systems, including a deliberately mis-docked negative control."}
+::: {#fig-md-stable-frames layout-ncol=1 fig-cap="GROMACS production-trajectory coordinates for the MD-stable Control 002 complex, replicate 1. Top: first saved frame (0 ns). Bottom: final saved frame (20 ns), aligned to the start-frame protein. Both uncropped panels show the complete EGFR protein, teal ligand, and grey ATP-pocket residues within 5 Å of the starting ligand. In the final frame, a translucent grey ligand marks the starting pose. The retained teal ligand illustrates persistence of the modeled pocket geometry."}
+![Start of Control 002 production trajectory (0 ns).](figures/md_control_002_rep01_start.png){width=85% fig-alt="Uncropped full-protein GROMACS production-trajectory frame at 0 ns, showing the stable Control 002 ligand in the EGFR ATP pocket."}
+
+![End of Control 002 production trajectory (20 ns).](figures/md_control_002_rep01_end.png){width=85% fig-alt="Uncropped full-protein GROMACS production-trajectory frame at 20 ns, aligned to the start-frame protein, with a translucent grey start-pose ligand reference and teal final ligand."}
+:::
+
+::: {#fig-md-failed-frames layout-ncol=1 fig-cap="GROMACS production-trajectory coordinates for the deliberately mis-docked negative control, replicate 1. Top: first saved frame (0 ns). Bottom: final saved frame (20 ns), aligned to the start-frame protein. Both panels retain the complete protein and the start-frame ATP-pocket residues (grey). In the final frame, the translucent grey ligand is the starting pose and the red ligand is the actual endpoint. This system failed the majority-replicate gate in all three trajectories."}
+![Start of mis-docked negative-control production trajectory (0 ns).](figures/md_misdocked_control_rep01_start.png){width=85% fig-alt="Uncropped full-protein GROMACS production-trajectory frame at 0 ns for the deliberately mis-docked negative control."}
+
+![End of mis-docked negative-control production trajectory (20 ns).](figures/md_misdocked_control_rep01_end.png){width=85% fig-alt="Uncropped full-protein GROMACS production-trajectory frame at 20 ns for the deliberately mis-docked negative control, aligned to the start-frame protein, with grey start-pose and red final ligand."}
+:::
+
+![MD pose-persistence stress test. Points summarize candidate-level median ligand RMSD and key-interaction occupancy across three independent 20 ns production trajectories; colors indicate the predeclared majority-replicate decision.](figures/figure6_md_stability.png){#fig-md width=100% fig-alt="Ligand RMSD and interaction occupancy for replicated MD systems, distinguishing stable poses from the deliberately mis-docked control."}
 
 # Discussion
 
@@ -193,7 +205,7 @@ ATP, adenosine triphosphate; BEDROC, Boltzmann-enhanced discrimination of receiv
 
 ## Availability of data and materials
 
-Source code, workflow configurations, tests, figures, the rendered manuscript, and machine-readable supporting data are available at [https://github.com/eva-mitropoulou/Syndesis](https://github.com/eva-mitropoulou/Syndesis). The exact paper package is the release named in the final submitted version. It includes pose coordinates, native interaction-bit tables, ligand-level benchmark scores and fingerprints, bootstrap and permutation draws, late-fusion and exclusion analyses, graph-mapping validation, four-receptor primary manifests, AMBER/GAFF2 parameterization reports, GROMACS inputs, replicate-level MD metrics, and per-frame pose-persistence measurements. Raw structures and benchmark molecules originate from the PDB and DUD-E and remain subject to their source terms. No separate supplementary document accompanies this manuscript.
+Source code, workflow configurations, tests, figures, the rendered manuscript, and machine-readable supporting data are available at [https://github.com/eva-mitropoulou/Syndesis](https://github.com/eva-mitropoulou/Syndesis). The exact paper package is the [`v1.1.7-paper`](https://github.com/eva-mitropoulou/Syndesis/tree/v1.1.7-paper) tagged repository snapshot. It includes pose coordinates, native interaction-bit tables, ligand-level benchmark scores and fingerprints, bootstrap and permutation draws, late-fusion and exclusion analyses, graph-mapping validation, four-receptor primary manifests, AMBER/GAFF2 parameterization reports, GROMACS inputs, replicate-level MD metrics, and per-frame pose-persistence measurements. Raw structures and benchmark molecules originate from the PDB and DUD-E and remain subject to their source terms. No separate supplementary document accompanies this manuscript.
 
 ## Competing interests
 
