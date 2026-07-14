@@ -118,7 +118,7 @@ ATP, adenosine triphosphate; BEDROC, Boltzmann-enhanced discrimination of receiv
 
 ## Availability of data and materials
 
-Source code, workflow configurations, tests, figures, the rendered manuscript, and machine-readable supporting data are available at [https://github.com/eva-mitropoulou/Syndesis](https://github.com/eva-mitropoulou/Syndesis). The exact paper package is the [v1.1.4-paper release](https://github.com/eva-mitropoulou/Syndesis/releases/tag/v1.1.4-paper). It includes pose coordinates, native interaction-bit tables, ligand-level benchmark scores and fingerprints, bootstrap and permutation draws, exclusion analyses, graph-mapping validation, and the four-receptor primary manifests. Raw structures and benchmark molecules originate from the PDB and DUD-E and remain subject to their source terms. No separate supplementary document accompanies this manuscript.
+Source code, workflow configurations, tests, figures, the rendered manuscript, and machine-readable supporting data are available at [https://github.com/eva-mitropoulou/Syndesis](https://github.com/eva-mitropoulou/Syndesis). The exact paper package is the [v1.1.5-paper release](https://github.com/eva-mitropoulou/Syndesis/releases/tag/v1.1.5-paper). It includes pose coordinates, native interaction-bit tables, ligand-level benchmark scores and fingerprints, bootstrap and permutation draws, exclusion analyses, graph-mapping validation, and the four-receptor primary manifests. Raw structures and benchmark molecules originate from the PDB and DUD-E and remain subject to their source terms. No separate supplementary document accompanies this manuscript.
 
 ## Competing interests
 
