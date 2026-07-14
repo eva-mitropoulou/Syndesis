@@ -1,4 +1,4 @@
-# Syndesis v1.0.1-paper
+# Syndesis v1.0.2-paper
 
 This release is the reproducibility package for the Journal of Cheminformatics manuscript, *Pose-coupled native-interaction weighting for kinase ensemble docking: retrospective evaluation on EGFR and CDK2*.
 
