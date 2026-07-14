@@ -16,6 +16,9 @@ FINGERPRINTS = INPUTS / "prospective_pose_fingerprints.parquet"
 MASTER = INPUTS / "prospective_master_scores.parquet"
 LIBRARY = INPUTS / "prospective_library.parquet"
 OUTPUT = INPUTS / "prospective_ranked_corrected.parquet"
+PRIMARY_EGFR_RECEPTORS = {
+    "1m17_a_aq4_999", "1xkk_a_fmm_91", "4hjo_a_aq4_1001", "5cav_a_4zq_1101",
+}
 
 
 def main() -> int:
@@ -33,6 +36,10 @@ def main() -> int:
     fingerprints["zinc_id"] = fingerprints["ligand_id"].astype(str)
 
     master = pd.read_parquet(MASTER)
+    master = master[master["target_receptor_id"].isin(PRIMARY_EGFR_RECEPTORS)].copy()
+    fingerprints = fingerprints[fingerprints["target_receptor_id"].isin(PRIMARY_EGFR_RECEPTORS)].copy()
+    if set(master["target_receptor_id"].unique()) != PRIMARY_EGFR_RECEPTORS:
+        raise RuntimeError("Prospective master scores do not contain exactly the four primary EGFR receptors")
     master["zinc_id"] = master["lit_pcba_id"].astype(str)
     merged = master.merge(
         fingerprints[["zinc_id", "target_receptor_id", "native_union_recall", "num_interactions"]],
@@ -63,6 +70,7 @@ def main() -> int:
         "recall_threshold": float(ranked["recall_median_threshold"].iloc[0]),
         "top_zinc_id": ranked.iloc[0]["zinc_id"],
         "native_prior_receptors": included_receptors,
+        "docking_receptors": sorted(PRIMARY_EGFR_RECEPTORS),
         "native_prior_bit_count": len(target),
     })
     return 0

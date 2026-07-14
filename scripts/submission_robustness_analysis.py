@@ -32,12 +32,41 @@ TARGETS = {
         "native": ROOT / "results/analysis_inputs/egfr_native_interaction_fingerprints.parquet",
         "descriptors": ROOT / "results/analysis_inputs/egfr_ligand_descriptors.csv",
         "excluded_native_receptors": ["6duk_c_jbj_1103"],
+        "docking_receptors": [
+            "1m17_a_aq4_999", "1xkk_a_fmm_91", "4hjo_a_aq4_1001", "5cav_a_4zq_1101",
+        ],
+        "analysis_role": "primary_four_receptor",
+    },
+    "EGFR_5RECEPTOR_SENSITIVITY": {
+        "master": ROOT / "results/analysis_inputs/egfr_master.parquet",
+        "native": ROOT / "results/analysis_inputs/egfr_native_interaction_fingerprints.parquet",
+        "descriptors": ROOT / "results/analysis_inputs/egfr_ligand_descriptors.csv",
+        "excluded_native_receptors": ["6duk_c_jbj_1103"],
+        "docking_receptors": [
+            "1m17_a_aq4_999", "1xkk_a_fmm_91", "4hjo_a_aq4_1001", "5cav_a_4zq_1101",
+            "6duk_c_jbj_1103",
+        ],
+        "analysis_role": "five_receptor_sensitivity",
+    },
+    "CDK2_5RECEPTOR_SENSITIVITY": {
+        "master": ROOT / "results/analysis_inputs/cdk2_master.parquet",
+        "native": ROOT / "results/analysis_inputs/cdk2_native_interaction_fingerprints.parquet",
+        "descriptors": ROOT / "results/analysis_inputs/cdk2_ligand_descriptors.csv",
+        "excluded_native_receptors": [],
+        "docking_receptors": [
+            "1qmz_a_atp", "1fin_a_atp", "2a4l_a_rrc", "1aq1_a_stu", "1pxn_a_ck6",
+        ],
+        "analysis_role": "five_receptor_sensitivity_unphosphorylated_1qmz",
     },
     "CDK2": {
         "master": ROOT / "results/analysis_inputs/cdk2_master.parquet",
         "native": ROOT / "results/analysis_inputs/cdk2_native_interaction_fingerprints.parquet",
         "descriptors": ROOT / "results/analysis_inputs/cdk2_ligand_descriptors.csv",
         "excluded_native_receptors": [],
+        "docking_receptors": [
+            "1fin_a_atp", "2a4l_a_rrc", "1aq1_a_stu", "1pxn_a_ck6",
+        ],
+        "analysis_role": "primary_four_receptor_excluding_unphosphorylated_1qmz",
     },
 }
 
@@ -48,6 +77,14 @@ def ef(labels: np.ndarray, scores: np.ndarray, fraction: float = 0.01) -> float:
 
 def load_target(config: dict) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
     raw = pd.read_parquet(config["master"])
+    expected_receptors = set(config["docking_receptors"])
+    raw = raw[raw["target_receptor_id"].isin(expected_receptors)].copy()
+    observed_receptors = set(raw["target_receptor_id"].unique())
+    if observed_receptors != expected_receptors:
+        raise RuntimeError(
+            f"Receptor filter mismatch: expected {sorted(expected_receptors)}, "
+            f"observed {sorted(observed_receptors)}"
+        )
     raw = raw.sort_values("cnnscore", ascending=False).drop_duplicates(
         ["lit_pcba_id", "target_receptor_id"]
     )
@@ -86,6 +123,8 @@ def load_target(config: dict) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
         "included_native_receptors": included,
         "excluded_native_receptors": config["excluded_native_receptors"],
         "interaction_bit_count": len(target),
+        "docking_receptors": sorted(expected_receptors),
+        "analysis_role": config["analysis_role"],
     }
     return raw, per.reset_index(), prior
 
@@ -352,8 +391,15 @@ def analog_lineage() -> pd.DataFrame:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--target", choices=sorted(TARGETS), action="append")
+    parser.add_argument(
+        "--combine-only",
+        action="store_true",
+        help="Combine existing per-target artifacts without rerunning their resampling loops.",
+    )
     args = parser.parse_args()
-    selected = args.target or list(TARGETS)
+    if args.combine_only and args.target:
+        parser.error("--combine-only cannot be combined with --target")
+    selected = [] if args.combine_only else (args.target or list(TARGETS))
     output_names = {
         "permutation_null_summary": "csv",
         "permutation_null_draws": "parquet",
@@ -412,6 +458,14 @@ def main() -> int:
         "tie_handling": "stable mergesort descending",
         "primary_native_priors": {
             name: config.get("primary_prior_metadata") for name, config in TARGETS.items()
+        },
+        "analysis_roles": {name: config["analysis_role"] for name, config in TARGETS.items()},
+        "ensemble_definitions": {
+            name: {
+                "docking_receptors": config["docking_receptors"],
+                "excluded_native_receptors": config["excluded_native_receptors"],
+            }
+            for name, config in TARGETS.items()
         },
         "paper_analysis_config": "configs/paper_analysis.yaml",
     }

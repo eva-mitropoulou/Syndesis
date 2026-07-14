@@ -17,6 +17,9 @@ from syndesis.enrichment.native_prior import native_union, parse_fingerprint, re
 
 INPUTS = ROOT / "results" / "analysis_inputs"
 OUTPUT = ROOT / "results" / "robustness"
+PRIMARY_EGFR_RECEPTORS = {
+    "1m17_a_aq4_999", "1xkk_a_fmm_91", "4hjo_a_aq4_1001", "5cav_a_4zq_1101",
+}
 
 
 def rank_series(scores: pd.Series) -> pd.Series:
@@ -26,6 +29,9 @@ def rank_series(scores: pd.Series) -> pd.Series:
 def main() -> int:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     master = pd.read_parquet(INPUTS / "egfr_master.parquet")
+    master = master[master["target_receptor_id"].isin(PRIMARY_EGFR_RECEPTORS)].copy()
+    if set(master["target_receptor_id"].unique()) != PRIMARY_EGFR_RECEPTORS:
+        raise RuntimeError("EGFR master scores do not contain exactly the four primary receptors")
     native = pd.read_parquet(INPUTS / "egfr_native_interaction_fingerprints.parquet")
     prior, _ = native_union(native, ["6duk_c_jbj_1103"])
     master["recall"] = master["fingerprint_sparse_json"].map(

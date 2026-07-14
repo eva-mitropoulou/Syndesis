@@ -17,22 +17,22 @@ On the EGFR DUD-E benchmark (542 actives and 35,010 decoys), strict graph-preser
 
 | Ranking | ROC-AUC | EF1% | EF5% | BEDROC |
 |---|---:|---:|---:|---:|
-| GNINA | 0.766 | 11.79 | 6.90 | 0.208 |
-| GNINA + ATP-site native-union recall | **0.772** | **16.40** | **7.75** | **0.282** |
+| GNINA | 0.770 | 11.98 | 7.01 | 0.210 |
+| GNINA + ATP-site native-union recall | **0.775** | **16.40** | **7.71** | **0.282** |
 
-At the 1% cutoff, the coupled ranking retrieved **89 actives among 356 molecules**, compared with **64** for GNINA. The paired EF1% gain was 4.61 (95% bootstrap CI 2.58–6.82).
+At the 1% cutoff, the coupled ranking retrieved **89 actives among 356 molecules**, compared with **65** for GNINA. The paired EF1% gain was 4.42 (95% bootstrap CI 2.58–6.63).
 
-The EGFR docking ensemble contains five receptor conformations, including 6DUK. The primary interaction prior contains only the four ATP-site holo complexes 1M17, 1XKK, 4HJO, and 5CAV. JBJ from 6DUK is allosteric and is excluded from every ATP-site prior calculation.
+The primary EGFR docking ensemble contains four ATP-site holo conformations: 1M17, 1XKK, 4HJO, and 5CAV. These same four complexes define the interaction prior. Ligand-stripped 6DUK is excluded from the primary workflow and retained only as a five-receptor sensitivity analysis; it does not materially change the EGFR conclusion.
 
 The result was tested against three different 1,000-permutation nulls:
 
 | Null | Mean EF1% | Observed minus null | Empirical p |
 |---|---:|---:|---:|
 | All-ligand shuffle | 11.35 | 5.05 | 0.0010 |
-| Heavy-atom-count-matched shuffle | 12.39 | 4.01 | 0.0010 |
-| Class-conditional assignment | 14.26 | 2.13 | 0.0040 |
+| Heavy-atom-count-matched shuffle | 12.40 | 4.00 | 0.0010 |
+| Class-conditional assignment | 14.27 | 2.13 | 0.0040 |
 
-Every leave-one-receptor-out EGFR analysis preserved a positive paired effect. Excluding the exact-overlap FMM complex retained EF1% 15.29, and removing both duplicate AQ4 complexes together retained EF1% 15.66; both paired intervals excluded zero. Among the 369 actives with ECFP4 similarity below 0.30 to every distinct ATP-site native ligand, the coupled score recovered 54 in the global top 1%, compared with 39 for GNINA.
+Every leave-one-primary-receptor-out EGFR analysis preserved a positive paired effect. Excluding the exact-overlap FMM complex retained EF1% 15.29, and removing both duplicate AQ4 complexes together retained EF1% 15.66; both paired intervals excluded zero. Among the 369 actives with ECFP4 similarity below 0.30 to every distinct ATP-site native ligand, the coupled score recovered 54 in the global top 1%, compared with 39 for GNINA.
 
 CDK2 defined the boundary of the claim. The same fixed rule increased EF1% from
 10.97 to 13.08, retrieving 62 rather than 52 actives among the first 283
@@ -62,7 +62,7 @@ The implementation is fail-closed:
 ## Evidence Layers
 
 1. **Structural curation:** ATP-site kinase complexes, normalized residue maps, and receptor-state metadata.
-2. **Ensemble docking:** five EGFR or CDK2 receptor conformations with reproducible seeds and boxes.
+2. **Ensemble docking:** four primary EGFR receptor conformations (five only in the 6DUK sensitivity analysis) or five CDK2 receptor conformations, with reproducible seeds and boxes.
 3. **Neural rescoring:** GNINA score-only evaluation of one pose per ligand-receptor pair.
 4. **Interaction analysis:** ProLIF fingerprints using prepared ligand graphs and docked coordinates.
 5. **Statistical controls:** paired bootstraps, three permutation nulls, formula sensitivity, and complete leave-one-out analyses.

@@ -50,7 +50,7 @@ screening:
   max_analogs_to_screen: 30
   stage8_mini_config: data/processed/stage9/stage8_analog_miniscreen.yaml
   stage8_processed: data/processed/stage9/stage8_mini_screen
-  receptor_limit: 5
+  receptor_limit: 4
   num_modes: 3
 
 acceptance:

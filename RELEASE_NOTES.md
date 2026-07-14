@@ -3,8 +3,9 @@
 This release is the reproducibility package for the Journal of Cheminformatics manuscript, *Pose-coupled native-interaction weighting for kinase ensemble docking: retrospective evaluation on EGFR and CDK2*.
 
 This release standardizes the project, Python package, command-line interface, and
-environment name as `Syndesis`. The EGFR primary case study and CDK2 transfer analysis
-are unchanged.
+environment name as `Syndesis`. The EGFR primary case study uses the four ATP-site
+receptor states; the original 6DUK-inclusive result is retained only as an explicitly
+labelled ensemble sensitivity analysis.
 
 This update finalizes the focused manuscript and its reproducibility package. It adds
 the DUD-E benchmark limitation, formula-weight sensitivity, CDK2 permutation results,
@@ -14,9 +15,9 @@ audit and documents the unphosphorylated 1QMZ representation.
 
 ## Scientific scope
 
-- Five EGFR receptor conformations are used for docking.
-- The primary EGFR interaction prior uses only four ATP-site holo complexes: 1M17, 1XKK, 4HJO and 5CAV.
-- The allosteric ligand JBJ from 6DUK is excluded from ATP-site prior construction; 6DUK remains a receptor conformation.
+- Four EGFR receptor conformations are used for the primary docking and ranking analysis: 1M17, 1XKK, 4HJO, and 5CAV.
+- The primary EGFR interaction prior uses the same four ATP-site holo complexes: 1M17, 1XKK, 4HJO and 5CAV.
+- Ligand-stripped 6DUK is excluded from the primary protocol and retained only for the five-receptor ensemble sensitivity analysis.
 - The primary score couples GNINA CNNscore and interaction recall from the same Uni-Dock-selected pose.
 - EGFR is method development plus retrospective evaluation; CDK2 is a target-transfer boundary analysis.
 

@@ -17,7 +17,17 @@ docking_receptor_ensemble:
   - 1xkk_a_fmm_91
   - 4hjo_a_aq4_1001
   - 5cav_a_4zq_1101
+
+five_receptor_sensitivity_ensemble:
+  - 1m17_a_aq4_999
+  - 1xkk_a_fmm_91
+  - 4hjo_a_aq4_1001
+  - 5cav_a_4zq_1101
   - 6duk_c_jbj_1103
+  rationale: >
+    6DUK is retained only to assess whether adding the ligand-stripped,
+    allosteric-ligand-stabilized conformation materially changes the
+    four-receptor primary conclusion.
 
 ranking:
   pose_scope: top_unidock_pose_per_ligand_receptor

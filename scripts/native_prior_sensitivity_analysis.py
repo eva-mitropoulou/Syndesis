@@ -26,6 +26,9 @@ TARGETS = {
             "AQ4": ["1m17_a_aq4_999", "4hjo_a_aq4_1001"],
         },
         "descriptors": ROOT / "results/analysis_inputs/egfr_ligand_descriptors.csv",
+        "docking_receptors": [
+            "1m17_a_aq4_999", "1xkk_a_fmm_91", "4hjo_a_aq4_1001", "5cav_a_4zq_1101",
+        ],
     },
     "CDK2": {
         "master": ROOT / "results/analysis_inputs/cdk2_master.parquet",
@@ -36,6 +39,9 @@ TARGETS = {
             "ATP": ["1qmz_a_atp", "1fin_a_atp"],
         },
         "descriptors": ROOT / "results/analysis_inputs/cdk2_ligand_descriptors.csv",
+        "docking_receptors": [
+            "1qmz_a_atp", "1fin_a_atp", "2a4l_a_rrc", "1aq1_a_stu", "1pxn_a_ck6",
+        ],
     },
 }
 
@@ -141,6 +147,10 @@ def analyze_target(name: str, config: dict, out: Path) -> None:
     merged = pd.read_parquet(config["master"]).sort_values("cnnscore", ascending=False).drop_duplicates(
         ["lit_pcba_id", "target_receptor_id"]
     )
+    expected_receptors = set(config["docking_receptors"])
+    merged = merged[merged["target_receptor_id"].isin(expected_receptors)].copy()
+    if set(merged["target_receptor_id"].unique()) != expected_receptors:
+        raise RuntimeError(f"{name}: master does not contain exactly the configured docking receptors")
     merged["lit_pcba_id"] = merged["lit_pcba_id"].astype(str)
     allowed = merged["status"].isin(["ok", "no_scored_pose"])
     if not allowed.all():
