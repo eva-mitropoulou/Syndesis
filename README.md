@@ -18,20 +18,22 @@ On the EGFR DUD-E benchmark (542 actives and 35,010 decoys), strict graph-preser
 
 | Ranking | ROC-AUC | EF1% | EF5% | BEDROC |
 |---|---:|---:|---:|---:|
-| GNINA | 0.766 | 11.79 | 6.90 | 0.209 |
-| GNINA + native-union recall | **0.770** | **16.21** | **7.64** | **0.279** |
+| GNINA | 0.766 | 11.79 | 6.90 | 0.208 |
+| GNINA + ATP-site native-union recall | **0.772** | **16.40** | **7.75** | **0.282** |
 
-At the 1% cutoff, the coupled ranking retrieved **88 actives among 356 molecules**, compared with **64** for GNINA. The paired EF1% gain was 4.42 (95% bootstrap CI 2.40–6.63).
+At the 1% cutoff, the coupled ranking retrieved **89 actives among 356 molecules**, compared with **64** for GNINA. The paired EF1% gain was 4.61 (95% bootstrap CI 2.58–6.82).
+
+The EGFR docking ensemble contains five receptor conformations, including 6DUK. The primary interaction prior contains only the four ATP-site holo complexes 1M17, 1XKK, 4HJO, and 5CAV. JBJ from 6DUK is allosteric and is excluded from every ATP-site prior calculation.
 
 The result was tested against three different 1,000-permutation nulls:
 
 | Null | Mean EF1% | Observed minus null | Empirical p |
 |---|---:|---:|---:|
-| All-ligand shuffle | 11.46 | 4.76 | 0.0010 |
-| Heavy-atom-matched shuffle | 12.33 | 3.88 | 0.0010 |
-| Class-conditional assignment | 14.14 | 2.08 | 0.0030 |
+| All-ligand shuffle | 11.35 | 5.05 | 0.0010 |
+| Heavy-atom-count-matched shuffle | 12.39 | 4.01 | 0.0010 |
+| Class-conditional assignment | 14.26 | 2.13 | 0.0040 |
 
-Every leave-one-receptor-out EGFR analysis preserved a positive paired effect. Excluding the native ligand that exactly overlaps a DUD-E active also preserved the result (EF1% 16.40).
+Every leave-one-receptor-out EGFR analysis preserved a positive paired effect. Excluding the exact-overlap FMM complex retained EF1% 15.29, and removing both duplicate AQ4 complexes together retained EF1% 15.66; both paired intervals excluded zero. Among the 369 actives with ECFP4 similarity below 0.30 to every distinct ATP-site native ligand, the coupled score recovered 54 in the global top 1%, compared with 39 for GNINA.
 
 CDK2 defined the boundary of the claim. The same fixed rule increased EF1% from
 10.97 to 13.08, retrieving 62 rather than 52 actives among the first 283
@@ -106,16 +108,21 @@ The full workflow also requires working installations of Uni-Dock, GNINA 1.3.3, 
 
 ## Reproducing the Paper
 
-Three reproduction levels are supported:
+The paper analysis is frozen in [`configs/paper_analysis.yaml`](configs/paper_analysis.yaml). Four reproduction levels are supported:
 
 ```bash
 # 1. Validate package behavior
 pytest -q
 
-# 2. Rebuild publication statistics from the packaged pose-level masters
+# 2. Rebuild the ATP-site prior sensitivities and publication statistics
+PYTHONPATH=src python scripts/native_prior_sensitivity_analysis.py
 PYTHONPATH=src python scripts/submission_robustness_analysis.py
 
-# 3. Render the manuscript after regenerating figures
+# 3. Rebuild the prospective ranking and native-chemotype audit
+PYTHONPATH=src python scripts/build_corrected_prospective_ranking.py
+PYTHONPATH=src python scripts/active_native_similarity_analysis.py
+
+# 4. Render the manuscript after regenerating figures
 python scripts/create_manuscript_figures.py
 quarto render manuscript/syndesis_jcheminformatics_v2.qmd --to typst
 ```
@@ -128,7 +135,7 @@ Please cite the ChemRxiv preprint:
 
 > Mitropoulou E, Giannopoulos D. **Pose-coupled native-interaction weighting for kinase ensemble docking: retrospective evaluation on EGFR and CDK2.** ChemRxiv. 2026. DOI pending.
 
-Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff). The repository is prepared for archival through Zenodo when the release DOI is minted.
+Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff). The paper release is tagged `v1.0.0-paper`; the Zenodo DOI will be inserted after the archive service mints it.
 
 ## Authors
 

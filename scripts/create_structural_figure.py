@@ -124,13 +124,13 @@ def assemble(paths: list[Path]) -> None:
         background = Image.new("RGBA", source.size, "white")
         images.append(Image.alpha_composite(background, source).convert("RGB"))
     tile_w, tile_h = 1450, 1015
-    margin, header = 55, 120
+    margin, header = 55, 145
     canvas = Image.new("RGB", (2 * tile_w + 3 * margin, 2 * (tile_h + header) + 3 * margin), "white")
     titles = [
-        ("A", "Native-derived interaction prior", "1XKK/FMM; key EGFR residues highlighted"),
-        ("B", "Sampling and ranking are distinct", "AQ4: rank 1, 5.81 Å (red); rank 11, 0.83 Å (green); crystal pose gray"),
-        ("C", "High neural score, weak prior recovery", "DUD-E decoy C49121561; CNNscore 0.951, recall 0.158; rank 57 to 820"),
-        ("D", "Interaction-consistent pose promoted", "DUD-E active 475036; CNNscore 0.895, recall 0.421; rank 519 to 27"),
+        ("A", "ATP-site native interaction prior", "1XKK/FMM; key EGFR residues highlighted"),
+        ("B", "Sampling and ranking are distinct", "AQ4: rank 1 = 5.81 Å; rank 11 = 0.83 Å; crystal pose gray"),
+        ("C", "High neural score, weak prior recovery", "DUD-E decoy C49121561; CNNscore 0.951; recall 0.194; rank 63 to 928"),
+        ("D", "Interaction-consistent pose promoted", "DUD-E active 475036; CNNscore 0.895; recall 0.500; rank 525 to 19"),
     ]
     draw = ImageDraw.Draw(canvas)
     for index, (image, (letter, title, subtitle)) in enumerate(zip(images, titles)):
@@ -141,9 +141,9 @@ def assemble(paths: list[Path]) -> None:
         px = x + (tile_w - image.width) // 2
         py = y + header + (tile_h - image.height) // 2
         canvas.paste(image, (px, py))
-        draw.text((x, y), letter, fill="#172126", font=font(44, True))
-        draw.text((x + 60, y + 2), title, fill="#172126", font=font(34, True))
-        draw.text((x + 60, y + 54), subtitle, fill="#41535c", font=font(24))
+        draw.text((x, y), letter, fill="#172126", font=font(50, True))
+        draw.text((x + 68, y + 2), title, fill="#172126", font=font(39, True))
+        draw.text((x + 68, y + 65), subtitle, fill="#41535c", font=font(28))
     canvas.save(OUT / "figure1_structural.png", dpi=(300, 300))
 
 

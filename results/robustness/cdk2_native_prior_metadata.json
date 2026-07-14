@@ -1,7 +1,16 @@
 {
   "target": "CDK2",
-  "n_native_complexes": 5,
-  "global_union_size": 47,
+  "n_deposited_native_complexes": 5,
+  "n_primary_native_complexes": 5,
+  "primary_native_receptors": [
+    "1aq1_a_stu",
+    "1fin_a_atp",
+    "1pxn_a_ck6",
+    "1qmz_a_atp",
+    "2a4l_a_rrc"
+  ],
+  "excluded_primary_native_receptors": [],
+  "primary_union_size": 47,
   "core_60pct_size": 22,
   "n_pose_rows": 141480,
   "n_fingerprint_success": 141110,

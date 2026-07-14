@@ -197,8 +197,10 @@ def analyze_target(name: str, config: dict, out: Path) -> None:
     correlation_path = out / "interaction_size_correlations.csv"
     correlations = pd.DataFrame(correlation_rows)
     if correlation_path.exists():
-        correlations = pd.concat([pd.read_csv(correlation_path), correlations], ignore_index=True)
-        correlations = correlations.drop_duplicates(["target", "scope", "interaction_term", "variable"], keep="last")
+        existing = pd.read_csv(correlation_path)
+        correlations = pd.concat(
+            [existing[~existing["target"].eq(name)], correlations], ignore_index=True
+        )
     correlations.to_csv(correlation_path, index=False)
 
     rows = []

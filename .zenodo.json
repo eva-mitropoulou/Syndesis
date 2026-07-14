@@ -8,5 +8,5 @@
     {"name": "Mitropoulou, Evangelia", "affiliation": "University of Patras"},
     {"name": "Giannopoulos, Dimitris", "affiliation": "University of Patras"}
   ],
-  "description": "Reproducible structure-based workflow for pose-coupled GNINA and target-native interaction weighting, with EGFR and CDK2 enrichment controls, deterministic analog auditing, and replicated MD pose-stability testing. Compact machine-readable results are included; raw docking intermediates, trajectories, model weights, and third-party tools are excluded."
+  "description": "Reproducible structure-based workflow for pose-coupled GNINA and target-native interaction weighting, with an ATP-site-only EGFR prior, EGFR and CDK2 enrichment controls, deterministic analog auditing, and replicated MD pose-stability testing. Analysis-ready pose fingerprints, permutation draws, prospective inputs, ligand parameters, GROMACS topologies, replicate metrics, figures, and manuscript sources are included; large trajectories and third-party tools are excluded."
 }

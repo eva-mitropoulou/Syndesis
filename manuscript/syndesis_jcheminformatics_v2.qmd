@@ -10,8 +10,8 @@ author:
 affiliations:
   - id: unipatras
     name: "Department of Chemistry, University of Patras, 26504 Patras, Greece"
-date: last-modified
 bibliography: references.bib
+reference-section-title: References
 format:
   typst:
     toc: false

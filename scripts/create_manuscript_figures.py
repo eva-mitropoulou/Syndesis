@@ -101,7 +101,7 @@ def permutation_nulls() -> None:
     draws = pd.read_parquet(ROOT / "results/analysis_inputs/permutation_null_draws.parquet")
     labels = {
         "all_ligand": "All-ligand",
-        "heavy_atom_decile": "Property-matched",
+        "heavy_atom_decile": "Heavy-atom-count-matched",
         "class_conditional": "Class-conditional",
     }
     colors = {"all_ligand": "#637381", "heavy_atom_decile": "#2596a8", "class_conditional": "#e07a32"}
@@ -209,7 +209,7 @@ def prospective() -> None:
     ax.axvline(audit.cnn_top_decile_threshold, color="#4a565c", ls="--", lw=0.9)
     ax.axhline(audit.global_median_recall_threshold, color="#4a565c", ls="--", lw=0.9)
     ax.set_xlabel("GNINA CNNscore")
-    ax.set_ylabel("Native-union interaction recall")
+    ax.set_ylabel("ATP-site native-union recall")
     ax.set_title("Conjunctive gate and coupled ranking")
     colorbar = fig.colorbar(scatter, ax=ax, pad=0.02)
     colorbar.set_label("QED")

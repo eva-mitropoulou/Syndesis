@@ -1,0 +1,74 @@
+============================================================================
+| ACPYPE: AnteChamber PYthon Parser interfacE v. 2023.10.27 (c) 2026 AWSdS |
+============================================================================
+DEBUG: CLI: -i ${PROJECT_ROOT}/data/processed/stage11/md_work/ligand_parameters/mol_aatoplajlqecrd_uhfffaoysa_n/mol_aatoplajlqecrd_uhfffaoysa_n.mol2 -b mol_aatoplajlqecrd_uhfffaoysa_n -c bcc -n 0 -a gaff2 -o gmx -f
+DEBUG: Python Version 3.12.13 | packaged by conda-forge | (main, Mar 5 2026, 16:50:00) [GCC 14.3.0]
+DEBUG: Max execution time tolerance is 3h
+DEBUG: ${PROJECT_ROOT}/.tools/stage11_amber/bin/antechamber -dr no -i mol_aatoplajlqecrd_uhfffaoysa_n.mol2 -fi mol2 -o tmp -fo ac -pf y
+DEBUG: Info: The atom type is set to gaff; the options available to the -at flag are
+ gaff, gaff2, amber, bcc, abcg2, and sybyl.
+
+
+DEBUG: setResNameCheckCoords done
+DEBUG: Net charge drift '0.000000'
+==> ... charge set to 0
+==> Executing Antechamber...
+DEBUG: ${PROJECT_ROOT}/.tools/stage11_amber/bin/antechamber -dr no -i mol_aatoplajlqecrd_uhfffaoysa_n.mol2 -fi mol2 -o mol_aatoplajlqecrd_uhfffaoysa_n_bcc_gaff2.mol2 -fo mol2 -c bcc -nc 0 -m 1 -s 2 -df 2 -at gaff2 -pf n 
+==> * Antechamber OK *
+DEBUG: ${PROJECT_ROOT}/.tools/stage11_amber/bin/parmchk2 -i mol_aatoplajlqecrd_uhfffaoysa_n_bcc_gaff2.mol2 -f mol2 -o mol_aatoplajlqecrd_uhfffaoysa_n_AC.frcmod -s 2
+==> * Parmchk OK *
+==> Executing Tleap...
+DEBUG: ${PROJECT_ROOT}/.tools/stage11_amber/bin/tleap -f tleap.in
+DEBUG: ++++++++++start_quote+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+DEBUG: Checking 'UNL'....
+Checking parameters for unit 'UNL'.
+Checking for bond parameters.
+Checking for angle parameters.
+Unit is OK.
+DEBUG: ++++++++++end_quote+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+==> * Tleap OK *
+==> Removing temporary files...
+DEBUG: prmtop and inpcrd files loaded
+DEBUG: basename defined = 'mol_aatoplajlqecrd_uhfffaoysa_n'
+DEBUG: getCoords done
+DEBUG: getABCOEFs done
+DEBUG: charge to be balanced: total -0.0020000011
+DEBUG: balanceCharges done
+DEBUG: Balanced TotalCharge -0.0000000000
+DEBUG: PBC = None
+DEBUG: getAtoms done
+DEBUG: getBonds done
+DEBUG: getAngles done
+DEBUG: getDihedrals done
+==> Using OpenBabel v.3.1.0
+
+==> Writing GROMACS files
+
+==> Disambiguating lower and uppercase atomtypes in GMX top file, even if identical.
+
+DEBUG: writing GRO file
+DEBUG: Box size estimated
+DEBUG: writing POSRE file
+DEBUG: atomTypes 16
+DEBUG: GMX atomtypes done
+DEBUG: atoms 39
+DEBUG: GMX atoms done
+DEBUG: bonds 42
+DEBUG: GMX bonds done
+DEBUG: atomPairs 95
+DEBUG: GMX pairs done
+DEBUG: angles 72
+DEBUG: GMX angles done
+DEBUG: setProperDihedralsCoef done
+DEBUG: properDihedralsCoefRB 111
+DEBUG: properDihedralsAlphaGamma 0
+DEBUG: properDihedralsGmx45 111
+==> Writing GMX dihedrals for GMX 4.5 and higher.
+
+DEBUG: GMX special proper dihedrals done
+DEBUG: improperDihedrals 14
+DEBUG: GMX improper dihedrals done
+==> Overwriting pickle file mol_aatoplajlqecrd_uhfffaoysa_n.pkl
+==> Removing temporary files...
+Total time of execution: 33s
+DEBUG: No tmp folder left to be removed

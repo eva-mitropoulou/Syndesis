@@ -9,7 +9,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from egfr_dockingforge.enrichment.native_prior import native_union, parse_fingerprint
+from egfr_dockingforge.enrichment.native_prior import native_union, parse_fingerprint  # noqa: E402
 
 INPUTS = ROOT / "results/analysis_inputs"
 FINGERPRINTS = INPUTS / "prospective_pose_fingerprints.parquet"

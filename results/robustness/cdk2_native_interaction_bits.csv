@@ -1,4 +1,4 @@
-target,interaction_bit,native_count,native_frequency,in_global_union,in_60pct_core,native_receptors_json
+target,interaction_bit,native_count,native_frequency,in_primary_union,in_60pct_core,native_receptors_json
 CDK2,pocket_residue:10:Hydrophobic,2,0.4,True,False,"[""1aq1_a_stu"", ""2a4l_a_rrc""]"
 CDK2,pocket_residue:10:ImplicitHBDonor,1,0.2,True,False,"[""1qmz_a_atp""]"
 CDK2,pocket_residue:10:VdWContact,5,1.0,True,True,"[""1aq1_a_stu"", ""1fin_a_atp"", ""1pxn_a_ck6"", ""1qmz_a_atp"", ""2a4l_a_rrc""]"
