@@ -99,13 +99,13 @@ The pose-decoupled late-fusion comparator reported in Table 2 independently comb
 
 ![EF1% permutation distributions for EGFR and CDK2 under unrestricted, heavy-atom-count-matched, and class-conditional interaction assignments.](figures/figure4_permutation_nulls.png){#fig-permutation width=100% fig-alt="Permutation distributions with observed pose-coupled enrichment marked for EGFR and CDK2."}
 
-## Robustness analyses localize the scope of the EGFR result
+## Robustness and scope of the EGFR result
 
-No single primary receptor explained the effect: leave-one-receptor-out EF1% gains ranged from 3.50 to 4.79, with all paired intervals excluding zero. Removing the exact-overlap FMM native ligand retained EF1% 15.29 and a paired gain of 3.32 (95% CI 1.84 to 5.34); removing both AQ4 complexes retained EF1% 15.66 and a gain of 3.69 (1.11 to 6.08). Among 369 actives with maximum ECFP4 similarity below 0.30 to every distinct native ligand, the coupled ranking recovered 54 in the global top 1%, compared with 39 for GNINA.
+The EGFR improvement was not dependent on a single receptor state. In leave-one-receptor-out analyses, the EF1% gain ranged from 3.50 to 4.79, and every paired 95% confidence interval remained above zero. Potential native-ligand leakage also did not explain the result. Removing 1XKK/FMM, whose ligand exactly matched one DUD-E active, retained an EF1% of 15.29, while jointly removing both AQ4-containing complexes retained an EF1% of 15.66. Moreover, among the 369 actives with ECFP4 similarity below 0.30 to every native ligand, the coupled method recovered 54 in the global top 1%, compared with 39 for GNINA.
 
-Recall correlated with heavy-atom count ($\rho=0.218$) and molecular weight ($\rho=0.221$), and more strongly with total detected contacts ($\rho=0.704$). This motivates the heavy-atom-count-matched null and prevents interpreting union recall as size-free. The 60%-frequency core, frequency-weighted, Jaccard, and four-receptor-specific priors gave EF1% values of 17.14, 16.58, 15.85, and 16.03, respectively, versus 11.98 for GNINA. These are robustness observations, not evidence that one weighting formula is universally optimal.
+Native-union recall was weakly associated with ligand size but strongly associated with the total number of detected contacts: Spearman $\rho$ was 0.218 for heavy-atom count, 0.221 for molecular weight, and 0.704 for contact count. Recall should therefore not be interpreted as size-independent, although the heavy-atom-count-matched permutation analysis showed that size alone did not account for the enrichment gain.
 
-Across $\lambda=0.25$ to $3$ in $\mathrm{CNNscore}[1+\lambda R]$, the EGFR direction remained positive (EF1% 13.82 to 18.24); $\lambda=1$ was the development-fixed primary value rather than the empirically optimal value.
+The positive EGFR result was also retained under alternative interaction definitions. Conserved-core, frequency-weighted, Jaccard, and receptor-specific priors produced EF1% values of 17.14, 16.58, 15.85, and 16.03, respectively, compared with 11.98 for GNINA. Across $\lambda$ values from 0.25 to 3, EF1% ranged from 13.82 to 18.24. These analyses support the robustness of the interaction contribution but do not establish a universally optimal prior or weighting. The development-fixed value $\lambda=1$ therefore remained the primary specification.
 
 ## Five-receptor ensemble sensitivity
 
@@ -140,10 +140,16 @@ All 21 planned production trajectories completed. The majority-replicate gate la
 | Analog 006 | Deterministic analog | 3/3 | 2.30 | 0.64 | Stable |
 | Mis-docked control | Deliberate negative control | 0/3 | 5.72 | 0.008 | Unstable |
 
-::: {#fig-md-frames layout-ncol=2 fig-cap="GROMACS production-trajectory coordinates for the MD-stable Control 002 complex, replicate 1. Left: first saved frame (0 ns). Right: final saved frame (20 ns). The end frame was aligned to the start frame on protein atoms; both uncropped panels show the complete EGFR protein, teal ligand, and grey ATP-pocket residues within 5 Å of the ligand. These snapshots illustrate modeled pocket retention and complement the replicate-level metrics in Table 4."}
-![Start of production trajectory (0 ns).](figures/md_control_002_rep01_start.png){fig-alt="Uncropped full-protein GROMACS production-trajectory frame at 0 ns, showing the Control 002 ligand in the EGFR ATP pocket."}
+::: {#fig-md-stable-frames layout-ncol=1 fig-cap="GROMACS production-trajectory coordinates for the MD-stable Control 002 complex, replicate 1. Top: first saved frame (0 ns). Bottom: final saved frame (20 ns), aligned to the start-frame protein. Both uncropped panels show the complete EGFR protein, teal ligand, and grey ATP-pocket residues within 5 Å of the starting ligand. In the final frame, a translucent grey ligand marks the starting pose. The retained teal ligand illustrates persistence of the modeled pocket geometry."}
+![Start of Control 002 production trajectory (0 ns).](figures/md_control_002_rep01_start.png){width=85% fig-alt="Uncropped full-protein GROMACS production-trajectory frame at 0 ns, showing the stable Control 002 ligand in the EGFR ATP pocket."}
 
-![End of production trajectory (20 ns).](figures/md_control_002_rep01_end.png){fig-alt="Uncropped full-protein GROMACS production-trajectory frame at 20 ns, aligned to the start-frame protein, showing the Control 002 ligand in the EGFR ATP pocket."}
+![End of Control 002 production trajectory (20 ns).](figures/md_control_002_rep01_end.png){width=85% fig-alt="Uncropped full-protein GROMACS production-trajectory frame at 20 ns, aligned to the start-frame protein, with a translucent grey start-pose ligand reference and teal final ligand."}
+:::
+
+::: {#fig-md-failed-frames layout-ncol=1 fig-cap="GROMACS production-trajectory coordinates for the deliberately mis-docked negative control, replicate 1. Top: first saved frame (0 ns). Bottom: final saved frame (20 ns), aligned to the start-frame protein. Both panels retain the complete protein and the start-frame ATP-pocket residues (grey). In the final frame, the translucent grey ligand is the starting pose and the red ligand is the actual endpoint. This system failed the majority-replicate gate in all three trajectories."}
+![Start of mis-docked negative-control production trajectory (0 ns).](figures/md_misdocked_control_rep01_start.png){width=85% fig-alt="Uncropped full-protein GROMACS production-trajectory frame at 0 ns for the deliberately mis-docked negative control."}
+
+![End of mis-docked negative-control production trajectory (20 ns).](figures/md_misdocked_control_rep01_end.png){width=85% fig-alt="Uncropped full-protein GROMACS production-trajectory frame at 20 ns for the deliberately mis-docked negative control, aligned to the start-frame protein, with grey start-pose and red final ligand."}
 :::
 
 ![MD pose-persistence stress test. Points summarize candidate-level median ligand RMSD and key-interaction occupancy across three independent 20 ns production trajectories; colors indicate the predeclared majority-replicate decision.](figures/figure6_md_stability.png){#fig-md width=100% fig-alt="Ligand RMSD and interaction occupancy for replicated MD systems, distinguishing stable poses from the deliberately mis-docked control."}
