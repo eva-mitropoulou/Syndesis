@@ -135,7 +135,7 @@ Please cite the ChemRxiv preprint:
 
 > Mitropoulou E, Giannopoulos D. **Pose-coupled native-interaction weighting for kinase ensemble docking: retrospective evaluation on EGFR and CDK2.** ChemRxiv. 2026. DOI pending.
 
-Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff). The paper release is tagged `v1.0.0-paper`; the Zenodo DOI will be inserted after the archive service mints it.
+Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff). The reproducibility package is frozen in the `v1.0.0-paper` GitHub release; the ChemRxiv DOI will be inserted after the preprint service assigns it.
 
 ## Authors
 
