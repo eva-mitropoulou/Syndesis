@@ -37,6 +37,14 @@ plt.rcParams.update(
 )
 
 
+def primary_table(stem: str) -> pd.DataFrame:
+    """Load the four-receptor primary artifacts, not legacy aggregate CDK2 rows."""
+    combined = pd.read_csv(ROBUSTNESS / f"{stem}.csv")
+    egfr = combined[combined.target.eq("EGFR")]
+    cdk2 = pd.read_csv(ROBUSTNESS / f"interim_cdk2_{stem}.csv")
+    return pd.concat([egfr, cdk2], ignore_index=True)
+
+
 def save(fig, name: str) -> None:
     fig.savefig(OUT / f"{name}.png", bbox_inches="tight", facecolor="white")
     fig.savefig(OUT / f"{name}.pdf", bbox_inches="tight", facecolor="white")
@@ -44,7 +52,7 @@ def save(fig, name: str) -> None:
 
 
 def enrichment() -> None:
-    metrics_table = pd.read_csv(ROBUSTNESS / "bootstrap_metric_intervals.csv")
+    metrics_table = primary_table("bootstrap_metric_intervals")
     targets = ["EGFR", "CDK2"]
     arms = ["gnina", "coupled"]
     labels = ["GNINA", "GNINA +\ninteraction"]
@@ -75,7 +83,7 @@ def enrichment() -> None:
 
 
 def paired_deltas() -> None:
-    deltas = pd.read_csv(ROBUSTNESS / "paired_metric_effects.csv")
+    deltas = primary_table("paired_metric_effects")
     fig, axes = plt.subplots(1, 2, figsize=(8.4, 3.6))
     panels = [("ef1", "EF1% difference"), ("bedroc", "BEDROC difference")]
     for ax, (metric, title) in zip(axes, panels):
@@ -98,7 +106,15 @@ def paired_deltas() -> None:
 
 def permutation_nulls() -> None:
     summary = pd.read_csv(ROBUSTNESS / "permutation_null_summary.csv")
+    summary = pd.concat([
+        summary[summary.target.eq("EGFR")],
+        pd.read_csv(ROBUSTNESS / "interim_cdk2_permutation_null_summary.csv"),
+    ], ignore_index=True)
     draws = pd.read_parquet(ROOT / "results/analysis_inputs/permutation_null_draws.parquet")
+    draws = pd.concat([
+        draws[draws.target.eq("EGFR")],
+        pd.read_parquet(ROBUSTNESS / "interim_cdk2_permutation_null_draws.parquet"),
+    ], ignore_index=True)
     labels = {
         "all_ligand": "All-ligand",
         "heavy_atom_decile": "Heavy-atom-count-matched",
@@ -125,6 +141,10 @@ def permutation_nulls() -> None:
 
 def receptor_sensitivity() -> None:
     frame = pd.read_csv(ROBUSTNESS / "leave_one_receptor_out.csv")
+    frame = pd.concat([
+        frame[frame.target.eq("EGFR")],
+        pd.read_csv(ROBUSTNESS / "interim_cdk2_leave_one_receptor_out.csv"),
+    ], ignore_index=True)
     targets = ["EGFR", "CDK2"]
     fig, axes = plt.subplots(1, 2, figsize=(10.7, 4.1), constrained_layout=True)
     for ax, target in zip(axes, targets):

@@ -214,6 +214,60 @@ def metric_values(labels: np.ndarray, scores: np.ndarray) -> dict[str, float]:
     }
 
 
+def late_fusion_comparator(name: str, raw: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Compare pose-coupled scoring with a deliberately pose-decoupled fusion.
+
+    The late-fusion score independently maximizes CNNscore and recall across
+    receptor states. It is included as a structural-interpretability comparator,
+    not as a physically realizable pose score.
+    """
+    _, cnn, recalls, labels = aligned_vectors(raw)
+    scores = {
+        "gnina": np.nanmax(cnn, axis=1),
+        "pose_coupled": np.nanmax(cnn * (1 + recalls), axis=1),
+        "pose_decoupled_late_fusion": np.nanmax(cnn, axis=1) * (1 + np.nanmax(recalls, axis=1)),
+    }
+    metrics = []
+    for arm, values in scores.items():
+        metrics.append({"target": name, "arm": arm, **metric_values(labels, values)})
+
+    positive = np.flatnonzero(labels == 1)
+    negative = np.flatnonzero(labels == 0)
+    contrasts = {
+        "pose_coupled_minus_late_fusion": ("pose_coupled", "pose_decoupled_late_fusion"),
+        "late_fusion_minus_gnina": ("pose_decoupled_late_fusion", "gnina"),
+    }
+    # The manuscript's paired late-fusion comparison is predeclared for EF1%;
+    # retaining only this draw avoids unnecessary repeated BEDROC calculations.
+    draws = {contrast: {"ef1": []} for contrast in contrasts}
+    for iteration in range(N_BOOT):
+        rng = np.random.default_rng(SEED + iteration)
+        indices = np.concatenate([
+            rng.choice(positive, len(positive), replace=True),
+            rng.choice(negative, len(negative), replace=True),
+        ])
+        sampled_ef1 = {arm: ef(labels[indices], values[indices]) for arm, values in scores.items()}
+        for contrast, (numerator, denominator) in contrasts.items():
+            for metric in draws[contrast]:
+                draws[contrast][metric].append(sampled_ef1[numerator] - sampled_ef1[denominator])
+
+    effects = []
+    for contrast, (numerator, denominator) in contrasts.items():
+        for metric, values in draws[contrast].items():
+            array = np.asarray(values)
+            effects.append({
+                "target": name,
+                "contrast": contrast,
+                "metric": metric,
+                "estimate": metric_values(labels, scores[numerator])[metric] - metric_values(labels, scores[denominator])[metric],
+                "ci_lo": np.percentile(array, 2.5),
+                "ci_hi": np.percentile(array, 97.5),
+                "bootstrap_fraction_positive": np.mean(array > 0),
+                "n_bootstrap": N_BOOT,
+            })
+    return pd.DataFrame(metrics), pd.DataFrame(effects)
+
+
 def bootstrap_metric_tables(
     name: str, per: pd.DataFrame
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -423,6 +477,9 @@ def main() -> int:
         intervals, effects = bootstrap_metric_tables(name, per)
         frames["bootstrap_metric_intervals"] = intervals
         frames["paired_metric_effects"] = effects
+        late_metrics, late_effects = late_fusion_comparator(name, raw)
+        late_metrics.to_csv(OUT / f"interim_{name.lower()}_late_fusion_comparator_metrics.csv", index=False)
+        late_effects.to_csv(OUT / f"interim_{name.lower()}_late_fusion_comparator_effects.csv", index=False)
         prefix = f"interim_{name.lower()}_"
         for stem, frame in frames.items():
             path = OUT / f"{prefix}{stem}.{output_names[stem]}"
@@ -448,6 +505,12 @@ def main() -> int:
                 )
         else:
             combined.to_csv(OUT / f"{stem}.{extension}", index=False)
+    for stem in ["late_fusion_comparator_metrics", "late_fusion_comparator_effects"]:
+        paths = [OUT / f"interim_{name.lower()}_{stem}.csv" for name in TARGETS]
+        if all(path.exists() for path in paths):
+            pd.concat([pd.read_csv(path) for path in paths], ignore_index=True).to_csv(
+                OUT / f"{stem}.csv", index=False
+            )
     prospective_audit().to_csv(OUT / "prospective_gate_audit.csv", index=False)
 
     metadata = {

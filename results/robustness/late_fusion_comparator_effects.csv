@@ -1,0 +1,3 @@
+target,contrast,metric,estimate,ci_lo,ci_hi,bootstrap_fraction_positive,n_bootstrap
+EGFR,pose_coupled_minus_late_fusion,ef1,0.5527592354575219,-0.5527592354575219,2.026783863344253,0.8515,2000
+EGFR,late_fusion_minus_gnina,ef1,3.8693146482026624,1.8425307848584094,5.7118454330610735,1.0,2000

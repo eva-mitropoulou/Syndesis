@@ -1,0 +1,5 @@
+label,frame,time_ps,coordinate_file
+control_002_rep01_start,0,0.000,figures/manuscript/md_trajectory_frames/control_002_rep01_start.pdb
+control_002_rep01_end,2000,20000.000,figures/manuscript/md_trajectory_frames/control_002_rep01_end.pdb
+misdocked_control_rep01_start,0,0.000,figures/manuscript/md_trajectory_frames/misdocked_control_rep01_start.pdb
+misdocked_control_rep01_end,2000,20000.000,figures/manuscript/md_trajectory_frames/misdocked_control_rep01_end.pdb

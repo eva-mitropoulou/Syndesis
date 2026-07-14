@@ -5,27 +5,28 @@
   "ef_top_set_rounding": "round(N * fraction), minimum 1",
   "tie_handling": "stable mergesort descending",
   "primary_native_priors": {
-    "EGFR": null,
+    "EGFR": {
+      "included_native_receptors": [
+        "1m17_a_aq4_999",
+        "1xkk_a_fmm_91",
+        "4hjo_a_aq4_1001",
+        "5cav_a_4zq_1101"
+      ],
+      "excluded_native_receptors": [
+        "6duk_c_jbj_1103"
+      ],
+      "interaction_bit_count": 62,
+      "docking_receptors": [
+        "1m17_a_aq4_999",
+        "1xkk_a_fmm_91",
+        "4hjo_a_aq4_1001",
+        "5cav_a_4zq_1101"
+      ],
+      "analysis_role": "primary_four_receptor"
+    },
     "EGFR_5RECEPTOR_SENSITIVITY": null,
     "CDK2_5RECEPTOR_SENSITIVITY": null,
-    "CDK2": {
-      "included_native_receptors": [
-        "1qmz_a_atp",
-        "1fin_a_atp",
-        "2a4l_a_rrc",
-        "1aq1_a_stu",
-        "1pxn_a_ck6"
-      ],
-      "excluded_native_receptors": [],
-      "interaction_bit_count": 47,
-      "docking_receptors": [
-        "1aq1_a_stu",
-        "1fin_a_atp",
-        "1pxn_a_ck6",
-        "2a4l_a_rrc"
-      ],
-      "analysis_role": "primary_four_receptor_excluding_unphosphorylated_1qmz"
-    }
+    "CDK2": null
   },
   "analysis_roles": {
     "EGFR": "primary_four_receptor",
