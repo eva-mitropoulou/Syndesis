@@ -137,9 +137,9 @@ The complete docking campaigns require the source DUD-E and ZINC files described
 
 Please cite the frozen software and data snapshot until the ChemRxiv preprint is posted:
 
-> Mitropoulou E, Giannopoulos D. **Syndesis v1.1.7-paper: pose-coupled native-interaction weighting for kinase ensemble docking.** GitHub tagged repository snapshot, 2026.
+> Mitropoulou E, Giannopoulos D. **Syndesis v1.1.8-paper: pose-coupled native-interaction weighting for kinase ensemble docking.** GitHub tagged repository snapshot, 2026.
 
-Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff). The reproducibility package is frozen in the `v1.1.7-paper` GitHub tag. ChemRxiv preprint metadata will be added after posting.
+Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff). The reproducibility package is frozen in the `v1.1.8-paper` GitHub tag. ChemRxiv preprint metadata will be added after posting.
 
 ## Authors
 
