@@ -28,7 +28,9 @@ Kinase ATP pockets provide a stringent test because they contain recurrent hinge
 
 The primary study was a paired comparison between GNINA and a pose-coupled GNINA-plus-interaction score on the same EGFR ligand-receptor evaluations. The EGFR docking ensemble contained 1M17, 1XKK, 4HJO, 5CAV, and 6DUK. The interaction prior used only ATP-site holo complexes 1M17/AQ4, 1XKK/FMM, 4HJO/AQ4, and 5CAV/4ZQ; the allosteric ligand in 6DUK was excluded from prior construction [@to2019]. CDK2 used 1QMZ/ATP, 1FIN/ATP, 2A4L/RRC, 1AQ1/STU, and 1PXN/CK6; 1H00 was held out. Receptor identities, chains, docking boxes, quality decisions, and residue maps are machine-readable in the release.
 
-EGFR receptor chains were prepared from PDB structures [@berman2000], with non-protein residues removed and Open Babel 3.1.0 used to produce pH 7.4, Gasteiger-charged PDBQT receptors. For docked-pose fingerprints, the ProLIF protein was regenerated from the exact docking PDBQT. A five-receptor audit found identical docking and ProLIF heavy-atom sets and zero ProLIF-only atoms. The CDK2 chain-A extractor represented 1QMZ without HETATM phosphothreonine TPO160; the 1QMZ-excluded result is therefore treated as a sensitivity analysis rather than a phosphorylated-CDK2 model.
+EGFR receptor chains were prepared from PDB structures [@berman2000], with non-protein residues removed and Open Babel 3.1.0 used to produce pH 7.4, Gasteiger-charged PDBQT receptors. For docked-pose fingerprints, the ProLIF protein was regenerated from the exact docking PDBQT by Open Babel; ProLIF then assigned residue, aromatic, donor, and acceptor chemical perception to that docking-derived model. A five-receptor audit found identical docking and ProLIF heavy-atom sets and zero ProLIF-only atoms. The CDK2 chain-A extractor represented 1QMZ without HETATM phosphothreonine TPO160; the 1QMZ-excluded result is therefore treated as a sensitivity analysis rather than a phosphorylated-CDK2 model.
+
+**Table 1.** Receptor ensembles, benchmark sizes, and native-prior complexes.
 
 | Target | Docking receptor states | Benchmark molecules | Native-prior complexes |
 |---|---|---:|---:|
@@ -51,11 +53,7 @@ The multiplier is bounded between one and two. Critically, CNNscore and recall i
 
 ## Statistical evaluation
 
-EF1% was the primary endpoint; ROC-AUC, EF5%, and BEDROC ($\alpha=80.5$) were secondary [@truchon2007]. We used 2,000 paired class-stratified bootstrap resamples (seed 807). Three 1,000-draw permutation controls reassigned complete five-receptor recall vectors: across all ligands, within heavy-atom-count deciles, and within activity class. The last preserves active-decoy recall distributions and tests molecule-specific assignment rather than a general random-score null. Receptor exclusions, native-complex exclusions, joint duplicate-chemotype exclusions, exact native/DUD-E identity checks, ECFP4 similarity strata, and recall-size correlations tested robustness [@bemis1996; @rogers2010].
-
-## Downstream evidence layer
-
-Redocking, a deterministic RDKit analog audit, replicated 20 ns AMBER ff19SB/GAFF2/OPC3 MD triage, and a 2,000-compound ZINC-derived prospective application were retained as auditable downstream workflow demonstrations. They did not contribute to the enrichment endpoint or convert a rank into an activity claim. Full protocols, lineage tables, parameterization warnings, trajectories-derived metrics, and prospective ranks are available in the public release rather than a separate supplementary document.
+EF1% was the primary endpoint; ROC-AUC, EF5%, and BEDROC ($\alpha=80.5$) were secondary [@truchon2007]. We used 2,000 paired class-stratified bootstrap resamples (seed 807). Three 1,000-draw permutation controls reassigned complete five-receptor recall vectors: across all ligands, within heavy-atom-count deciles, and within activity class. The last preserves active-decoy recall distributions and tests molecule-specific assignment rather than a general random-score null. Receptor exclusions, native-complex exclusions, joint duplicate-chemotype exclusions, exact native/DUD-E identity checks, ECFP4 similarity strata, and recall-size correlations tested robustness [@bemis1996; @rogers2010]. DUD-E decoys are property-matched benchmark compounds rather than experimentally confirmed inactives, and its analogue and decoy construction can introduce benchmark-specific bias; this analysis therefore evaluates incremental ranking performance, not prospective activity prediction [@mysinger2012; @stein2021; @wallach2018].
 
 # Results
 
@@ -68,6 +66,8 @@ Redocking separated pose sampling from pose selection. In one AQ4 task, a 0.83 A
 ## Pose-coupled weighting improves EGFR early enrichment
 
 The EGFR benchmark comprised 542 actives and 35,010 decoys. GNINA achieved EF1% 11.79, retrieving 64 actives among the first 356 molecules. The coupled score achieved EF1% 16.40 and retrieved 89 actives. The paired EF1% improvement was 4.61 (95% CI 2.58 to 6.82); ROC-AUC, EF5%, and BEDROC also increased.
+
+**Table 2.** EGFR enrichment across the five-receptor ensemble. Intervals are percentile 95% confidence intervals from 2,000 class-stratified bootstrap resamples.
 
 | Ranking arm | ROC-AUC (95% CI) | EF1% (95% CI) | EF5% (95% CI) | BEDROC (95% CI) |
 |---|---:|---:|---:|---:|
@@ -82,15 +82,17 @@ The gain exceeded all three nulls. All-ligand reassignment gave mean EF1% 11.35 
 
 ## Robustness analyses localize the scope of the EGFR result
 
-No single receptor explained the effect: leave-one-receptor-out EF1% gains ranged from 3.50 to 4.97, with all paired intervals excluding zero. The allosteric 6DUK ligand was absent from the prior in every analysis. Removing the exact-overlap FMM native ligand retained EF1% 15.29 and a paired gain of 3.50 (95% CI 1.84 to 5.53); removing both AQ4 complexes retained EF1% 15.66 and a gain of 3.87 (1.29 to 6.26). Among 369 actives with maximum ECFP4 similarity below 0.30 to every distinct native ligand, the coupled ranking recovered 54 in the global top 1%, compared with 39 for GNINA.
+No single receptor explained the effect: leave-one-receptor-out EF1% gains ranged from 2.95 to 4.97, with all paired intervals excluding zero. The allosteric 6DUK ligand was absent from the prior in every analysis. Removing the exact-overlap FMM native ligand retained EF1% 15.29 and a paired gain of 3.50 (95% CI 1.84 to 5.53); removing both AQ4 complexes retained EF1% 15.66 and a gain of 3.87 (1.29 to 6.26). Among 369 actives with maximum ECFP4 similarity below 0.30 to every distinct native ligand, the coupled ranking recovered 54 in the global top 1%, compared with 39 for GNINA.
 
 Recall correlated weakly with heavy-atom count ($\rho=0.158$) and molecular weight ($\rho=0.160$), but more strongly with total detected contacts ($\rho=0.569$). This motivates the size-matched null and prevents interpreting union recall as size-free. Conserved-core, frequency-weighted, Jaccard, and receptor-specific priors also improved EGFR enrichment; these are robustness observations, not evidence that one weighting formula is universally optimal.
+
+Across $\lambda=0.25$ to $3$ in $\mathrm{CNNscore}[1+\lambda R]$, the EGFR direction remained positive; $\lambda=1$ was the development-fixed primary value rather than the empirically optimal value.
 
 ![Leave-one-receptor-out EF1% effects for EGFR and CDK2.](figures/figure5_receptor_sensitivity.png){#fig-receptor-sensitivity width=92% fig-alt="Receptor-exclusion effects on coupled-score EF1% differences."}
 
 ## CDK2 defines a transfer boundary
 
-Applying the same procedure to CDK2 increased EF1% from 10.97 to 13.08, corresponding to 52 versus 62 actives among the first 283 molecules. The paired difference was 2.11 (95% CI -0.42 to 4.64), and receptor exclusions were heterogeneous. The positive direction and permutation results are compatible with useful interaction information, but the paired uncertainty does not establish transfer beyond the EGFR ensemble. Excluding the unphosphorylated 1QMZ representation gave a difference of 2.74 (0.00 to 5.06), which is a sensitivity result rather than validation of phosphorylated CDK2 chemistry.
+Applying the same procedure to CDK2 increased EF1% from 10.97 to 13.08, corresponding to 52 versus 62 actives among the first 283 molecules. The paired difference was 2.11 (95% CI -0.42 to 4.64), and receptor exclusions were heterogeneous. Its all-ligand, heavy-atom-count-matched, and class-conditional permutation tests gave empirical $p=0.0010$, 0.0140, and 0.0220, respectively. The positive direction is compatible with useful interaction information, but the paired uncertainty does not establish transfer beyond the EGFR ensemble. Excluding the unphosphorylated 1QMZ representation gave a difference of 2.74 (0.00 to 5.06), which is a sensitivity result rather than validation of phosphorylated CDK2 chemistry.
 
 # Discussion
 
@@ -98,9 +100,7 @@ The main finding is methodological and specific: a native-derived interaction pr
 
 The robustness analyses also refine the biological interpretation. The effect survived removal of individual receptor states, exact native-ligand overlap, and duplicate AQ4 structures, and remained visible among low-similarity actives. These results support the view that the prior contributes target-structural information rather than merely recognizing one crystallographic chemotype. At the same time, union recall depends on the number of detected contacts and different prior definitions also perform well. The appropriate conclusion is not that native-union recall is uniquely correct, but that explicit target-native interaction evidence can complement a learned score.
 
-CDK2 sets the boundary of the claim. Its point estimates are favorable, but the paired EF1% interval crosses zero and receptor dependence is substantial. Transfer should therefore be evaluated target by target rather than assumed from kinase-family membership. Likewise, DUD-E is external to Syndesis development but not necessarily independent of GNINA training structures or chemistry; this study estimates the incremental value of coupling on these benchmarks, not absolute GNINA generalization.
-
-The broader Syndesis workflow is intentionally secondary here. Deterministic analog, MD, and prospective modules preserve decision provenance and offer practical follow-up tools, but they neither validate the enrichment result nor demonstrate biological activity. Their role is to make a structural ranking decision inspectable after the primary retrospective test has been completed.
+CDK2 sets the boundary of the claim. Its point estimates are favorable, but the paired EF1% interval crosses zero and receptor dependence is substantial. Transfer should therefore be evaluated target by target rather than assumed from kinase-family membership. The one-state ligand-preparation strategy is an additional practical limitation because alternative protonation, tautomeric, stereochemical, and conformational states can affect both docking and interaction recovery. Likewise, DUD-E is external to Syndesis development but not necessarily independent of GNINA training structures or chemistry; this study estimates the incremental value of coupling on these benchmarks, not absolute GNINA generalization.
 
 # Conclusions
 
@@ -108,13 +108,13 @@ Pose-coupled native-interaction weighting improved EGFR early enrichment beyond 
 
 # Abbreviations
 
-ATP, adenosine triphosphate; BEDROC, Boltzmann-enhanced discrimination of receiver operating characteristic; CDK2, cyclin-dependent kinase 2; CNN, convolutional neural network; DUD-E, Directory of Useful Decoys--Enhanced; ECFP, extended-connectivity fingerprint; EF, enrichment factor; EGFR, epidermal growth factor receptor; GNINA, graph neural network interaction scoring; IFP, interaction fingerprint; MD, molecular dynamics; NDCG, normalized discounted cumulative gain; ROC-AUC, area under the receiver-operating-characteristic curve.
+ATP, adenosine triphosphate; BEDROC, Boltzmann-enhanced discrimination of receiver operating characteristic; CDK2, cyclin-dependent kinase 2; CNN, convolutional neural network; DUD-E, Directory of Useful Decoys--Enhanced; ECFP, extended-connectivity fingerprint; EF, enrichment factor; EGFR, epidermal growth factor receptor; IFP, interaction fingerprint; MD, molecular dynamics; NDCG, normalized discounted cumulative gain; ROC-AUC, area under the receiver-operating-characteristic curve.
 
 # Declarations
 
 ## Availability of data and materials
 
-Source code, workflow configurations, tests, figures, the rendered manuscript, and machine-readable supporting data are available at [https://github.com/eva-mitropoulou/Syndesis](https://github.com/eva-mitropoulou/Syndesis). The exact paper package is the [v1.1.2-paper release](https://github.com/eva-mitropoulou/Syndesis/releases/tag/v1.1.2-paper). It includes pose coordinates, native interaction-bit tables, ligand-level benchmark scores and fingerprints, bootstrap and permutation draws, exclusion analyses, analog lineage, graph-mapping validation, MD protocols and replicate metrics, and prospective ranks. Raw structures and benchmark molecules originate from the PDB, DUD-E, and ZINC22 and remain subject to their source terms. No separate supplementary document accompanies this manuscript.
+Source code, workflow configurations, tests, figures, the rendered manuscript, and machine-readable supporting data are available at [https://github.com/eva-mitropoulou/Syndesis](https://github.com/eva-mitropoulou/Syndesis). The exact paper package is the [v1.1.3-paper release](https://github.com/eva-mitropoulou/Syndesis/releases/tag/v1.1.3-paper). It includes pose coordinates, native interaction-bit tables, ligand-level benchmark scores and fingerprints, bootstrap and permutation draws, exclusion analyses, analog lineage, graph-mapping validation, MD protocols and replicate metrics, and prospective ranks. Raw structures and benchmark molecules originate from the PDB, DUD-E, and ZINC22 and remain subject to their source terms. No separate supplementary document accompanies this manuscript.
 
 ## Competing interests
 

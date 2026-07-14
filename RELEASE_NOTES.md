@@ -1,4 +1,4 @@
-# Syndesis v1.1.2-paper
+# Syndesis v1.1.3-paper
 
 This release is the reproducibility package for the Journal of Cheminformatics manuscript, *Pose-coupled native-interaction weighting for kinase ensemble docking: retrospective evaluation on EGFR and CDK2*.
 
@@ -6,9 +6,11 @@ This release standardizes the project, Python package, command-line interface, a
 environment name as `Syndesis`. The EGFR primary case study and CDK2 transfer analysis
 are unchanged.
 
-This update adds a fail-closed docking/ProLIF receptor-consistency audit, derives
-docked-pose ProLIF receptors from the exact docking PDBQT, documents the unphosphorylated
-1QMZ representation, and expands the MD, pose-ranker, and analog-gate methods.
+This update finalizes the focused manuscript and its reproducibility package. It adds
+the DUD-E benchmark limitation, formula-weight sensitivity, CDK2 permutation results,
+explicit docking-derived ProLIF chemical perception, table captions, and the corrected
+leave-one-receptor-out range. It retains the fail-closed docking/ProLIF receptor-consistency
+audit and documents the unphosphorylated 1QMZ representation.
 
 ## Scientific scope
 

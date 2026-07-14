@@ -12,7 +12,7 @@ author:
       - ref: unipatras
 affiliations:
   - id: unipatras
-    name: "Department of Chemistry, University of Patras, University Campus, 26504 Rio, Patras, Greece"
+    name: "University of Patras, Greece"
 bibliography: references.bib
 reference-section-title: References
 format:
