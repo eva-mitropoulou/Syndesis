@@ -1,2 +1,1 @@
-"""Stage 9 agentic analog optimization package."""
-
+"""Stage 9 deterministic analog generation and structural audit."""

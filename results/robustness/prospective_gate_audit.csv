@@ -1,0 +1,2 @@
+n_scored,cnn_top_decile_threshold,global_median_recall_threshold,n_gate_pass,ranking_after_gate,top_coupled_zinc_id,top_coupled_cnnscore,top_coupled_recall,top_coupled_score,top_coupled_passes_gate,top_accepted_zinc_id
+1993,0.7065239999999998,0.25,137,gnina_interaction_score_descending,11705051,0.94508,0.3157894736842105,1.2435263157894738,True,11705051

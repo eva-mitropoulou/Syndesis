@@ -62,8 +62,9 @@ def _prepare_ligand_for_gnina(pose_file: str | Path, paths: dict[str, Path], oba
     GNINA's CNN and empirical scoring need correct connectivity/bond orders.
     A PDBQT stripped to bare ATOM/HETATM lines loses all bond information, so
     the previous PDB line-strip corrupted scoring. We use OpenBabel to convert
-    PDBQT -> SDF, which perceives and writes bonds. Falls back to the original
-    file if OpenBabel is unavailable (recorded as a warning by the caller).
+    PDBQT -> SDF, which perceives and writes bonds. Conversion failure blocks
+    rescoring because a bond-order-deficient substitute is not scientifically
+    equivalent.
     """
     source = Path(pose_file)
     if source.suffix.lower() not in {".pdbqt", ".pdb"}:
@@ -72,29 +73,19 @@ def _prepare_ligand_for_gnina(pose_file: str | Path, paths: dict[str, Path], oba
     target = ligand_dir / f"{source.stem}.sdf"
     if target.exists() and target.stat().st_mtime >= source.stat().st_mtime:
         return target
-    if obabel:
-        try:
-            completed = subprocess.run(
-                [obabel, str(source), "-O", str(target)],
-                check=False,
-                capture_output=True,
-                text=True,
-                timeout=120,
-            )
-            if completed.returncode == 0 and target.exists() and target.stat().st_size > 0:
-                return target
-        except Exception:
-            pass
-    # Fallback: PDB copy (bond orders may be imperfect). Better than a PDBQT
-    # that GNINA cannot parse; the caller records a warning.
-    fallback = ligand_dir / f"{source.stem}.pdb"
-    atom_lines = [
-        line.rstrip()
-        for line in source.read_text(encoding="utf-8").splitlines()
-        if line.startswith(("ATOM", "HETATM"))
-    ]
-    fallback.write_text("\n".join([*atom_lines, "END", ""]), encoding="utf-8")
-    return fallback
+    if not obabel:
+        raise RuntimeError("Open Babel is required to convert PDB/PDBQT poses for GNINA rescoring.")
+    completed = subprocess.run(
+        [obabel, str(source), "-O", str(target)],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    if completed.returncode != 0 or not target.exists() or target.stat().st_size == 0:
+        detail = (completed.stderr or completed.stdout or "no conversion output").strip()
+        raise RuntimeError(f"Open Babel ligand conversion failed for {source}: {detail[-500:]}")
+    return target
 
 
 def _rank_within_task(frame: pd.DataFrame, column: str, ascending: bool) -> pd.Series:

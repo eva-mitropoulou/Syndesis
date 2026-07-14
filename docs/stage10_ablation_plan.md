@@ -1,5 +1,5 @@
 # Stage 10 Ablation Plan
 
-Supported strategies include random enumeration, docking-score-only, GNINA-only, RDKit rule-based generation, REINVENT4 if available, single-agent LLM, council loop, council plus ProLIF, council plus ProLIF and pose confidence, and the post-MD council variant.
+Supported deterministic strategies include random enumeration, docking-score-only selection, GNINA-only selection, and RDKit rule-based generation with ProLIF and pose-confidence constraints.
 
-Ablations compare council versus single-agent, feedback versus no feedback, ProLIF/pose-confidence components, GNINA versus docking-only, rule-based versus LLM-based, and MD filter impact after Stage 11.
+Ablations compare docking-only, GNINA, ProLIF, pose-confidence, and post-MD decision layers under matched molecule and screening budgets.

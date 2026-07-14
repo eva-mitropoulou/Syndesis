@@ -5,8 +5,7 @@
 #
 # Idempotent and safe to re-run. Regenerates stages 5,6,9,10 (from existing
 # data) and 11,12 (from the finished MD), then rebuilds the top-level summary.
-# Requires the vLLM/Qwen endpoint to be UP only if re-running the Stage 9 LLM
-# loop; by default it re-reports from existing Stage 9 outputs (no LLM needed).
+# Re-reports deterministic Stage 9 analog outputs without regenerating molecules.
 # ---------------------------------------------------------------------------
 set -u
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -32,10 +31,10 @@ run build-pose-labels     --config configs/stage6_pose_model.yaml
 run evaluate-pose-models  --config configs/stage6_pose_model.yaml
 run report-stage6         --config configs/stage6_pose_model.yaml
 
-# Stage 9 re-report from existing accepted-analog outputs (no LLM re-run)
-run score-analog-acceptance      --config configs/stage9_agentic_analog_loop.yaml
-run benchmark-analog-strategies  --config configs/stage9_agentic_analog_loop.yaml
-run report-stage9                --config configs/stage9_agentic_analog_loop.yaml
+# Stage 9 re-report from existing deterministic analog outputs
+run score-analog-acceptance      --config configs/stage9_deterministic_analogs.yaml
+run benchmark-analog-strategies  --config configs/stage9_deterministic_analogs.yaml
+run report-stage9                --config configs/stage9_deterministic_analogs.yaml
 
 # Stage 10 ablation (consistent acceptance tolerances) + report
 run compute-analog-benchmark-metrics --config configs/stage10_ablation_benchmark.yaml

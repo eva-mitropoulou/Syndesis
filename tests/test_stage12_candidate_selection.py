@@ -3,11 +3,13 @@ from __future__ import annotations
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from egfr_dockingforge.stage12.final_candidate_selection import build_final_candidate_table
 
 
 CONFIG = Path("configs/stage12_candidate_dossiers.yaml")
+pytestmark = pytest.mark.integration
 
 
 def test_known_controls_are_separate_from_generated_candidates() -> None:

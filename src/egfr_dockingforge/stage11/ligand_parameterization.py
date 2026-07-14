@@ -76,6 +76,42 @@ def _amber_env(config: dict[str, Any]) -> dict[str, str]:
     return env
 
 
+def _regenerate_clean_conformer(input_sdf: Path, out_sdf: Path) -> bool:
+    """Write a fresh, low-strain 3D conformer of the SAME molecule for charge
+    derivation. AM1-BCC's SQM step can fail to reach SCF self-consistency on a
+    strained docked pose (observed for the erlotinib control: 'No convergence in
+    SCF after 1000 steps'); a clean ETKDG+MMFF conformer of the identical graph
+    (same atoms, bonds, protonation, net charge) converges reliably. Only the
+    conformer used for charge derivation changes -- downstream pose placement is
+    unaffected because charges are atom-type/topology properties. Returns True on
+    success."""
+    try:
+        from rdkit import Chem
+        from rdkit.Chem import AllChem
+    except Exception:
+        return False
+    mol = Chem.MolFromMolFile(str(input_sdf), removeHs=False)
+    if mol is None:
+        return False
+    params = AllChem.ETKDGv3()
+    if AllChem.EmbedMolecule(mol, params) != 0:
+        return False
+    try:
+        AllChem.MMFFOptimizeMolecule(mol, maxIters=2000)
+    except Exception:
+        pass  # keep the embedded conformer even if MMFF is unavailable for it
+    Chem.MolToMolFile(mol, str(out_sdf))
+    return out_sdf.exists()
+
+
+def _sqm_scf_failed(out_dir: Path) -> bool:
+    sqm = out_dir / "sqm.out"
+    if not sqm.exists():
+        return False
+    text = sqm.read_text(encoding="utf-8", errors="replace")
+    return "Unable to achieve self consistency" in text or "No convergence in SCF" in text
+
+
 def _parameterize_amber_gaff2(row: dict, config: dict[str, Any], paths: dict[str, Path]) -> dict:
     ff = config["forcefield"]
     work = paths["md_root"] / "ligand_parameters" / row["molecule_id"]
@@ -109,15 +145,28 @@ def _parameterize_amber_gaff2(row: dict, config: dict[str, Any], paths: dict[str
         and itp.stat().st_mtime >= input_sdf.stat().st_mtime
     )
     if not cached:
-        code, text = _run([obabel, "-isdf", str(input_sdf), "-omol2", "-O", str(mol2)], work, env)
-        if code != 0 or not mol2.exists():
-            raise RuntimeError(f"OpenBabel MOL2 conversion failed for {row['molecule_id']}: {text[-1000:]}")
         acpype = _tool_path(ff["acpype_executable"])
-        code, text = _run(
-            [acpype, "-i", str(mol2), "-b", basename, "-c", "bcc", "-n", str(charge), "-a", "gaff2", "-o", "gmx", "-f"],
-            work,
-            env,
-        )
+
+        def _obabel_and_acpype(src_sdf: Path) -> tuple[int, str]:
+            code, text = _run([obabel, "-isdf", str(src_sdf), "-omol2", "-O", str(mol2)], work, env)
+            if code != 0 or not mol2.exists():
+                raise RuntimeError(f"OpenBabel MOL2 conversion failed for {row['molecule_id']}: {text[-1000:]}")
+            return _run(
+                [acpype, "-i", str(mol2), "-b", basename, "-c", "bcc", "-n", str(charge), "-a", "gaff2", "-o", "gmx", "-f"],
+                work,
+                env,
+            )
+
+        code, text = _obabel_and_acpype(input_sdf)
+        first_ok = code == 0 and itp.exists() and gro.exists() and not _sqm_scf_failed(out_dir)
+        if not first_ok:
+            # SQM likely failed to converge on the strained docked pose. Retry once
+            # from a clean, MMFF-minimized conformer of the same molecule (charges
+            # are conformer-robust; only the geometry fed to SQM changes).
+            clean_sdf = work / f"{basename}_clean_conformer.sdf"
+            if _regenerate_clean_conformer(input_sdf, clean_sdf):
+                warnings.append("charge_derivation_retried_from_clean_conformer_after_sqm_failure")
+                code, text = _obabel_and_acpype(clean_sdf)
         if code != 0 or not itp.exists() or not gro.exists():
             raise RuntimeError(f"ACPYPE GAFF2 parameterization failed for {row['molecule_id']}: {text[-1500:]}")
     else:

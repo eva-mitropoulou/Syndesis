@@ -4,7 +4,7 @@ stage:
 
 inputs:
   stage9_seeds: data/processed/stage9/analog_seed_scaffolds.parquet
-  stage9_iterations: data/processed/stage9/agent_iterations.parquet
+  stage9_iterations: data/processed/stage9/analog_iterations.parquet
   stage9_candidates: data/processed/stage9/analog_candidates.parquet
   stage9_validation: data/processed/stage9/analog_validation.parquet
   stage9_screening: data/processed/stage9/analog_screening_results.parquet
@@ -27,7 +27,7 @@ benchmark:
   screening_budget: 3
   bootstrap_iterations: 1000
   random_seed: 1010
-  primary_method: council_plus_prolif_pose_confidence
+  primary_method: rdkit_rule_based
 
 acceptance:
   min_pose_confidence: 0.30

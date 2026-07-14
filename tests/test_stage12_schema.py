@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from egfr_dockingforge.stage12.candidate_card_schema import validate_candidate_card
 from egfr_dockingforge.stage12.candidate_dossiers import run_stage12_all
@@ -11,6 +12,7 @@ from egfr_dockingforge.stage12.schemas import FINAL_CANDIDATE_COLUMNS, FINAL_RAN
 
 
 CONFIG = Path("configs/stage12_candidate_dossiers.yaml")
+pytestmark = pytest.mark.integration
 
 
 def test_stage12_outputs_match_required_schemas() -> None:

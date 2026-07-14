@@ -7,9 +7,6 @@ from typing import Any
 import pandas as pd
 
 from egfr_dockingforge.common.io import write_table
-from egfr_dockingforge.stage9.agent_council import LLM_STRATEGIES
-
-
 def summarize_iterations(
     candidates: pd.DataFrame,
     validation: pd.DataFrame,
@@ -29,7 +26,7 @@ def summarize_iterations(
                 "iteration_id": "iter_001",
                 "strategy_name": strategy,
                 "seed_id": "all",
-                "num_agent_proposals": 0 if strategy == "rdkit_rule_based" else len(cand),
+                "num_generated_analogs": len(cand),
                 "num_valid_molecules": int(val["valid_molecule_flag"].sum()) if not val.empty else 0,
                 "num_unique_molecules": int(cand["standard_smiles"].nunique()) if not cand.empty else 0,
                 "num_screened": len(scr),
@@ -44,8 +41,8 @@ def summarize_iterations(
             }
         )
     out = pd.DataFrame(rows)
-    write_table(paths["processed"] / "agent_iterations.parquet", out)
-    write_table(paths["processed"] / "agent_iterations.csv", out)
+    write_table(paths["processed"] / "analog_iterations.parquet", out)
+    write_table(paths["processed"] / "analog_iterations.csv", out)
     return out
 
 
@@ -54,7 +51,6 @@ def benchmark_strategies(
     validation: pd.DataFrame,
     screening: pd.DataFrame,
     acceptance: pd.DataFrame,
-    agent_status: pd.DataFrame,
     config: dict[str, Any],
     paths: dict[str, Path],
 ) -> pd.DataFrame:
@@ -68,17 +64,12 @@ def benchmark_strategies(
         valid = int(val["valid_molecule_flag"].sum()) if not val.empty else 0
         unique = int(cand["standard_smiles"].nunique()) if not cand.empty else 0
         accepted = int(acc["accepted_flag"].sum()) if not acc.empty else 0
-        is_llm = strategy in LLM_STRATEGIES
-        model_name = config["llm"]["model_name"] if is_llm else ""
-        notes = "local LLM proposal strategy logged in agent_proposal_status" if is_llm else "deterministic RDKit baseline"
-        if strategy == "reinvent4_baseline":
-            notes = "REINVENT4 package not installed; baseline recorded as not run"
         rows.append(
             {
                 "strategy_name": strategy,
                 "num_seeds": int(candidates["seed_id"].nunique()) if not candidates.empty else 0,
                 "num_iterations": int(config["loop"]["max_iterations"]),
-                "num_raw_proposals": raw if not is_llm else int(agent_status[agent_status["strategy_name"].eq(strategy)].shape[0]),
+                "num_raw_proposals": raw,
                 "num_valid_molecules": valid,
                 "validity_rate": valid / raw if raw else 0.0,
                 "uniqueness_rate": unique / raw if raw else 0.0,
@@ -95,10 +86,8 @@ def benchmark_strategies(
                 "bad_chemistry_rejection_rate": float((val["hard_scope_pass"] == False).mean()) if not val.empty else 0.0,
                 "binding_mode_break_rate": float((acc["binding_mode_preserved_flag"] == False).mean()) if not acc.empty else 0.0,
                 "mean_runtime_per_accepted_analog": 0.0,
-                "token_count_if_llm": 0,
-                "local_model_name_if_llm": model_name,
                 "cost_estimate_if_any": 0.0,
-                "benchmark_notes": notes,
+                "benchmark_notes": "deterministic RDKit transformation workflow",
             }
         )
     out = pd.DataFrame(rows)

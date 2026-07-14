@@ -8,5 +8,4 @@ The default baseline engine is AutoDock Vina. If Vina is not installed, the pipe
 records explicit `engine_unavailable` run metadata and does not fabricate poses.
 
 Stage 3 does not implement GNINA rescoring, ProLIF interaction recovery, pose-confidence
-modeling, MD, or agentic analog generation.
-
+modeling, MD, or deterministic analog generation.

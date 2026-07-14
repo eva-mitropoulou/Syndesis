@@ -1,0 +1,10 @@
+{
+  "target": "EGFR",
+  "n_native_complexes": 5,
+  "global_union_size": 76,
+  "core_60pct_size": 14,
+  "n_pose_rows": 177760,
+  "n_fingerprint_success": 177760,
+  "n_fingerprint_failure": 0,
+  "failure_policy": "Fail closed: all pose fingerprints must have status=ok before any native-prior sensitivity result is written."
+}

@@ -14,7 +14,6 @@ def compute_cost_metrics(strategy_metrics: pd.DataFrame, budget: pd.DataFrame, p
         accepted = max(int(row["num_pre_md_accepted"]), 1)
         gpu = float(b["gpu_seconds"].sum()) if not b.empty else 0.0
         wall = float(b["walltime_seconds"].sum()) if not b.empty else 0.0
-        tokens = int(b["llm_token_count"].sum()) if not b.empty else 0
         rows.append(
             {
                 "strategy_id": row["strategy_id"],
@@ -25,11 +24,8 @@ def compute_cost_metrics(strategy_metrics: pd.DataFrame, budget: pd.DataFrame, p
                 "num_gnina_tasks": int(b["num_gnina_tasks"].sum()) if not b.empty else 0,
                 "num_prolif_tasks": int(b["num_prolif_tasks"].sum()) if not b.empty else 0,
                 "num_md_tasks_if_available": int(b["num_md_tasks_if_available"].sum()) if not b.empty else 0,
-                "llm_token_count_total": tokens,
-                "local_llm_runtime_seconds": 0.0,
                 "accepted_analogs_per_gpu_hour": row["num_pre_md_accepted"] / (gpu / 3600) if gpu else 0.0,
                 "accepted_analogs_per_wall_hour": row["num_pre_md_accepted"] / (wall / 3600) if wall else 0.0,
-                "accepted_analogs_per_1000_llm_tokens": row["num_pre_md_accepted"] / (tokens / 1000) if tokens else 0.0,
                 "notes": "cost table derived from Stage 9 logs; no new compute launched in Stage 10",
             }
         )

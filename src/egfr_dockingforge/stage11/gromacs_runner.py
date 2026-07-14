@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import json
 import os
+import queue
 import subprocess
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -10,6 +12,32 @@ from typing import Any
 import pandas as pd
 
 from egfr_dockingforge.common.io import write_table
+
+
+class _SlotPool:
+    """Hands out distinct CPU-core-block slots [0..n-1] to concurrent mdruns.
+
+    The core-pin offset MUST come from a slot acquired when a run actually
+    STARTS, not from the task's static list index: a ThreadPoolExecutor
+    schedules tasks dynamically, and finished/skipped systems (e.g. an already
+    equilibrated finalist) shift which tasks run together. Using the static
+    index then lets two concurrent runs land on the SAME `-pinoffset`, pinning
+    both to the same physical cores while others sit idle (observed: cores 0-2
+    pegged, 3-5 idle, ~half throughput). Acquiring a free slot per running task
+    guarantees each of the (<= n) concurrent runs gets its own core block."""
+
+    def __init__(self, n: int) -> None:
+        self._q: queue.Queue[int] = queue.Queue()
+        for i in range(max(1, n)):
+            self._q.put(i)
+
+    @contextmanager
+    def slot(self):
+        s = self._q.get()
+        try:
+            yield s
+        finally:
+            self._q.put(s)
 from egfr_dockingforge.stage11.forcefield_config import gromacs_version
 
 
@@ -26,9 +54,16 @@ PHASES = [*EQUIL_PHASES, PRODUCTION_PHASE]
 
 
 def _num_replicates(sys: dict[str, Any], config: dict[str, Any]) -> int:
-    """Replicate count for a system: finalists get finalist_replicates, others
-    get quick_replicates. Independent replicates use distinct velocity seeds."""
+    """Replicate count for a system: an explicit planned_replicates (from the
+    candidate manifest) wins; else finalists get finalist_replicates and others
+    quick_replicates. Independent replicates use distinct velocity seeds."""
     md = config["md"]
+    planned = sys.get("planned_replicates")
+    try:
+        if planned is not None and int(planned) > 0:
+            return int(planned)
+    except (TypeError, ValueError):
+        pass
     if bool(sys.get("selected_for_replicate_md", False)):
         return max(1, int(md.get("finalist_replicates", 3)))
     return max(1, int(md.get("quick_replicates", 1)))
@@ -156,7 +191,23 @@ def _run_phase(gmx, work, deffnm, mdp, topology, input_structure, extra_grompp, 
     start_time = ""
     end_time = ""
     if not tpr.exists():
-        grompp = [gmx, "grompp", "-f", str(mdp), "-c", input_structure, "-p", topology, "-o", str(tpr), "-maxwarn", "0"] + extra_grompp
+        # maxwarn is strict (0) by default so no real physics warning is masked.
+        # Two documented-benign exceptions get exactly one allowed warning:
+        #   * minimization: a docked ligand's initial conformer can stretch an
+        #     excluded-atom pair beyond the cutoff ("...minimization will bring
+        #     such distances within the cut-off, you can ignore this warning.").
+        #     EM is precisely the step that repairs it.
+        #   * independent replicates (production_quick_repNN): these regenerate
+        #     velocities (gen_vel=yes, distinct seed) for statistical independence
+        #     on an already-NPT-equilibrated system, which trips GROMACS'
+        #     "generating velocities ... Parrinello-Rahman can be unstable for
+        #     equilibration" note. rep01 ran stably under the identical barostat,
+        #     so this is benign; keeping all replicates on one protocol is the
+        #     ensemble-consistent choice. The base production run (rep01) and all
+        #     equilibration phases stay strict at 0.
+        is_replicate = deffnm.startswith("production_quick_rep")
+        maxwarn = "1" if (deffnm == "minimization" or is_replicate) else "0"
+        grompp = [gmx, "grompp", "-f", str(mdp), "-c", input_structure, "-p", topology, "-o", str(tpr), "-maxwarn", maxwarn] + extra_grompp
         grompp_code, start_time, end_time = _run(grompp, work / f"{deffnm}.grompp.exec.log")
         if grompp_code != 0:
             return "failed_grompp", grompp_code, start_time, end_time, f"grompp failed; see {work / f'{deffnm}.grompp.exec.log'}"
@@ -181,7 +232,9 @@ def _pin_flags(config: dict[str, Any], slot: int) -> list[str]:
     total = int(md.get("cpu_cores", os.cpu_count() or 12))
     conc = max(1, int(md.get("max_concurrent_runs", 1)))
     ntomp = max(2, total // conc)
-    flags = ["-ntomp", str(ntomp)]
+    # -ntmpi 1 is REQUIRED alongside -ntomp when a GPU is used, otherwise GROMACS
+    # fatal-errors ("setting OpenMP threads without specifying thread-MPI ranks").
+    flags = ["-ntmpi", "1", "-ntomp", str(ntomp)]
     if bool(md.get("pin_threads", conc > 1)):
         flags += ["-pin", "on", "-pinoffset", str((slot % conc) * ntomp), "-pinstride", "1"]
     # Force this run onto the single GPU explicitly when co-scheduling.
@@ -190,9 +243,9 @@ def _pin_flags(config: dict[str, Any], slot: int) -> list[str]:
     return flags
 
 
-def _equilibrate_system(sys, config, paths, version) -> tuple[list[dict], bool]:
+def _equilibrate_system(sys, config, paths, version, equil_slot: int = 0) -> tuple[list[dict], bool]:
     """Run the (internally serial) min->NVT->NPT chain for one system. Returns
-    (recorded rows, equilibration_ok)."""
+    (recorded rows, equilibration_ok). equil_slot selects the pinned core block."""
     gmx = config["forcefield"]["gromacs_executable"]
     work = paths["md_root"] / sys["md_system_id"]
     topology = sys["topology_file"]
@@ -202,10 +255,24 @@ def _equilibrate_system(sys, config, paths, version) -> tuple[list[dict], bool]:
         phase, ensemble = EQUIL_PHASES[0]
         rows.append(_record_run(sys, phase, ensemble, "rep01", work, phase, work / f"{phase}.mdp", config, version, "blocked_missing_system_build", None, "", "", "system build blocked", ""))
         return rows, False
+    # Thread/pin flags so concurrent equilibration runs do not oversubscribe
+    # physical cores (each equil worker gets cpu_cores/max_concurrent_equil
+    # threads pinned to its own block). Without this, GROMACS auto-grabs all
+    # logical cores per run and concurrent runs spin-wait, collapsing throughput.
+    md = config["md"]
+    total = int(md.get("cpu_cores", os.cpu_count() or 6))
+    econc = max(1, int(md.get("max_concurrent_equil", min(2, int(md.get("max_concurrent_runs", 1))))))
+    entomp = max(1, total // econc)
+    # -ntmpi 1 required with -ntomp under GPU (see _pin_flags).
+    extra_mdrun = ["-ntmpi", "1", "-ntomp", str(entomp)]
+    if bool(md.get("pin_threads", econc > 1)):
+        extra_mdrun += ["-pin", "on", "-pinoffset", str((equil_slot % econc) * entomp), "-pinstride", "1"]
+    if md.get("gpu") not in ("cpu",):
+        extra_mdrun += ["-gpu_id", str(md.get("gpu_id", "0"))]
     for phase, ensemble in EQUIL_PHASES:
         mdp = work / f"{phase}.mdp"
         input_structure = _phase_input(work, sys, phase)
-        status, code, st, en, err = _run_phase(gmx, work, phase, mdp, topology, input_structure, _phase_extra_grompp(work, phase))
+        status, code, st, en, err = _run_phase(gmx, work, phase, mdp, topology, input_structure, _phase_extra_grompp(work, phase), mdrun_extra=extra_mdrun)
         rows.append(_record_run(sys, phase, ensemble, "rep01", work, phase, mdp, config, version, status, code, st, en, err, input_structure))
         if status != "complete":
             return rows, False
@@ -231,8 +298,16 @@ def make_gromacs_runs(systems: pd.DataFrame, config: dict[str, Any], paths: dict
     # --- Phase 1: equilibrate systems (each chain internal-serial; systems in
     # parallel up to `equil_conc`). Only systems whose equilibration completes proceed. ---
     equil_ok: dict[str, bool] = {}
+    equil_pool = _SlotPool(equil_conc)
+
+    def _equil_task(sys):
+        # Acquire a distinct core-block slot for the duration this system is
+        # actually running, so concurrent equilibrations never share cores.
+        with equil_pool.slot() as slot:
+            return _equilibrate_system(sys, config, paths, version, slot)
+
     with ThreadPoolExecutor(max_workers=equil_conc) as pool:
-        futs = {pool.submit(_equilibrate_system, sys, config, paths, version): sys for sys in sys_records}
+        futs = {pool.submit(_equil_task, sys): sys for sys in sys_records}
         for fut in as_completed(futs):
             sys = futs[fut]
             erows, ok = fut.result()
@@ -255,18 +330,22 @@ def make_gromacs_runs(systems: pd.DataFrame, config: dict[str, Any], paths: dict
             extra = ["-t", str(work / "npt_equilibration.cpt")] if r == 1 else ["-r", str(work / "npt_equilibration.gro")]
             jobs.append((sys, f"rep{r:02d}", deffnm, mdp, extra))
 
-    def _run_production(job, slot):
+    prod_pool = _SlotPool(conc)
+
+    def _run_production(job):
         sys, replicate_id, deffnm, mdp, extra = job
         work = paths["md_root"] / sys["md_system_id"]
         input_structure = str(work / "npt_equilibration.gro")
-        status, code, st, en, err = _run_phase(
-            gmx, work, deffnm, mdp, sys["topology_file"], input_structure, extra,
-            mdrun_extra=_pin_flags(config, slot),
-        )
+        # Distinct core block per concurrently-running replicate (see _SlotPool).
+        with prod_pool.slot() as slot:
+            status, code, st, en, err = _run_phase(
+                gmx, work, deffnm, mdp, sys["topology_file"], input_structure, extra,
+                mdrun_extra=_pin_flags(config, slot),
+            )
         return _record_run(sys, phase, ensemble, replicate_id, work, deffnm, mdp, config, version, status, code, st, en, err, input_structure)
 
     with ThreadPoolExecutor(max_workers=conc) as pool:
-        futs = {pool.submit(_run_production, job, i): job for i, job in enumerate(jobs)}
+        futs = {pool.submit(_run_production, job): job for job in jobs}
         for fut in as_completed(futs):
             rows.append(fut.result())
 

@@ -106,7 +106,7 @@ run_step run_stage12            "$PY" -m egfr_dockingforge.cli run-stage12 --con
 #    corrected pipeline so no on-disk artifact contradicts the manuscript. This
 #    fires automatically the instant the MD completes (incl. overnight / after an
 #    outage-driven resume), so the project reaches a fully-consistent, portfolio-
-#    ready state with no manual step. Idempotent; re-report only (no LLM re-run).
+#    ready state with no manual step. Idempotent; report-only.
 if [ -x "${PROJECT_DIR}/scripts/finalize_all_reports.sh" ]; then
   if ! grep -qxF "finalize_reports" "$STATE" 2>/dev/null; then
     log "START finalize_all_reports"

@@ -97,7 +97,9 @@ def screen_analog_batch(candidates: pd.DataFrame, validation: pd.DataFrame, seed
         analog = candidate_idx.loc[row["molecule_id"]]
         seed = seed_idx.loc[analog["seed_id"]]
         heavy = Chem.MolFromSmiles(analog["standard_smiles"]).GetNumHeavyAtoms()
-        le = -float(row["best_gnina_cnnaffinity"]) / max(heavy, 1) if pd.notna(row["best_gnina_cnnaffinity"]) else 0.0
+        if pd.isna(row["best_gnina_cnnaffinity"]):
+            raise ValueError(f"Missing GNINA CNNaffinity for analog {row['molecule_id']}.")
+        le = -float(row["best_gnina_cnnaffinity"]) / max(heavy, 1)
         binding_preserved = (
             float(row["best_pose_confidence"]) >= float(config["acceptance"]["min_pose_confidence"])
             and float(row["best_key_interaction_recall_consensus"]) >= float(config["acceptance"]["min_key_interaction_recall"])

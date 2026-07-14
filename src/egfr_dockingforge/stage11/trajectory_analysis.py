@@ -236,7 +236,7 @@ def _equilibration_qc(row: dict, gmx: str, config: dict) -> dict:
 
 def _analyze_completed_run(row: dict, gmx: str) -> dict:
     import MDAnalysis as mda
-    from MDAnalysis.analysis import rms
+    from MDAnalysis.analysis import align, rms
     from MDAnalysis.lib.distances import distance_array
 
     tpr = Path(row["tpr_file"])
@@ -269,27 +269,55 @@ def _analyze_completed_run(row: dict, gmx: str) -> dict:
     universe.trajectory[0]
     ligand_ref = ligand.positions.copy()
     backbone_ref = backbone.positions.copy()
-    # Pocket-lining protein heavy atoms: within 6 A of any ligand heavy atom in
-    # the reference frame. Ligand "stays in the pocket" if it keeps contact.
     lig_heavy_ref = ligand.select_atoms("not name H*") or ligand
     box0 = universe.dimensions
+    # Pocket-lining protein backbone atoms: backbone atoms of residues within 6 A
+    # of any ligand heavy atom in the reference frame. This LOCAL, rigid selection
+    # is the correct alignment frame for pose analysis. The trjconv global-Backbone
+    # fit is dominated by mobile N/C-terminal tails and flexible loops of the
+    # kinase domain (backbone RMSD 4-7 A even for a stable pose), which leaves the
+    # binding site sub-optimally aligned and INFLATES the ligand RMSD. Re-aligning
+    # per frame on the pocket backbone gives (a) a meaningful pocket RMSD and (b) a
+    # ligand RMSD measured in the frame that actually matters for binding.
     ref_pair = distance_array(protein.positions, lig_heavy_ref.positions, box=box0)
-    pocket_mask = ref_pair.min(axis=1) <= 6.0
-    pocket_atoms = protein[pocket_mask]
-    pocket_center_ref = pocket_atoms.center_of_mass() if len(pocket_atoms) else protein.center_of_mass()
+    pocket_res_mask = ref_pair.min(axis=1) <= 6.0
+    pocket_residues = protein[pocket_res_mask].residues
+    pocket_bb = pocket_residues.atoms.select_atoms("backbone")
+    if len(pocket_bb) < 4:  # fall back to full backbone if the local set is too small
+        pocket_bb = backbone
+        warnings.append("pocket_backbone_too_small_used_full_backbone")
+    pocket_bb_ref = pocket_bb.positions.copy()
+    pocket_bb_ref_c = pocket_bb_ref - pocket_bb_ref.mean(axis=0)
+
+    # Pocket heavy atoms (for the in-pocket contact test) = pocket residues' heavy atoms.
+    pocket_atoms = pocket_residues.atoms.select_atoms("not name H*")
     ligand_com_ref = ligand.center_of_mass()
 
     ligand_rmsd = []
+    pocket_rmsd = []
     backbone_rmsd = []
     com_drift = []
     rg = []
     inside = []
     times = []
     lig_heavy = ligand.select_atoms("not name H*") or ligand
+    lig_heavy_ref_pos = lig_heavy.positions.copy()
     for ts in universe.trajectory:
-        # Frames are already superposed on the protein backbone by trjconv, so a
-        # plain (non-superposing) RMSD now measures ligand motion in that frame.
-        ligand_rmsd.append(float(rms.rmsd(ligand.positions, ligand_ref, center=False, superposition=False)))
+        # Per-frame least-squares superposition on the POCKET backbone (Kabsch),
+        # then apply that same rotation/translation to the ligand so its RMSD is
+        # measured in the locally-aligned binding-site frame.
+        mob = pocket_bb.positions
+        mob_com = mob.mean(axis=0)
+        R, _ = align.rotation_matrix(mob - mob_com, pocket_bb_ref_c)
+        # pocket backbone RMSD after this optimal local alignment
+        aligned_bb = (mob - mob_com) @ R.T
+        pocket_rmsd.append(float(np.sqrt(np.mean(np.sum((aligned_bb - pocket_bb_ref_c) ** 2, axis=1)))))
+        # ligand heavy-atom RMSD in the same local frame
+        lig = lig_heavy.positions
+        aligned_lig = (lig - mob_com) @ R.T
+        aligned_lig_ref = lig_heavy_ref_pos - pocket_bb_ref.mean(axis=0)
+        ligand_rmsd.append(float(np.sqrt(np.mean(np.sum((aligned_lig - aligned_lig_ref) ** 2, axis=1)))))
+        # global backbone RMSD (trjconv-fitted frame) kept for reference/QC
         backbone_rmsd.append(float(rms.rmsd(backbone.positions, backbone_ref, center=False, superposition=False)))
         com_drift.append(float(np.linalg.norm(ligand.center_of_mass() - ligand_com_ref)))
         rg.append(float(ligand.radius_of_gyration()))
@@ -302,13 +330,14 @@ def _analyze_completed_run(row: dict, gmx: str) -> dict:
 
     analyzed_ns = (max(times) - min(times)) / 1000.0 if times else 0.0
     ligand_rmsd = np.asarray(ligand_rmsd)
+    pocket_rmsd = np.asarray(pocket_rmsd)
     return {
         "analyzed_ns": analyzed_ns,
         "ligand_rmsd_median_angstrom": float(np.median(ligand_rmsd)),
         "ligand_rmsd_p95_angstrom": float(np.percentile(ligand_rmsd, 95)),
         "ligand_rmsd_max_angstrom": float(np.max(ligand_rmsd)),
-        "pocket_rmsd_median_angstrom": float(np.median(ligand_rmsd)),
-        "pocket_rmsd_p95_angstrom": float(np.percentile(ligand_rmsd, 95)),
+        "pocket_rmsd_median_angstrom": float(np.median(pocket_rmsd)),
+        "pocket_rmsd_p95_angstrom": float(np.percentile(pocket_rmsd, 95)),
         "protein_backbone_rmsd_median_angstrom": float(np.median(backbone_rmsd)),
         "ligand_com_drift_median_angstrom": float(np.median(com_drift)),
         "ligand_com_drift_max_angstrom": float(np.max(com_drift)),

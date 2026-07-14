@@ -1,112 +1,138 @@
 # Syndesis
 
-Syndesis is a structure-based computational workflow for EGFR ATP-site analog design that tries to keep only the candidates that bind in a believable way, rather than the ones that simply score well. I built it because a docking score on its own is easy to "hack": a molecule can be scored highly while sitting in a pose that breaks the interactions a real EGFR inhibitor is known to make. Syndesis instead asks several independent lines of structural evidence — the docked pose, a residue-level interaction fingerprint, a leakage-controlled pose-confidence model, and a short molecular-dynamics pose-stability test — to agree before a candidate is accepted. The name (Greek *sýndesis*, "binding together") refers both to ligand–target binding and to binding these independent checks together into one decision.
+**Pose-coupled native-interaction weighting for auditable kinase docking**
 
-This is a computational, methods-oriented project. It does **not** claim experimentally confirmed inhibitors, cellular activity, selectivity, or clinical relevance. Scores, poses, and simulations are hypotheses that would require experimental validation.
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-2F855A.svg)](LICENSE)
+[![Preprint: ChemRxiv](https://img.shields.io/badge/preprint-ChemRxiv-8A1538.svg)](#citation)
 
-## Table of Contents
+Syndesis is a structure-based cheminformatics workflow for testing whether interactions observed in native protein-ligand complexes add useful ranking information to neural docking scores. Its central rule is deliberately simple: combine GNINA CNNscore with recovery of a target-native interaction prior **on the same receptor-specific pose**, then maximize that coupled score across an ensemble.
 
-- [What the workflow does](#what-the-workflow-does)
-- [Pipeline](#pipeline)
-- [Main results](#main-results)
-  - [Redocking validation](#redocking-validation)
-  - [Pose-confidence model](#pose-confidence-model)
-  - [Analog optimization and score-hacking](#analog-optimization-and-score-hacking)
-  - [MD pose stability](#md-pose-stability)
-- [Scope and limits](#scope-and-limits)
-- [Reproduce](#reproduce)
-- [Repository layout](#repository-layout)
-- [Citation](#citation)
+I built Syndesis to make virtual-screening decisions inspectable. A high score is not accepted as a biological claim; the workflow records the pose, recovered contacts, uncertainty, native-ligand overlap, parameterization warnings, and replicate-level molecular-dynamics evidence behind each decision. The name comes from the Greek *syndesis*, or “connection,” reflecting both molecular binding and the connection of independent evidence.
 
-## What the workflow does
+> **Claim boundary:** this repository reports computational ranking and pose-persistence evidence. It does not claim experimental activity, affinity, selectivity, or clinical relevance.
 
-The target is the human EGFR (ERBB1/HER1) kinase domain (UniProt P00533), orthosteric ATP site, reversible noncovalent inhibitors. The starting point is a set of curated EGFR co-crystal structures: I extract the native ligands, clean the receptors, and use the crystallographic binding geometry as the reference for what a real ATP-site pose looks like.
+## Main Result
 
-From there the idea is simple to state. Most weak docking pipelines stop at "dock, then sort by score". Syndesis goes further: it checks whether a docked pose reproduces the conserved EGFR interactions (hinge Met793, gatekeeper Thr790, catalytic Lys745, DFG Asp855), scores pose confidence with a model that is explicitly audited for label leakage, and — for the finalists — runs short explicit-solvent MD to see whether the pose actually holds. A candidate is accepted only if these agree; a candidate whose score improves while its binding mode degrades is flagged and rejected as score-hacking. The headline metric is therefore not the best docking score but the **accepted-analog rate** under all of these gates.
+On the EGFR DUD-E benchmark (542 actives and 35,010 decoys), strict graph-preserving ProLIF recomputation produced:
 
-The project also includes a small, honest experiment on the analog-generation step itself: I compare a deterministic RDKit rule-based generator against a local LLM-agent design loop (Qwen3-32B served through vLLM), screening both through exactly the same acceptance gates.
+| Ranking | ROC-AUC | EF1% | EF5% | BEDROC |
+|---|---:|---:|---:|---:|
+| GNINA | 0.766 | 11.79 | 6.90 | 0.209 |
+| GNINA + native-union recall | **0.770** | **16.21** | **7.64** | **0.279** |
 
-## Pipeline
+At the 1% cutoff, the coupled ranking retrieved **88 actives among 356 molecules**, compared with **64** for GNINA. The paired EF1% gain was 4.42 (95% bootstrap CI 2.40–6.63).
 
-The workflow is organised as thirteen configurable stages, each driven from a single CLI (`egfrforge <command> --config configs/<stage>.yaml`) and each writing versioned tables plus an HTML report:
+The result was tested against three different 1,000-permutation nulls:
 
-0. Scope definition (target, inclusion/exclusion rules).
-1. EGFR co-crystal benchmark: fetch structures, extract native ligands, clean receptors.
-2. Receptor ensemble: cluster pocket conformations, select a representative state.
-3. Redocking / cross-docking: recover native poses; symmetry-aware RMSD; pose labeling.
-4. GNINA rescoring: CNNscore / CNNaffinity as pose-quality and affinity features.
-5. Interaction atlas (ProLIF): define the conserved-core EGFR key interactions.
-6. Pose-confidence model: predict native-like poses from leakage-audited, deployment-safe features.
-7. Candidate library: assemble known EGFR ligands and native ligands.
-8. Candidate screening: dock, rescore, interaction-profile, aggregate.
-9. Analog optimization: RDKit rule-based and LLM-agent generation, screened head-to-head.
-10. Ablation / benchmark: compare strategies by accepted-analog rate and score-hacking rate.
-11. MD stress test: short, replicated explicit-solvent MD for finalist pose stability.
-12. Candidate dossiers: per-candidate evidence cards, provenance bundle, model and dataset cards.
+| Null | Mean EF1% | Observed minus null | Empirical p |
+|---|---:|---:|---:|
+| All-ligand shuffle | 11.46 | 4.76 | 0.0010 |
+| Heavy-atom-matched shuffle | 12.33 | 3.88 | 0.0010 |
+| Class-conditional assignment | 14.14 | 2.08 | 0.0030 |
 
-## Main results
+Every leave-one-receptor-out EGFR analysis preserved a positive paired effect. Excluding the native ligand that exactly overlaps a DUD-E active also preserved the result (EF1% 16.40).
 
-All numbers below come from the pipeline's own outputs. The full replicated finalist MD was still running at the time of writing, so the MD numbers for the three known controls are marked as preliminary and the designed analogs are noted as scheduled.
+CDK2 defined the boundary of the claim. The same fixed rule increased EF1% from
+10.97 to 13.08, retrieving 62 rather than 52 actives among the first 283
+molecules. Its paired EF1% difference was 2.11 (95% CI -0.42 to 4.64), and
+leave-one-receptor-out effects were heterogeneous; the result is therefore
+reported as favorable but unresolved rather than as an independent replication.
 
-### Redocking validation
+## What Is Different
 
-Across the benchmark ligands, docking recovers a near-native pose (≤ 2 Å) among the sampled poses for **5 of 5** ligands, with a median best-pose RMSD of **1.43 Å**. However, the top-scored (rank-1) pose is not always the native-like one — for example the 1M17/AQ4 complex places a 1.6 Å pose at rank 3 while rank 1 is ~8 Å. In other words, docking *samples* the right geometry but the empirical score does not reliably *rank* it first. This is exactly the gap the interaction constraints and the pose-confidence model are meant to close, and it is the reason the workflow does not trust docking score alone.
-
-### Pose-confidence model
-
-The pose-confidence label is the RMSD-to-crystal ground truth (is the pose native-like?), kept deliberately separate from the interaction features so the model cannot read its own answer. Features are passed through a default-deny leakage audit: only deployment-safe inputs (raw interaction bits, docking/GNINA scores, pose geometry, ligand descriptors, receptor-state metadata) are allowed, and any feature that measures agreement with the native reference is dropped.
-
-On a Bemis-Murcko scaffold-holdout test set, the learned ranker (LightGBM LambdaRank) reaches **NDCG@3 = 0.69** versus **0.41** for ranking by docking score alone and 0.28–0.32 for GNINA CNN scores. I treat this as encouraging but not decisive: the benchmark contains only about four distinct scaffolds in the holdout, so I report the difference as a trend and flag the small scaffold diversity as a limitation rather than claiming a powered result.
-
-### Analog optimization and score-hacking
-
-Starting from three known EGFR chemotypes as seeds, the workflow generated and screened 26 analogs and accepted 10 under the full gate set. Screening was identical across generation strategies:
-
-| Strategy | Generator | Valid | Screened | Accepted |
-|---|---|---:|---:|---:|
-| rule-based | RDKit | 17 | 17 | 6 |
-| single agent | Qwen3-32B | 2 | 2 | 1 |
-| council (no feedback) | Qwen3-32B | 3 | 3 | 1 |
-| council (tool feedback) | Qwen3-32B | 2 | 2 | 1 |
-| council (interaction-constrained) | Qwen3-32B | 2 | 2 | 1 |
-
-The LLM arms each produced only a handful of molecules, so I present this as a **feasibility demonstration** — a local open-weights agent can be bridged to the same cheminformatics tooling and produce valid, screenable analogs evaluated on equal footing with the rule-based baseline — not as a powered comparison between generators.
-
-Score-hacking is reported with two complementary definitions to be transparent: a strict acceptance gate flagged and rejected **3** analogs whose CNN score improved while the binding mode broke, and a broader diagnostic auditor flagged **8** cases in total (the 3 plus 5 milder cases where a composite score improved while interaction evidence weakened — 5 of which still passed the acceptance gate). Reporting both is the honest framing: the auditor is stricter than the gate and surfaces borderline candidates the gate lets through.
-
-### MD pose stability
-
-Finalists (three known controls plus the top three accepted analogs) are stress-tested with short explicit-solvent MD (AMBER19SB / GAFF2 / AM1-BCC / OPC3, GROMACS), with restrained equilibration and three independent replicates per finalist. Pose stability is measured in the protein reference frame after periodic-boundary correction and least-squares fitting on the protein backbone; ligand RMSD is taken relative to the docked start pose, with interaction persistence tracked alongside.
-
-Preliminary single-replicate results for the three known EGFR chemotypes show stable poses over 20 ns (median ligand RMSD ≈ 1.8–2.0 Å, pocket contact retained throughout). A methodological note worth flagging for anyone doing similar analysis: a naive lab-frame RMSD (without removing periodic-boundary translation and protein rotation) reports these same stable poses as 8–21 Å "failures"; the protein-frame analysis is what recovers the correct ≈ 2 Å. The full replicated finalist run, including the designed analogs, was in progress when this repository was published and the tables will be updated when it completes.
-
-## Reproduce
-
-The pipeline is packaged as an installable CLI. External tools (docking engine, GNINA, GROMACS, OpenBabel, AmberTools) are system/conda binaries or Docker images and are not installed by pip — see `configs/tools.example.yaml` and `docs/reproducibility_notes.md`.
-
-```bash
-conda env create -f environment.yml
-conda activate egfr-dockingforge
-pip install -e .
-pytest -q                       # unit tests
-egfrforge --help                # list all stage commands
-```
-
-Input structures are public (RCSB PDB; UniProt P00533) and known ligands come from ChEMBL. Each stage records tool versions, command lines, and config hashes in its outputs, and a provenance bundle is produced at the end.
-
-## Repository layout
+The primary score for ligand `i` and receptor state `r` is:
 
 ```text
-src/egfr_dockingforge/   pipeline package (stage0 … stage12)
-configs/                 one YAML config per stage
-workflows/               Snakemake workflow
-scripts/                 resumable MD driver and helpers
-tests/                   unit tests
-docs/                    per-stage protocols, source registries, non-claim notes
+S(i) = max_r CNNscore(i,r) * [1 + recall(i,r)]
 ```
 
-The Python package keeps its original name `egfr_dockingforge` for import stability; "Syndesis" is the project/method name used in the paper and reports.
+where `recall(i,r)` is the fraction of target-native residue-by-interaction bits recovered by that exact pose. CNNscore from one receptor is never combined with interaction recall from another.
+
+The implementation is fail-closed:
+
+- Docked coordinates are mapped back onto the prepared SDF molecular graph before ProLIF analysis.
+- Atom-count, element-order, or fingerprint failures block ranking instead of becoming zero-valued interactions.
+- Missing ligand net charge blocks MD parameterization.
+- GAFF2 ligands cannot be mixed with a CHARMM protein force field unless explicitly overridden.
+- Parameterization warnings are retained in machine-readable reports.
+- No dependency or scientific-method fallback is selected silently.
+
+## Evidence Layers
+
+1. **Structural curation:** ATP-site kinase complexes, normalized residue maps, and receptor-state metadata.
+2. **Ensemble docking:** five EGFR or CDK2 receptor conformations with reproducible seeds and boxes.
+3. **Neural rescoring:** GNINA score-only evaluation of one pose per ligand-receptor pair.
+4. **Interaction analysis:** ProLIF fingerprints using prepared ligand graphs and docked coordinates.
+5. **Statistical controls:** paired bootstraps, three permutation nulls, formula sensitivity, and complete leave-one-out analyses.
+6. **Leakage audit:** exact identity, scaffold, and ECFP4 similarity between native ligands and benchmark actives.
+7. **Deterministic analog audit:** versioned RDKit transformations with complete parent-to-analog lineage.
+8. **Replicated MD:** 7 systems x 3 independent 20 ns trajectories using ff19SB, GAFF2/AM1-BCC, OPC3, and GROMACS.
+
+The MD gate accepted four systems by majority replicate and rejected three, including a deliberately mis-docked negative control with median ligand RMSD 5.72 Å and key-interaction occupancy 0.008.
+
+## Repository Map
+
+```text
+src/egfr_dockingforge/   installable pipeline and CLI
+configs/                 versioned scientific policies and run parameters
+scripts/                 enrichment, robustness, provenance, and figure workflows
+tests/                   unit and regression tests
+docs/                    methods, source registries, and non-claim policies
+results/                 compact machine-readable publication results
+figures/                 publication figures
+manuscript/              Quarto source and rendered paper
+workflows/               Snakemake orchestration
+```
+
+Large docking intermediates and trajectories are intentionally excluded. The release contains compact results, source manifests, checksums, and deterministic analysis scripts rather than multi-gigabyte run directories.
+
+## Installation
+
+Create the scientific environment and install the package:
+
+```bash
+micromamba create -n syndesis -f environment.yml
+micromamba activate syndesis
+python -m pip install -e .
+pytest -q
+```
+
+The default suite excludes tests that require generated campaign artifacts or
+external chemistry executables. Run `pytest -m integration` after staging those
+inputs and tools.
+
+The full workflow also requires working installations of Uni-Dock, GNINA 1.3.3, Open Babel, AmberTools (`antechamber` and `parmchk2`), ACPYPE, and GROMACS 2026.0. Tool paths are deployment settings; see [`configs/tools.example.yaml`](configs/tools.example.yaml) and [`docs/reproducibility_notes.md`](docs/reproducibility_notes.md).
+
+## Reproducing the Paper
+
+Three reproduction levels are supported:
+
+```bash
+# 1. Validate package behavior
+pytest -q
+
+# 2. Rebuild publication statistics from the packaged pose-level masters
+PYTHONPATH=src python scripts/submission_robustness_analysis.py
+
+# 3. Render the manuscript after regenerating figures
+python scripts/create_manuscript_figures.py
+quarto render manuscript/syndesis_jcheminformatics_v2.qmd --to typst
+```
+
+The complete docking campaigns require the source DUD-E and ZINC files described in the manifests, prepared receptor files, and GPU-capable external tools. Commands do not substitute a different engine when a required tool is missing.
 
 ## Citation
 
-If you use this work, please cite it via `CITATION.cff`. A manuscript describing the method is in preparation (E. Mitropoulou and D. Giannopoulos, University of Patras). Released under the MIT License.
+Please cite the ChemRxiv preprint:
+
+> Mitropoulou E, Giannopoulos D. **Pose-coupled native-interaction weighting for kinase ensemble docking: retrospective evaluation on EGFR and CDK2.** ChemRxiv. 2026. DOI pending.
+
+Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff). The repository is prepared for archival through Zenodo when the release DOI is minted.
+
+## Authors
+
+**Evangelia Mitropoulou** and **Dimitris Giannopoulos**<br>
+Department of Chemistry, University of Patras, Greece
+
+Syndesis was developed as a research-grade computational chemistry project with emphasis on reproducibility, failure-aware engineering, and scientifically bounded interpretation.

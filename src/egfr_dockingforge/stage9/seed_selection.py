@@ -19,8 +19,9 @@ def select_seed_scaffolds(inputs: dict[str, pd.DataFrame], config: dict[str, Any
     # only carries cnnscore, but parent ligand efficiency must be computed from
     # cnnaffinity to match the analog side (see analog_acceptance).
     agg_cols = ["molecule_id", "best_screening_pose_id", "best_target_receptor_id", "best_receptor_state"]
-    if "best_gnina_cnnaffinity" in agg.columns:
-        agg_cols.append("best_gnina_cnnaffinity")
+    if "best_gnina_cnnaffinity" not in agg.columns:
+        raise ValueError("candidate_aggregate_scores must contain best_gnina_cnnaffinity.")
+    agg_cols.append("best_gnina_cnnaffinity")
     df = ranked.merge(
         agg[agg_cols],
         on="molecule_id",
@@ -31,10 +32,8 @@ def select_seed_scaffolds(inputs: dict[str, pd.DataFrame], config: dict[str, Any
         & (df["best_key_interaction_recall_consensus"] >= float(config["seed_selection"]["min_key_interaction_recall"]))
     ].copy()
     if filt.empty:
-        filt = df.head(int(config["seed_selection"]["min_seeds"])).copy()
-        reason = "top_ranked_stage8_control_seed_relaxed_due_to_no_prospective_candidates"
-    else:
-        reason = "passed_stage8_pose_confidence_and_interaction_filters"
+        raise RuntimeError("No Stage 8 candidates satisfy the configured Stage 9 seed gates.")
+    reason = "passed_stage8_pose_confidence_and_interaction_filters"
     filt = filt.head(int(config["seed_selection"]["max_seeds"]))
     rows = []
     for i, row in enumerate(filt.to_dict("records"), start=1):
@@ -51,7 +50,7 @@ def select_seed_scaffolds(inputs: dict[str, pd.DataFrame], config: dict[str, Any
                 "best_receptor_state": row.get("best_receptor_state", ""),
                 "best_pose_confidence": float(row.get("best_pose_confidence", 0.0)),
                 "best_gnina_cnnscore": float(row.get("best_gnina_cnnscore", 0.0)),
-                "best_gnina_cnnaffinity": float(row.get("best_gnina_cnnaffinity", 0.0)),
+                "best_gnina_cnnaffinity": float(row["best_gnina_cnnaffinity"]),
                 "best_key_interaction_recall_consensus": float(row.get("best_key_interaction_recall_consensus", 0.0)),
                 "novelty_bucket": row.get("novelty_bucket", "known_control"),
                 "medchem_flags_json": row.get("medchem_flags_json", "[]"),

@@ -19,8 +19,7 @@ def _parent_ligand_efficiency(seed: dict) -> float:
     heavy = mol.GetNumHeavyAtoms() if mol is not None else 1
     affinity = seed.get("best_gnina_cnnaffinity")
     if affinity is None or (isinstance(affinity, float) and pd.isna(affinity)):
-        # Backward-compatible fallback for seed tables lacking cnnaffinity.
-        affinity = seed.get("best_gnina_cnnscore", 0.0)
+        raise ValueError("Seed best_gnina_cnnaffinity is required for ligand efficiency.")
     return -float(affinity) / max(heavy, 1)
 
 

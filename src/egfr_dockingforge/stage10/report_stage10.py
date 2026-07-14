@@ -29,9 +29,9 @@ def write_stage10_report(paths: dict[str, Path]) -> Path:
 <body>
 <h1>Stage 10 - Budget-controlled analog optimization benchmark</h1>
 <p><strong>Non-claim:</strong> this report is a computational benchmark only and makes no experimental EGFR activity claim.</p>
-<p>Stage 10 consumed Stage 9 outputs only. No new docking, GNINA, ProLIF, pose-confidence scoring, agent generation, or MD was run.</p>
+<p>Stage 10 consumed Stage 9 outputs only. No new docking, GNINA, ProLIF, pose-confidence scoring, analog generation, or MD was run.</p>
 <h2>Benchmark design</h2><p>Paired seed scaffolds, fixed proposal/screening budgets, accepted analog rate as the primary metric, score-hacking rate as the primary failure metric.</p>
-<h2>Strategy definitions</h2>{_table(manifest, ["strategy_id","strategy_name","enabled_flag","uses_llm","uses_prolif_constraint","uses_pose_confidence","uses_md_filter","md_status"])}
+<h2>Strategy definitions</h2>{_table(manifest, ["strategy_id","strategy_name","enabled_flag","uses_prolif_constraint","uses_pose_confidence","uses_md_filter","md_status"])}
 <h2>Budget audit</h2>{_table(budget, ["strategy_id","seed_id","num_raw_proposals","num_valid_unique_analogs","num_screened_analogs","budget_normalized_flag","budget_violation_reason"])}
 <h2>Pre-MD benchmark results</h2>{_table(metrics, ["strategy_name","num_raw_proposals","num_valid_molecules","num_screened","num_pre_md_accepted","accepted_analog_rate_pre_md","score_hacking_rate","md_status"])}
 <h2>Post-MD benchmark status</h2><p>{html.escape(str(manifest["md_status"].value_counts().to_dict()))}</p>

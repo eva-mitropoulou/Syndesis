@@ -133,7 +133,7 @@ def compute_seed_and_strategy_metrics(master: pd.DataFrame, manifest: pd.DataFra
             "mean_delta_ligand_efficiency": float(g["delta_ligand_efficiency"].mean()) if len(g) else 0.0,
             "median_delta_ligand_efficiency": float(g["delta_ligand_efficiency"].median()) if len(g) else 0.0,
             "mean_runtime_per_valid_analog": 0.0, "mean_runtime_per_accepted_analog": 0.0,
-            "gpu_seconds_per_accepted_analog": 0.0, "llm_tokens_per_accepted_analog": 0.0,
+            "gpu_seconds_per_accepted_analog": 0.0,
             "md_status": strat["md_status"], "notes": strat["notes"],
         })
     strategy_metrics = pd.DataFrame(strategy_rows)

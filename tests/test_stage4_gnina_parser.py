@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from pathlib import Path
+
+import pytest
+
+from egfr_dockingforge.stage4.gnina_runner import _prepare_ligand_for_gnina
 from egfr_dockingforge.stage4.score_parser import parse_gnina_output
 from egfr_dockingforge.stage4.scoring_engines import parse_gnina_version
 
@@ -27,3 +32,9 @@ def test_gnina_parser_handles_missing_cnn_vs() -> None:
 def test_gnina_version_parser() -> None:
     assert parse_gnina_version("gnina v1.3.3 master") == "gnina v1.3.3"
 
+
+def test_gnina_pose_conversion_requires_openbabel(tmp_path: Path) -> None:
+    pose = tmp_path / "pose.pdbqt"
+    pose.write_text("END\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="Open Babel is required"):
+        _prepare_ligand_for_gnina(pose, {"processed": tmp_path})

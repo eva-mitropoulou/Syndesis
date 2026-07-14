@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from egfr_dockingforge.stage12.candidate_card_builder import build_candidate_cards
 from egfr_dockingforge.stage12.dossier_renderer import render_candidate_dossiers
@@ -12,6 +13,7 @@ from egfr_dockingforge.stage12.nonclaim_generator import REQUIRED_NON_CLAIMS
 
 
 CONFIG = Path("configs/stage12_candidate_dossiers.yaml")
+pytestmark = pytest.mark.integration
 
 
 def test_selected_candidates_have_cards_dossiers_figures_and_pose_status() -> None:

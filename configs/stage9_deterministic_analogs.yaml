@@ -1,0 +1,63 @@
+stage:
+  name: stage9_deterministic_analog_audit
+  version: 0.2.0
+
+inputs:
+  stage8_config: configs/stage8_candidate_screening.yaml
+  ranked_candidates: data/processed/stage8/ranked_candidates.parquet
+  candidate_aggregate_scores: data/processed/stage8/candidate_aggregate_scores.parquet
+  screening_pose_decisions: data/processed/stage8/screening_pose_decisions.parquet
+  screening_interaction_features: data/processed/stage8/screening_interaction_features.parquet
+  stage7_master: data/processed/stage7/candidate_library_master.parquet
+  stage7_prepared_ligands: data/processed/stage7/candidate_ligand_preparation.parquet
+  key_interactions: data/processed/stage5/key_egfr_interactions.parquet
+  stage6_model: models/stage6/pose_ranker.pkl
+  stage6_feature_schema: models/stage6/feature_schema.json
+
+paths:
+  processed: data/processed/stage9
+  reports: reports
+  analog_sdf_dir: data/processed/stage9/prepared_analogs
+
+seed_selection:
+  min_seeds: 1
+  max_seeds: 3
+  min_pose_confidence: 0.30
+  min_key_interaction_recall: 0.20
+
+edit_sites:
+  max_sites_per_seed: 6
+  protect_key_interaction_atoms: true
+
+transforms:
+  max_analogs_per_seed_per_strategy: 6
+  enabled_classes:
+    - small_substituent_scan
+    - halogen_scan
+    - heteroatom_swap
+    - solubilizing_tail_tuning
+    - conservative_bioisostere
+    - brics_recombination
+
+loop:
+  random_seed: 909
+  max_iterations: 1
+  strategies:
+    - rdkit_rule_based
+
+screening:
+  enabled: true
+  max_analogs_to_screen: 30
+  stage8_mini_config: data/processed/stage9/stage8_analog_miniscreen.yaml
+  stage8_processed: data/processed/stage9/stage8_mini_screen
+  receptor_limit: 5
+  num_modes: 3
+
+acceptance:
+  min_pose_confidence: 0.30
+  min_key_interaction_recall: 0.20
+  require_binding_mode_preserved: true
+  require_ligand_efficiency_preserved: true
+  max_medchem_risk_delta: 0.40
+  min_delta_candidate_score: -0.02
+  min_delta_ligand_efficiency: -0.10

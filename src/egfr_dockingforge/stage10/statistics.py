@@ -53,7 +53,6 @@ def run_statistical_comparisons(seed_metrics: pd.DataFrame, config: dict[str, An
     primary = config["benchmark"]["primary_method"]
     methods = [
         "random_analog_enumeration","docking_score_only_optimization","gnina_only_optimization","rdkit_rule_based",
-        "reinvent4_baseline_if_available","single_agent","council_loop","council_plus_prolif",
     ]
     rows = []
     for method in methods:

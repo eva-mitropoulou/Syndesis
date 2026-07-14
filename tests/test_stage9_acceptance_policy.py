@@ -1,4 +1,5 @@
 import pandas as pd
+import pytest
 
 from egfr_dockingforge.stage9.analog_acceptance import score_analog_acceptance
 
@@ -12,6 +13,7 @@ def test_docking_score_improvement_alone_is_insufficient(tmp_path):
                 "best_pose_confidence": 0.6,
                 "best_key_interaction_recall_consensus": 0.5,
                 "best_gnina_cnnscore": 0.4,
+                "best_gnina_cnnaffinity": 5.0,
             }
         ]
     )
@@ -85,3 +87,10 @@ def test_parent_ligand_efficiency_uses_cnnaffinity_not_cnnscore():
     seed = {"standard_smiles": "Cc1ccccc1", "best_gnina_cnnscore": 0.8, "best_gnina_cnnaffinity": 6.0}
     le = _parent_ligand_efficiency(seed)
     assert abs(le - (-6.0 / 7)) < 1e-6
+
+
+def test_parent_ligand_efficiency_rejects_missing_cnnaffinity():
+    from egfr_dockingforge.stage9.analog_acceptance import _parent_ligand_efficiency
+
+    with pytest.raises(ValueError, match="best_gnina_cnnaffinity"):
+        _parent_ligand_efficiency({"standard_smiles": "CC", "best_gnina_cnnscore": 0.8})

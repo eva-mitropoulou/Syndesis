@@ -1,14 +1,12 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "Syndesis: an evidence-concordant, interaction-constrained workflow for EGFR ATP-site analog design"
+title: "Syndesis: pose-coupled native-interaction weighting for kinase ensemble docking"
 abstract: >-
-  Syndesis is a reproducible, leakage-audited, structure-based cheminformatics
-  workflow for EGFR ATP-site analog design that accepts a candidate only when
-  independent structural evidence (docked pose, ProLIF interaction fingerprint,
-  a leakage-controlled pose-confidence model, and short molecular-dynamics
-  pose-stability) agrees on the validated binding mode, operationalizing and
-  detecting docking-score hacking. Includes a feasibility comparison of an
-  LLM-agent analog-design loop against a deterministic rule-based baseline.
+  Syndesis is a reproducible structure-based cheminformatics workflow that couples
+  GNINA CNNscore to recovery of a target-native interaction prior on the same pose.
+  It includes EGFR and CDK2 enrichment benchmarks, permutation and native-overlap
+  controls, deterministic analog audits, and replicated molecular-dynamics pose
+  stability tests.
 type: software
 authors:
   - given-names: Evangelia
@@ -26,5 +24,18 @@ keywords:
   - molecular dynamics
   - score hacking
 license: MIT
-version: 0.1.0
-date-released: "2026-07-08"
+version: 0.2.0
+date-released: "2026-07-14"
+preferred-citation:
+  type: article
+  title: "Pose-coupled native-interaction weighting for kinase ensemble docking: retrospective evaluation on EGFR and CDK2"
+  authors:
+    - given-names: Evangelia
+      family-names: Mitropoulou
+      affiliation: "University of Patras"
+    - given-names: Dimitris
+      family-names: Giannopoulos
+      affiliation: "University of Patras"
+  journal: "ChemRxiv"
+  year: 2026
+  notes: "Preprint; DOI pending."

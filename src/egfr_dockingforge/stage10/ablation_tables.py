@@ -11,7 +11,7 @@ from egfr_dockingforge.common.io import write_table
 def _stage11_md_ablation_row(inputs: dict[str, pd.DataFrame | None] | None) -> dict:
     base = {
         "ablation_id": "md_filter_ablation",
-        "base_strategy": "council_plus_prolif_pose_confidence",
+        "base_strategy": "rdkit_rule_based",
         "removed_component": "",
         "added_component": "md_filter",
         "accepted_rate_change": 0.0,
@@ -83,11 +83,8 @@ def build_ablation_summary(
 ) -> pd.DataFrame:
     idx = strategy_metrics.set_index("strategy_name")
     pairs = [
-        ("council_vs_single_agent", "single_agent", "council_loop", "council"),
-        ("feedback_vs_no_feedback", "council_loop", "council_plus_prolif", "tool_feedback_or_prolif"),
-        ("pose_confidence_ablation", "council_plus_prolif", "council_plus_prolif_pose_confidence", "pose_confidence"),
         ("gnina_vs_docking", "docking_score_only_optimization", "gnina_only_optimization", "gnina"),
-        ("rule_based_vs_llm", "single_agent", "rdkit_rule_based", "rdkit_rule_based"),
+        ("constrained_rdkit_vs_gnina", "gnina_only_optimization", "rdkit_rule_based", "interaction_and_pose_constraints"),
     ]
     rows = []
     for aid, base, comp, added in pairs:

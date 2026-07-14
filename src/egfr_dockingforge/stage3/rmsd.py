@@ -40,7 +40,7 @@ def _load_mol_with_coords(path: str | Path, smiles: str | None):
     Docked poses are PDB/PDBQT with unreliable bond orders, so when a reference
     SMILES is available we assign bond orders from it (this also fixes element
     perception and lets us use the canonical atom-matching machinery). Returns
-    ``None`` if a chemically valid molecule cannot be built.
+    ``None`` if a chemically valid, template-mapped molecule cannot be built.
     """
     from rdkit import Chem
     from rdkit.Chem import AllChem
@@ -61,15 +61,16 @@ def _load_mol_with_coords(path: str | Path, smiles: str | None):
         mol = Chem.MolFromPDBFile(path, removeHs=True, sanitize=False)
     if mol is None:
         return None
-    if smiles:
-        template = Chem.MolFromSmiles(smiles)
-        if template is not None:
-            template = Chem.RemoveHs(template)
-            try:
-                mol = AllChem.AssignBondOrdersFromTemplate(template, mol)
-            except Exception:
-                # Fall back to the raw perceived connectivity.
-                pass
+    if not smiles:
+        return None
+    template = Chem.MolFromSmiles(smiles)
+    if template is None:
+        return None
+    template = Chem.RemoveHs(template)
+    try:
+        mol = AllChem.AssignBondOrdersFromTemplate(template, mol)
+    except Exception:
+        return None
     try:
         Chem.SanitizeMol(mol)
     except Exception:
@@ -89,20 +90,15 @@ def symmetry_corrected_rmsd(pose_path: str | Path, ref_path: str | Path, smiles:
     pose = _load_mol_with_coords(pose_path, smiles)
     ref = _load_mol_with_coords(ref_path, smiles)
     if pose is None or ref is None:
-        # Fall back to the naive positional RMSD on raw heavy-atom coordinates.
-        value = mapped_rmsd(heavy_atom_coords(pose_path), heavy_atom_coords(ref_path))
-        return value, "naive_atom_order_fallback", "fallback_no_molgraph"
+        raise RuntimeError("Symmetry-aware RMSD requires valid template-mapped molecular graphs.")
     if pose.GetNumAtoms() != ref.GetNumAtoms():
-        value = mapped_rmsd(heavy_atom_coords(pose_path), heavy_atom_coords(ref_path))
-        return value, "naive_atom_order_fallback", "fallback_atom_count_mismatch"
+        raise RuntimeError(
+            f"Template-mapped atom count mismatch: {pose.GetNumAtoms()} vs {ref.GetNumAtoms()}."
+        )
     # CalcRMS enumerates symmetry-equivalent atom mappings and returns the best,
     # WITHOUT modifying coordinates (no superposition) -> in-place symmetry RMSD.
-    try:
-        value = float(rdMolAlign.CalcRMS(pose, ref))
-        return value, "rdkit_symmetry_calcrms_inplace", "symmetry_matched"
-    except Exception as exc:  # noqa: BLE001
-        value = mapped_rmsd(heavy_atom_coords(pose_path), heavy_atom_coords(ref_path))
-        return value, "naive_atom_order_fallback", f"fallback_calcrms_error:{str(exc)[:80]}"
+    value = float(rdMolAlign.CalcRMS(pose, ref))
+    return value, "rdkit_symmetry_calcrms_inplace", "symmetry_matched"
 
 
 def compute_pose_rmsd(poses: pd.DataFrame, tasks: pd.DataFrame, transforms: pd.DataFrame, config: dict[str, Any], paths: dict[str, Path], ligand_prep: pd.DataFrame | None = None) -> pd.DataFrame:
@@ -122,7 +118,7 @@ def compute_pose_rmsd(poses: pd.DataFrame, tasks: pd.DataFrame, transforms: pd.D
         warning = ""
         naive_value = None
         sym_value = None
-        method = "symmetry_attempted_mapped_heavy_atom_fallback"
+        method = "rdkit_symmetry_calcrms_inplace"
         mapping_status = "failed"
         smiles = smiles_lookup.get(str(pose["ligand_id"]))
         try:
@@ -137,13 +133,9 @@ def compute_pose_rmsd(poses: pd.DataFrame, tasks: pd.DataFrame, transforms: pd.D
                 pose["pose_file"], transform["transformed_reference_pose_file"], smiles
             )
         except Exception as exc:  # noqa: BLE001
-            sym_value = naive_value
-            method = "naive_atom_order_fallback"
             mapping_status = f"symmetry_failed:{str(exc)[:80]}"
-            if not warning:
-                warning = str(exc)
-        if naive_value is None and sym_value is None:
             status = "failed"
+            warning = "; ".join(part for part in (warning, str(exc)) if part)
         rows.append({
             "pose_id": pose["pose_id"],
             "docking_task_id": pose["docking_task_id"],
@@ -154,7 +146,7 @@ def compute_pose_rmsd(poses: pd.DataFrame, tasks: pd.DataFrame, transforms: pd.D
             "pose_rank": pose["pose_rank"],
             "docking_score": pose["docking_score"],
             "rmsd_heavy_atom": naive_value,
-            "rmsd_symmetry_corrected": sym_value if sym_value is not None else naive_value,
+            "rmsd_symmetry_corrected": sym_value,
             "rmsd_method": method,
             "atom_mapping_status": mapping_status,
             "atom_mapping_warning": warning,

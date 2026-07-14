@@ -3,10 +3,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from egfr_dockingforge.stage12.candidate_dossiers import run_stage12_all
 
 
 CONFIG = Path("configs/stage12_candidate_dossiers.yaml")
+pytestmark = pytest.mark.integration
 
 
 def test_provenance_manifest_contains_required_sections() -> None:

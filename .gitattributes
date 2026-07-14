@@ -1,0 +1,14 @@
+*.docx binary
+*.parquet binary
+*.pdf binary
+*.png binary
+
+*.csv text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.pdb text eol=lf whitespace=-trailing-space,-blank-at-eof
+*.pdbqt text eol=lf whitespace=-trailing-space,-blank-at-eof
+*.py text eol=lf
+*.qmd text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf

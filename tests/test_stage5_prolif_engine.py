@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pandas as pd
+import pytest
 
 from egfr_dockingforge.stage5.prolif_engine import (
     compute_interactions,
@@ -9,6 +10,9 @@ from egfr_dockingforge.stage5.prolif_engine import (
     prepare_ligand_for_prolif,
     prepare_protein_for_prolif,
 )
+
+
+pytestmark = pytest.mark.integration
 
 
 def test_stage5_prolif_engine_returns_interactions() -> None:

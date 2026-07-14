@@ -10,17 +10,46 @@ from typing import Any
 import pandas as pd
 from rdkit import Chem
 
-from egfr_dockingforge.common.io import write_table
+from egfr_dockingforge.common.io import resolve_path, write_table
 from egfr_dockingforge.stage11.mdp_templates import write_mdp_templates
 
 
-def _run(command: list[str], cwd: Path, log_path: Path, input_text: str | None = None) -> tuple[int, str]:
+# Signatures of a transient filesystem hiccup (seen intermittently when the MD
+# work dir is on a Windows drive via drvfs/9p: GROMACS solvate/pdb2gmx write a
+# temp file then rename it over topol.top, and the rename occasionally reports a
+# spurious "System I/O error" even though the target was written). These are
+# safe to retry; real GROMACS errors (fatal, bad input) do not match and are not
+# retried.
+_TRANSIENT_IO_SIGNATURES = (
+    "Failed to rename",
+    "System I/O error",
+    "gmx_file_rename",
+)
+
+
+def _looks_transient_io(returncode: int, text: str, cwd: Path, command: list[str]) -> bool:
+    if returncode == 0:
+        return False
+    if not any(sig in text for sig in _TRANSIENT_IO_SIGNATURES):
+        return False
+    # If the intended output already exists (the write succeeded; only the rename
+    # was misreported), or a subsequent retry can regenerate it, treat as transient.
+    return True
+
+
+def _run(command: list[str], cwd: Path, log_path: Path, input_text: str | None = None, retries: int = 2) -> tuple[int, str]:
     log_path.parent.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
-    result = subprocess.run(command, cwd=cwd, input=input_text, text=True, capture_output=True, env=env)
-    text = f"$ {' '.join(command)}\n\nSTDOUT:\n{result.stdout}\n\nSTDERR:\n{result.stderr}\n"
-    log_path.write_text(text, encoding="utf-8")
-    return result.returncode, text
+    attempt = 0
+    while True:
+        result = subprocess.run(command, cwd=cwd, input=input_text, text=True, capture_output=True, env=env)
+        text = f"$ {' '.join(command)}\n\nSTDOUT:\n{result.stdout}\n\nSTDERR:\n{result.stderr}\n"
+        if result.returncode == 0 or attempt >= retries or not _looks_transient_io(result.returncode, text, cwd, command):
+            log_path.write_text(text, encoding="utf-8")
+            return result.returncode, text
+        attempt += 1
+        text = f"[transient filesystem error, retry {attempt}/{retries}]\n" + text
+        log_path.write_text(text, encoding="utf-8")
 
 
 def _pose_sdf_for_candidate(best_pose_id: str) -> Path:
@@ -119,6 +148,37 @@ def _water_name(config: dict[str, Any]) -> str:
     return water
 
 
+def _topology_molecule_counts(topology: Path) -> dict[str, int]:
+    """Read post-genion molecule counts from the GROMACS topology."""
+    counts: dict[str, int] = {}
+    section = ""
+    for raw in topology.read_text(encoding="utf-8").splitlines():
+        line = raw.split(";", 1)[0].strip()
+        if not line:
+            continue
+        if line.startswith("[") and line.endswith("]"):
+            section = line.strip("[] ").lower()
+            continue
+        if section == "molecules":
+            fields = line.split()
+            if len(fields) >= 2:
+                counts[fields[0]] = counts.get(fields[0], 0) + int(fields[1])
+    return counts
+
+
+def _ionized_system_counts(topology: Path) -> dict[str, int]:
+    counts = _topology_molecule_counts(topology)
+    num_na = counts.get("NA", 0)
+    num_cl = counts.get("CL", 0)
+    return {
+        "num_waters": counts.get("SOL", 0),
+        "num_na": num_na,
+        "num_cl": num_cl,
+        "net_charge_before_ions": num_cl - num_na,
+        "final_charge": 0,
+    }
+
+
 def _build_one_system(row: dict[str, Any], param: dict[str, Any], config: dict[str, Any], paths: dict[str, Path]) -> dict[str, Any]:
     gmx = config["forcefield"]["gromacs_executable"]
     work = paths["md_root"] / f"mdsys_{row['md_candidate_id']}"
@@ -129,9 +189,19 @@ def _build_one_system(row: dict[str, Any], param: dict[str, Any], config: dict[s
     protein_gro = work / "protein.gro"
     protein_top = work / "topol.top"
     posre = work / "posre.itp"
+    # Run every GROMACS build step with cwd=work (the system's own directory).
+    # Tools like `gmx solvate`/`gmx pdb2gmx` write a temp file (temp.topXXXX) in
+    # the CWD and then rename() it onto the -p/-o target. When the work dir is on
+    # a different filesystem than the CWD (here: work is on the Windows E: drive
+    # via drvfs/9p, while the process CWD was the project root on native ext4),
+    # rename(2) fails with EXDEV -> GROMACS "System I/O error: Failed to rename".
+    # Keeping cwd == work makes temp file and target share one filesystem.
+    # Resolve the receptor to an ABSOLUTE path: cwd is now the work dir (see the
+    # EXDEV note above), so a repo-relative receptor path would no longer resolve.
+    receptor_abs = str(resolve_path(row["receptor_file"]))
     code, _ = _run(
-        [gmx, "pdb2gmx", "-f", row["receptor_file"], "-o", str(protein_gro), "-p", str(protein_top), "-i", str(posre), "-ff", config["forcefield"]["protein_ff"], "-water", _water_name(config), "-ignh"],
-        Path.cwd(),
+        [gmx, "pdb2gmx", "-f", receptor_abs, "-o", str(protein_gro), "-p", str(protein_top), "-i", str(posre), "-ff", config["forcefield"]["protein_ff"], "-water", _water_name(config), "-ignh"],
+        work,
         work / "pdb2gmx.log",
     )
     if code != 0:
@@ -147,27 +217,27 @@ def _build_one_system(row: dict[str, Any], param: dict[str, Any], config: dict[s
     total_atoms = _combine_gro(protein_gro, ligand_pose_gro, complex_gro)
     _insert_ligand_topology(protein_top, ligand_itp, moleculetype)
     boxed = work / "boxed.gro"
-    code, _ = _run([gmx, "editconf", "-f", str(complex_gro), "-o", str(boxed), "-bt", config["forcefield"]["box_type"], "-d", str(config["forcefield"]["box_padding_nm"]), "-c"], Path.cwd(), work / "editconf.log")
+    code, _ = _run([gmx, "editconf", "-f", str(complex_gro), "-o", str(boxed), "-bt", config["forcefield"]["box_type"], "-d", str(config["forcefield"]["box_padding_nm"]), "-c"], work, work / "editconf.log")
     if code != 0:
         raise RuntimeError(f"editconf failed for {row['md_candidate_id']}; see {work / 'editconf.log'}")
     solvated = work / "solvated.gro"
-    code, _ = _run([gmx, "solvate", "-cp", str(boxed), "-cs", "spc216.gro", "-p", str(protein_top), "-o", str(solvated)], Path.cwd(), work / "solvate.log")
+    code, _ = _run([gmx, "solvate", "-cp", str(boxed), "-cs", "spc216.gro", "-p", str(protein_top), "-o", str(solvated)], work, work / "solvate.log")
     if code != 0:
         raise RuntimeError(f"solvate failed for {row['md_candidate_id']}; see {work / 'solvate.log'}")
     ions_tpr = work / "ions.tpr"
-    code, _ = _run([gmx, "grompp", "-f", str(mdp_files["ions"]), "-c", str(solvated), "-p", str(protein_top), "-o", str(ions_tpr), "-maxwarn", "2"], Path.cwd(), work / "grompp_ions.log")
+    code, _ = _run([gmx, "grompp", "-f", str(mdp_files["ions"]), "-c", str(solvated), "-p", str(protein_top), "-o", str(ions_tpr), "-maxwarn", "2"], work, work / "grompp_ions.log")
     if code != 0:
         raise RuntimeError(f"grompp ions failed for {row['md_candidate_id']}; see {work / 'grompp_ions.log'}")
     ionized = work / "ionized.gro"
     code, _ = _run(
         [gmx, "genion", "-s", str(ions_tpr), "-o", str(ionized), "-p", str(protein_top), "-pname", "NA", "-nname", "CL", "-neutral", "-conc", str(config["forcefield"]["salt_concentration_molar"])],
-        Path.cwd(),
+        work,
         work / "genion.log",
         input_text="SOL\n",
     )
     if code != 0:
         raise RuntimeError(f"genion failed for {row['md_candidate_id']}; see {work / 'genion.log'}")
-    final_atoms = int(Path(ionized).read_text(encoding="utf-8").splitlines()[1].strip())
+    system_counts = _ionized_system_counts(protein_top)
     return {
         "md_system_id": f"mdsys_{row['md_candidate_id']}",
         "md_candidate_id": row["md_candidate_id"],
@@ -184,11 +254,7 @@ def _build_one_system(row: dict[str, Any], param: dict[str, Any], config: dict[s
         "box_padding_nm": float(config["forcefield"]["box_padding_nm"]),
         "num_protein_atoms": int(Path(protein_gro).read_text(encoding="utf-8").splitlines()[1].strip()),
         "num_ligand_atoms": len(atom_names),
-        "num_waters": max(final_atoms - total_atoms, 0) // 3,
-        "num_na": 0,
-        "num_cl": 0,
-        "net_charge_before_ions": None,
-        "final_charge": None,
+        **system_counts,
         "salt_concentration_molar": float(config["forcefield"]["salt_concentration_molar"]),
         "build_status": "ready_for_md",
         "warnings_json": json.dumps(["solvated_with_spc216_coordinate_box_for_configured_three_site_water_model"]),
@@ -228,6 +294,44 @@ def config_get(d: dict, key: str, default):
     return d.get(key, default) if isinstance(d, dict) else default
 
 
+def _reusable_prior_build(row: dict, param: dict, paths: dict[str, Path]) -> dict | None:
+    """Return a previously-built system row if it is still valid, so re-running
+    build_md_systems does NOT rmtree a system whose equilibration is already
+    underway/complete. _build_one_system starts with shutil.rmtree(work); without
+    this guard, any resume (e.g. after fixing one ligand) would destroy the
+    finished minimization/NVT of every OTHER finalist. Reuse when a prior
+    ready_for_md row exists, its ionized structure is present and non-empty, and
+    it is at least as new as the ligand ITP (so a re-parameterization invalidates
+    the cache)."""
+    prior_path = paths["processed"] / "system_builds.parquet"
+    if not prior_path.exists():
+        return None
+    try:
+        prior = pd.read_parquet(prior_path)
+    except Exception:
+        return None
+    hit = prior[prior["md_candidate_id"] == row["md_candidate_id"]]
+    if hit.empty:
+        return None
+    prow = hit.iloc[0].to_dict()
+    if prow.get("build_status") != "ready_for_md":
+        return None
+    ionized = prow.get("ionized_structure_file") or ""
+    itp = param.get("itp") or param.get("ligand_itp_file") or ""
+    try:
+        ip = Path(ionized)
+        if not (ip.exists() and ip.stat().st_size > 0):
+            return None
+        if itp and Path(itp).exists() and Path(itp).stat().st_mtime > ip.stat().st_mtime:
+            return None  # ligand was re-parameterized after this build -> rebuild
+    except OSError:
+        return None
+    topology = Path(prow.get("topology_file") or "")
+    if topology.exists():
+        prow.update(_ionized_system_counts(topology))
+    return prow
+
+
 def build_md_systems(candidates: pd.DataFrame, params: pd.DataFrame, config: dict[str, Any], paths: dict[str, Path]) -> pd.DataFrame:
     pidx = params.set_index("md_candidate_id")
     rows = []
@@ -244,6 +348,12 @@ def build_md_systems(candidates: pd.DataFrame, params: pd.DataFrame, config: dic
             # A finalist whose ligand parameters failed (e.g. charge non-convergence)
             # cannot be simulated honestly; record the block instead of crashing.
             rows.append(_blocked_system(row, param))
+            continue
+        prior = _reusable_prior_build(row, param, paths)
+        if prior is not None:
+            # Idempotent resume: keep the existing solvated/ionized system (and any
+            # equilibration already run on top of it) instead of rebuilding.
+            rows.append(prior)
             continue
         rows.append(_build_one_system(row, param, config, paths))
     out = pd.DataFrame(rows)

@@ -7,11 +7,11 @@ import pandas as pd
 import MDAnalysis as mda
 import prolif as plf
 from rdkit import Chem
-from rdkit.Geometry import Point3D
 
 from egfr_dockingforge.stage5.interaction_recovery import tanimoto
+from egfr_dockingforge.stage5.pose_reconstruction import reconstruct_pose_sdf
 from egfr_dockingforge.stage5.prolif_engine import (
-    _autodock_element,
+    _PROTEIN_MOL_CACHE,
     _metadata_values,
     _parse_residue_id,
     _prolif_parameters,
@@ -31,30 +31,11 @@ def pose_sanity(poses: pd.DataFrame, paths: dict) -> pd.DataFrame:
 
 
 def _pose_sdf_from_template(pose_file: str, template_sdf: str, pose_id: str, paths: dict) -> Path:
-    supplier = Chem.SDMolSupplier(template_sdf, removeHs=True)
-    template = supplier[0] if supplier and len(supplier) else None
-    if template is None:
-        raise RuntimeError(f"Could not read Stage 7 SDF template: {template_sdf}")
-    coords = []
-    for raw in Path(pose_file).read_text(encoding="utf-8", errors="ignore").splitlines():
-        if not raw.startswith(("ATOM", "HETATM")):
-            continue
-        if _autodock_element(raw) == "H":
-            continue
-        coords.append((float(raw[30:38]), float(raw[38:46]), float(raw[46:54])))
-    if len(coords) != template.GetNumAtoms():
-        raise RuntimeError(f"Pose/template atom count mismatch for {pose_id}: {len(coords)} vs {template.GetNumAtoms()}")
-    mol = Chem.Mol(template)
-    conf = Chem.Conformer(mol.GetNumAtoms())
-    for idx, (x, y, z) in enumerate(coords):
-        conf.SetAtomPosition(idx, Point3D(x, y, z))
-    mol.RemoveAllConformers()
-    mol.AddConformer(conf)
     target = paths["prolif_ligands"] / f"{pose_id}.pose_template.sdf"
-    writer = Chem.SDWriter(str(target))
-    writer.write(mol)
-    writer.close()
-    return target
+    prepared_pdbqt = Path(template_sdf).with_suffix(".pdbqt")
+    if not prepared_pdbqt.exists():
+        raise RuntimeError(f"Prepared PDBQT required for strict pose reconstruction: {prepared_pdbqt}")
+    return reconstruct_pose_sdf(pose_file, template_sdf, prepared_pdbqt, target)
 
 
 def _empty_feature(pose: dict, warning: str) -> dict:
@@ -63,7 +44,11 @@ def _empty_feature(pose: dict, warning: str) -> dict:
 
 def _compute_interactions_rdkit(protein_file: Path, ligand_file: Path, residue_map: pd.DataFrame, config: dict) -> tuple[pd.DataFrame, dict]:
     engine, version = engine_metadata()
-    protein = plf.Molecule.from_mda(mda.Universe(str(protein_file)), inferrer=None, force=True)
+    protein_key = str(protein_file.resolve())
+    protein = _PROTEIN_MOL_CACHE.get(protein_key)
+    if protein is None:
+        protein = plf.Molecule.from_mda(mda.Universe(str(protein_file)), inferrer=None, force=True)
+        _PROTEIN_MOL_CACHE[protein_key] = protein
     mol = Chem.SDMolSupplier(str(ligand_file), removeHs=False)[0]
     if mol is None:
         raise RuntimeError(f"RDKit could not read pose SDF for ProLIF: {ligand_file}")

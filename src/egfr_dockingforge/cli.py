@@ -92,8 +92,6 @@ from egfr_dockingforge.stage9.candidate_screening import (
     detect_edit_sites_cli as run_detect_edit_sites,
     enumerate_rule_based_analogs_cli as run_enumerate_rule_based_analogs,
     report_stage9_cli as run_report_stage9,
-    run_agent_analog_loop_cli as run_stage9_agent_analog_loop,
-    run_reinvent4_baseline_cli as run_stage9_reinvent4_baseline,
     run_stage9_all,
     score_analog_acceptance_cli as run_score_analog_acceptance,
     screen_analog_batch_cli as run_screen_analog_batch,
@@ -622,77 +620,63 @@ def run_stage8(config_path: str) -> None:
 
 
 @main.command("select-analog-seeds")
-@click.option("--config", "config_path", default="configs/stage9_agentic_analog_loop.yaml", show_default=True)
+@click.option("--config", "config_path", default="configs/stage9_deterministic_analogs.yaml", show_default=True)
 def select_analog_seeds(config_path: str) -> None:
     summary = run_select_analog_seeds(Path(config_path))
     click.echo(f"Stage 9 selected seeds: {summary['seeds']}")
 
 
 @main.command("detect-edit-sites")
-@click.option("--config", "config_path", default="configs/stage9_agentic_analog_loop.yaml", show_default=True)
+@click.option("--config", "config_path", default="configs/stage9_deterministic_analogs.yaml", show_default=True)
 def detect_edit_sites(config_path: str) -> None:
     summary = run_detect_edit_sites(Path(config_path))
     click.echo(f"Stage 9 edit sites: {summary['edit_sites']}")
 
 
 @main.command("enumerate-rule-based-analogs")
-@click.option("--config", "config_path", default="configs/stage9_agentic_analog_loop.yaml", show_default=True)
+@click.option("--config", "config_path", default="configs/stage9_deterministic_analogs.yaml", show_default=True)
 def enumerate_rule_based_analogs(config_path: str) -> None:
     summary = run_enumerate_rule_based_analogs(Path(config_path))
     click.echo(f"Stage 9 rule-based analogs: {summary['analogs']}")
 
 
-@main.command("run-reinvent4-baseline")
-@click.option("--config", "config_path", default="configs/stage9_agentic_analog_loop.yaml", show_default=True)
-def run_reinvent4_baseline(config_path: str) -> None:
-    summary = run_stage9_reinvent4_baseline(Path(config_path))
-    click.echo(f"Stage 9 REINVENT4 baseline rows: {summary['rows']}")
-
-
-@main.command("run-agent-analog-loop")
-@click.option("--config", "config_path", default="configs/stage9_agentic_analog_loop.yaml", show_default=True)
-def run_agent_analog_loop(config_path: str) -> None:
-    summary = run_stage9_agent_analog_loop(Path(config_path))
-    click.echo(f"Stage 9 agent log rows: {summary['agent_rows']}")
-
-
 @main.command("validate-analog-batch")
-@click.option("--config", "config_path", default="configs/stage9_agentic_analog_loop.yaml", show_default=True)
+@click.option("--config", "config_path", default="configs/stage9_deterministic_analogs.yaml", show_default=True)
 def validate_analog_batch(config_path: str) -> None:
     summary = run_validate_analog_batch(Path(config_path))
     click.echo(f"Stage 9 validation rows: {summary['validation_rows']}")
 
 
 @main.command("screen-analog-batch")
-@click.option("--config", "config_path", default="configs/stage9_agentic_analog_loop.yaml", show_default=True)
+@click.option("--config", "config_path", default="configs/stage9_deterministic_analogs.yaml", show_default=True)
 def screen_analog_batch(config_path: str) -> None:
     summary = run_screen_analog_batch(Path(config_path))
     click.echo(f"Stage 9 screened analogs: {summary['screened']}")
 
 
 @main.command("score-analog-acceptance")
-@click.option("--config", "config_path", default="configs/stage9_agentic_analog_loop.yaml", show_default=True)
+@click.option("--config", "config_path", default="configs/stage9_deterministic_analogs.yaml", show_default=True)
 def score_analog_acceptance(config_path: str) -> None:
     summary = run_score_analog_acceptance(Path(config_path))
     click.echo(f"Stage 9 acceptance rows: {summary['acceptance_rows']}; accepted: {summary['accepted']}")
 
 
 @main.command("benchmark-analog-strategies")
-@click.option("--config", "config_path", default="configs/stage9_agentic_analog_loop.yaml", show_default=True)
+@click.option("--config", "config_path", default="configs/stage9_deterministic_analogs.yaml", show_default=True)
 def benchmark_analog_strategies(config_path: str) -> None:
     summary = run_benchmark_analog_strategies(Path(config_path))
     click.echo(f"Stage 9 benchmark strategies: {summary['strategies']}")
 
 
 @main.command("report-stage9")
-@click.option("--config", "config_path", default="configs/stage9_agentic_analog_loop.yaml", show_default=True)
+@click.option("--config", "config_path", default="configs/stage9_deterministic_analogs.yaml", show_default=True)
 def report_stage9(config_path: str) -> None:
     summary = run_report_stage9(Path(config_path))
     click.echo(f"Stage 9 report: {summary['report']}")
 
 
 @main.command("run-stage9")
-@click.option("--config", "config_path", default="configs/stage9_agentic_analog_loop.yaml", show_default=True)
+@click.option("--config", "config_path", default="configs/stage9_deterministic_analogs.yaml", show_default=True)
 def run_stage9(config_path: str) -> None:
     summary = run_stage9_all(Path(config_path))
     click.echo(f"Stage 9 complete: {summary['report']}")

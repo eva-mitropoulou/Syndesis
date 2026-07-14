@@ -25,7 +25,16 @@ def _md_lookup(inputs: dict[str, pd.DataFrame | None]) -> dict[str, dict[str, An
     if labels is not None:
         for row in labels.to_dict("records"):
             out.setdefault(row["molecule_id"], {}).update(row)
-    if metrics is not None and labels is not None:
+    if (
+        metrics is not None
+        and labels is not None
+        and {"molecule_id", "md_candidate_id"} <= set(labels.columns)
+        and "md_candidate_id" in metrics.columns
+    ):
+        # Guard the columns explicitly: an empty/partial MD cohort (e.g. every
+        # system failed equilibration) yields a labels frame without these
+        # columns, and the bare label[[...]] selection would KeyError. A missing
+        # MD result is a valid state -> just skip the metrics merge for it.
         merged = labels[["molecule_id", "md_candidate_id"]].merge(metrics, on="md_candidate_id", how="left")
         for row in merged.to_dict("records"):
             out.setdefault(row["molecule_id"], {}).update(row)

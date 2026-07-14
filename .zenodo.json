@@ -1,12 +1,12 @@
 {
-  "title": "Syndesis: an evidence-concordant, interaction-constrained workflow for EGFR ATP-site analog design",
+  "title": "Syndesis: pose-coupled native-interaction weighting for kinase ensemble docking",
   "upload_type": "software",
   "license": "MIT",
   "access_right": "open",
-  "keywords": ["cheminformatics", "structure-based drug design", "EGFR", "molecular docking", "interaction fingerprints", "molecular dynamics", "score hacking", "LLM agents"],
+  "keywords": ["cheminformatics", "structure-based drug design", "EGFR", "CDK2", "molecular docking", "interaction fingerprints", "molecular dynamics", "early enrichment"],
   "creators": [
     {"name": "Mitropoulou, Evangelia", "affiliation": "University of Patras"},
     {"name": "Giannopoulos, Dimitris", "affiliation": "University of Patras"}
   ],
-  "description": "Reproducible, leakage-audited, structure-based workflow that accepts EGFR ATP-site analog candidates only when docked pose, interaction fingerprint, a leakage-controlled pose-confidence model, and short MD pose-stability agree, operationalizing and detecting docking-score hacking. Includes an LLM-agent vs rule-based analog-design feasibility comparison. Source-only release; generated data, trajectories, model weights, and vendored third-party tools are excluded."
+  "description": "Reproducible structure-based workflow for pose-coupled GNINA and target-native interaction weighting, with EGFR and CDK2 enrichment controls, deterministic analog auditing, and replicated MD pose-stability testing. Compact machine-readable results are included; raw docking intermediates, trajectories, model weights, and third-party tools are excluded."
 }

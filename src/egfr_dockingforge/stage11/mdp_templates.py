@@ -63,6 +63,10 @@ pcoupltype = isotropic
 tau_p = 2.0
 ref_p = {config['md']['pressure_bar']}
 compressibility = 4.5e-5
+; With position restraints (-DPOSRES) active during pressure coupling, the restraint
+; reference coordinates MUST be scaled with the box; omitting this makes grompp fatal
+; ("pressure coupling with absolute position restraints ... Use the refcoord_scaling option").
+refcoord_scaling = com
 coulombtype = PME
 rcoulomb = 1.2
 rvdw = 1.2

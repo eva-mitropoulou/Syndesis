@@ -164,8 +164,6 @@ TABLE_SCHEMAS: dict[str, list[str]] = {
         "bad_chemistry_rejection_rate",
         "binding_mode_break_rate",
         "mean_runtime_per_accepted_analog",
-        "token_count_if_llm",
-        "local_model_name_if_llm",
         "cost_estimate_if_any",
         "benchmark_notes",
     ],

@@ -35,5 +35,4 @@ optimization?
 ## Validation Boundary
 
 Stage 0 validates project scope, decision logic, and source traceability only. It does not
-run docking, GNINA, ProLIF, MD, or agentic analog generation.
-
+run docking, GNINA, ProLIF, MD, or deterministic analog generation.
