@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.colors import TwoSlopeNorm
-from rdkit import Chem
-from rdkit.Chem import Draw
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -212,49 +210,9 @@ def md_stability() -> None:
     save(fig, "figure6_md_stability")
 
 
-def prospective() -> None:
-    frame = pd.read_parquet("/mnt/e/egfr_prospective/prospective_ranked_corrected.parquet")
-    audit = pd.read_csv(SHOWCASE / "submission_robustness" / "prospective_gate_audit.csv").iloc[0]
-    frame["passes_gate"] = ((frame.cnnscore >= audit.cnn_top_decile_threshold) &
-                             (frame.key_interaction_recall_consensus >= audit.global_median_recall_threshold))
-    accepted = frame[frame.passes_gate].sort_values("gnina_interaction_score", ascending=False)
-    top = accepted.head(6).copy()
-    fig, axes = plt.subplots(1, 2, figsize=(10.6, 4.5), gridspec_kw={"width_ratios": [1.25, 1]})
-    ax = axes[0]
-    ax.scatter(frame.cnnscore, frame.key_interaction_recall_consensus, s=10, color="#b9c3c8", alpha=0.45, linewidths=0)
-    scatter = ax.scatter(
-        accepted.cnnscore,
-        accepted.key_interaction_recall_consensus,
-        s=24 + 45 * accepted.qed,
-        c=accepted.qed,
-        cmap="viridis",
-        edgecolors="#27343a",
-        linewidths=0.35,
-        alpha=0.92,
-    )
-    ax.axvline(audit.cnn_top_decile_threshold, color="#4a565c", ls="--", lw=0.9)
-    ax.axhline(audit.global_median_recall_threshold, color="#4a565c", ls="--", lw=0.9)
-    ax.set_xlabel("GNINA CNNscore")
-    ax.set_ylabel("Native-union interaction recall")
-    ax.set_title("Conjunctive gate and coupled ranking")
-    colorbar = fig.colorbar(scatter, ax=ax, pad=0.02)
-    colorbar.set_label("QED")
-    ax.grid(color="#d9e0e3", lw=0.7)
-    structure_ax = axes[1]
-    structure_ax.set_axis_off()
-    molecules = [Chem.MolFromSmiles(value) for value in top.smiles]
-    legends = [f"P{i}: {zinc}" for i, zinc in enumerate(top.zinc_id, start=1)]
-    grid = Draw.MolsToGridImage(molecules, molsPerRow=2, subImgSize=(300, 220), legends=legends, useSVG=False)
-    structure_ax.imshow(grid)
-    structure_ax.set_title("Highest-ranked gate-passing structures")
-    fig.suptitle("Prospective EGFR prioritization yields testable, unlabeled hypotheses", y=1.02, fontsize=11, fontweight="bold")
-    save(fig, "figure7_prospective")
-
-
 if __name__ == "__main__":
     enrichment()
     paired_deltas()
     permutation_nulls()
     receptor_sensitivity()
     md_stability()
-    prospective()

@@ -19,8 +19,8 @@ from syndesis.stage5.prolif_engine import prepare_protein_for_prolif
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RERUN = Path("/home/dimit/cdk2_1pxn_altloc_rerun")
-CDK2 = Path("/mnt/e/cdk2_dude")
+RERUN = Path(os.environ.get("SYNTHESIS_1PXN_RERUN", "cdk2_1pxn_altloc_rerun"))
+CDK2 = Path(os.environ.get("SYNTHESIS_CDK2_WORK", "cdk2_dude"))
 RECEPTOR_ID = "1pxn_a_ck6"
 WORKERS = max(1, min(56, (os.cpu_count() or 2) - 4))
 BATCH_SIZE = 2_000

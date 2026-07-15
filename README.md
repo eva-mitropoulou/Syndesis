@@ -36,9 +36,10 @@ Every leave-one-primary-receptor-out EGFR analysis preserved a positive paired e
 
 CDK2 tested target transfer. Its primary receptor ensemble and native-interaction
 prior both exclude 1QMZ because the prepared docking receptor lost deposited
-phosphothreonine TPO160. A highest-occupancy alternate-location correction was
-also applied to 1PXN before its targeted rerun, yielding an exact docking-to-ProLIF
-heavy-atom match. Across 1FIN, 2A4L, 1AQ1, and 1PXN, the fixed rule increased
+phosphothreonine TPO160. For 1PXN, the 0.98-occupancy Lys33-A side chain was
+retained and the 0.02-occupancy Lys33-B conformer was removed before the targeted
+rerun, yielding an exact docking-to-ProLIF heavy-atom match. Across 1FIN, 2A4L,
+1AQ1, and 1PXN, the fixed rule increased
 EF1% from 11.60 to 14.98, recovering 71 rather than 55 actives among the first
 283 ranked molecules. Its paired EF1% difference was 3.375 (95% CI 0.422 to
 5.695), indicating a positive but target- and ensemble-dependent transfer result.
@@ -122,11 +123,7 @@ pytest -q
 PYTHONPATH=src python scripts/native_prior_sensitivity_analysis.py
 PYTHONPATH=src python scripts/submission_robustness_analysis.py
 
-# 3. Rebuild the prospective ranking and native-chemotype audit
-PYTHONPATH=src python scripts/build_corrected_prospective_ranking.py
-PYTHONPATH=src python scripts/active_native_similarity_analysis.py
-
-# 3b. Re-export frame-level MD evidence from completed trajectories
+# 3. Re-export frame-level MD evidence from completed trajectories
 PYTHONPATH=src python scripts/export_md_timeseries.py --md-root /path/to/egfr_md_work
 
 # 4. Render the manuscript after regenerating figures
@@ -134,7 +131,7 @@ python scripts/create_manuscript_figures.py
 quarto render manuscript/syndesis_jcheminformatics_v2.qmd --to typst
 ```
 
-The complete docking campaigns require the source DUD-E and ZINC files described in the manifests, prepared receptor files, and GPU-capable external tools. Commands do not substitute a different engine when a required tool is missing.
+The complete docking campaigns require the source DUD-E files described in the manifests, prepared receptor files, and GPU-capable external tools. Commands do not substitute a different engine when a required tool is missing.
 
 ## Citation
 

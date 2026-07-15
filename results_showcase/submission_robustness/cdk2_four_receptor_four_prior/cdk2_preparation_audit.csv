@@ -1,0 +1,2 @@
+target,primary_receptors_json,primary_native_receptors_json,expected_ligand_receptor_pairs,n_ligands,strict_fingerprint_success,no_scored_pose,strict_fingerprint_failure,native_union_size
+CDK2,"[""1fin_a_atp"", ""2a4l_a_rrc"", ""1aq1_a_stu"", ""1pxn_a_ck6""]","[""1fin_a_atp"", ""2a4l_a_rrc"", ""1aq1_a_stu"", ""1pxn_a_ck6""]",113184,28296,112814,370,0,38

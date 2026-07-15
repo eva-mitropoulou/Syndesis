@@ -26,11 +26,12 @@ keywords:
   - molecular dynamics
   - score hacking
 license: MIT
-version: 1.1.7
+version: 1.2.0
 date-released: "2026-07-15"
+url: "https://github.com/eva-mitropoulou/Syndesis/tree/v1.2.0-paper"
 preferred-citation:
   type: article
-  title: "Pose-coupled native-interaction weighting for kinase ensemble docking: retrospective evaluation on EGFR and CDK2"
+  title: "Pose-coupled native-interaction weighting in kinase ensemble docking: EGFR enrichment and CDK2 transfer"
   authors:
     - given-names: Evangelia
       family-names: Mitropoulou
@@ -41,4 +42,4 @@ preferred-citation:
       affiliation: "University of Patras"
       email: "dimit.giannopoulos@ac.upatras.gr"
   year: 2026
-  notes: "Frozen GitHub paper tag; ChemRxiv preprint metadata will be added after posting."
+  notes: "Frozen GitHub paper package, v1.2.0-paper."

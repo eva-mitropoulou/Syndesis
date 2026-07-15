@@ -19,11 +19,13 @@ Ensemble (holo, ATP-site ligand, chain A), spanning CDK2's activation axis:
   1PXN monomeric ATP-site inhibitor (CK6)
 Held out as DUD-E reference (NOT in ensemble): 1H00.
 
-Pure CPU. Writes under /mnt/e/cdk2_dude/receptors + a cdk2_receptor_ensemble.parquet.
+Pure CPU. Writes under $SYNTHESIS_CDK2_WORK/receptors plus a
+cdk2_receptor_ensemble.parquet.
 """
 from __future__ import annotations
 
 import ast
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -31,11 +33,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-PROJ = Path("/home/dimit/eva/Computational-Chemistry/protein_docking/syndesis")
+PROJ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJ / "src"))
 from syndesis.enrichment.run_enrichment import default_tools  # noqa: E402
 
-BASE = Path("/mnt/e/cdk2_dude")
+BASE = Path(os.environ.get("SYNTHESIS_CDK2_WORK", "cdk2_dude"))
 ENS_PDB = BASE / "ensemble"
 RECEPTORS = BASE / "receptors"
 OBABEL = default_tools(PROJ)["obabel"]  # canonical obabel (egfr-cadd env)

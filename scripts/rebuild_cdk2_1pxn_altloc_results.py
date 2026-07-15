@@ -7,6 +7,7 @@ does not overwrite the paper-facing result directory.
 from __future__ import annotations
 
 import json
+import os
 from collections import Counter
 from pathlib import Path
 
@@ -18,10 +19,10 @@ from native_prior_sensitivity_analysis import bits, evaluate, jaccard, recall, w
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RERUN = Path("/home/dimit/cdk2_1pxn_altloc_rerun")
+RERUN = Path(os.environ.get("SYNTHESIS_1PXN_RERUN", "cdk2_1pxn_altloc_rerun"))
 ROBUSTNESS = ROOT / "results_showcase" / "submission_robustness"
 SOURCE_MASTER = ROBUSTNESS / "corrected_enrichment" / "cdk2_master.parquet"
-NATIVE = Path("/mnt/e/cdk2_dude/stage5/native_interaction_fingerprints.parquet")
+NATIVE = Path(os.environ.get("SYNTHESIS_CDK2_NATIVE", "cdk2_dude/stage5/native_interaction_fingerprints.parquet"))
 OUT = RERUN / "four_receptor_four_prior_results"
 PRIMARY = ("1fin_a_atp", "2a4l_a_rrc", "1aq1_a_stu", "1pxn_a_ck6")
 
@@ -133,8 +134,8 @@ def main() -> int:
 
     config = {
         "master": OUT / "cdk2_master.parquet",
-        "actives": Path("/mnt/e/cdk2_dude/actives_final.ism"),
-        "decoys": Path("/mnt/e/cdk2_dude/decoys_final.ism"),
+        "actives": Path(os.environ.get("SYNTHESIS_CDK2_ACTIVES", "cdk2_dude/actives_final.ism")),
+        "decoys": Path(os.environ.get("SYNTHESIS_CDK2_DECOYS", "cdk2_dude/decoys_final.ism")),
         "target_size": len(union),
     }
     raw, per = statistics.load_target(config)

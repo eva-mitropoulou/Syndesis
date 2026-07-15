@@ -17,5 +17,6 @@
   "n_fingerprint_success": 112814,
   "n_no_scored_pose": 370,
   "n_fingerprint_failure": 0,
-  "failure_policy": "Fail closed for every scored pose; rows without a docked/scored pose remain explicitly non-applicable and are not imputed."
+  "failure_policy": "Fail closed for every scored pose; rows without a docked/scored pose remain explicitly non-applicable and are not imputed.",
+  "one_pxn_altloc_correction": "Highest-occupancy alternate-location selection before docking produced exact docking/ProLIF heavy-atom agreement."
 }

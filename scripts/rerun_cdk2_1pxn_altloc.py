@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -18,9 +19,9 @@ from syndesis.enrichment.run_enrichment import default_tools
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CDK2 = Path("/mnt/e/cdk2_dude")
-OLD_WORK = Path("/home/dimit/cdk2_enrichment")
-WORK = Path("/home/dimit/cdk2_1pxn_altloc_rerun")
+CDK2 = Path(os.environ.get("SYNTHESIS_CDK2_WORK", "cdk2_dude"))
+OLD_WORK = Path(os.environ.get("SYNTHESIS_CDK2_BASELINE", "cdk2_enrichment"))
+WORK = Path(os.environ.get("SYNTHESIS_1PXN_RERUN", "cdk2_1pxn_altloc_rerun"))
 RECEPTOR_ID = "1pxn_a_ck6"
 
 
