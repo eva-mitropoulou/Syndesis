@@ -45,19 +45,16 @@ def render(output: Path) -> None:
             ha="center", va="center", fontsize=8.5, color="#496276")
 
     stages = [
-        box(ax, 0.826, "Four EGFR ATP-site native complexes\n1M17/AQ4  •  1XKK/FMM  •  4HJO/AQ4  •  5CAV/4ZQ", "#dbeafe", height=0.087, fontsize=10.5),
-        box(ax, 0.698, "Residue–interaction fingerprints", "#e0f2fe", fontsize=12.5),
-        box(ax, 0.570, "Union interaction prior  C", "#ccfbf1", fontsize=12.5),
-        box(ax, 0.424, "Candidate docked independently into\nfour receptor states", "#e0f2fe", height=0.090, fontsize=12.5),
-        box(ax, 0.278, "For each selected pose:\nCNNscore(i,r) and recall R(i,r)", "#fef3c7", height=0.090, fontsize=11.7),
-        box(ax, 0.162, "Same-pose coupled score\nCNNscore(i,r) × [1 + R(i,r)]", "#fde68a", height=0.090, fontsize=12.5),
-        box(ax, 0.030, "Ligand ranking:\nmaximum coupled score across receptor states", "#bbf7d0", height=0.072, fontsize=10.8),
+        box(ax, 0.824, "Four EGFR ATP-site native complexes\n1M17/AQ4  •  1XKK/FMM  •  4HJO/AQ4  •  5CAV/4ZQ", "#dbeafe", height=0.087, fontsize=10.5),
+        box(ax, 0.692, "Residue–interaction fingerprints", "#e0f2fe", fontsize=12.5),
+        box(ax, 0.560, "Union interaction prior  C", "#ccfbf1", fontsize=12.5),
+        box(ax, 0.410, "Candidate docked independently into\nfour receptor states", "#e0f2fe", height=0.090, fontsize=12.5),
+        box(ax, 0.276, "For each selected pose:\nCNNscore(i,r) and recall R(i,r)", "#fef3c7", height=0.090, fontsize=11.7),
+        box(ax, 0.150, "Same-pose coupled score\nCNNscore(i,r) × [1 + R(i,r)]", "#fde68a", height=0.090, fontsize=12.5),
+        box(ax, 0.018, "Ligand ranking:\nmaximum coupled score across receptor states", "#bbf7d0", height=0.068, fontsize=10.8),
     ]
     for earlier, later in zip(stages, stages[1:]):
         arrow(ax, earlier[0], later[1])
-
-    ax.text(0.50, 0.130, "CNNscore and recall are never pooled across different poses.",
-            ha="center", va="center", fontsize=8.3, color="#7c4a03", style="italic")
 
     output.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output, dpi=300, bbox_inches="tight", facecolor="white")
