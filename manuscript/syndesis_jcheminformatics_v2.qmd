@@ -1,5 +1,5 @@
 ---
-title: "Pose-coupled native-interaction weighting for kinase ensemble docking: retrospective evaluation on EGFR and CDK2"
+title: "Pose-coupled native-interaction weighting in kinase ensemble docking: EGFR enrichment and CDK2 transfer"
 short-title: "Pose-coupled native-interaction weighting"
 author:
   - name: "Evangelia Mitropoulou"
@@ -12,7 +12,7 @@ author:
       - ref: unipatras
 affiliations:
   - id: unipatras
-    name: "Department of Chemistry, University of Patras, University Campus, 26504 Rio, Patras, Greece"
+    name: "University of Patras, Greece"
 bibliography: references.bib
 reference-section-title: References
 format:

@@ -1,0 +1,6 @@
+target,target_receptor_id,status,error_type,n_rows
+CDK2,1aq1_a_stu,ok,,28296
+CDK2,1fin_a_atp,no_scored_pose,RuntimeError,370
+CDK2,1fin_a_atp,ok,,27926
+CDK2,1pxn_a_ck6,ok,,28296
+CDK2,2a4l_a_rrc,ok,,28296
