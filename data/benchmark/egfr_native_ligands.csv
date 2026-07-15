@@ -1,0 +1,6 @@
+receptor_id,pdb_id,ligand_id,ligand_smiles,inchi_key,site_class,primary_prior
+1m17_a_aq4_999,1M17,AQ4,COCCOc1cc2c(cc1OCCOC)ncnc2Nc3cccc(c3)C#C,AAKJLRGGTJKAMG-UHFFFAOYSA-N,ATP_site,True
+1xkk_a_fmm_91,1XKK,FMM,CS(=O)(=O)CCNCc1ccc(o1)c2ccc3c(c2)c(ncn3)Nc4ccc(c(c4)Cl)OCc5cccc(c5)F,BCFGMOOMADDAQU-UHFFFAOYSA-N,ATP_site,True
+4hjo_a_aq4_1001,4HJO,AQ4,COCCOc1cc2c(cc1OCCOC)ncnc2Nc3cccc(c3)C#C,AAKJLRGGTJKAMG-UHFFFAOYSA-N,ATP_site,True
+5cav_a_4zq_1101,5CAV,4ZQ,C[C@H](c1nc2cnc(cc2n1[C@@H](C)C(F)(F)F)Nc3ccnc(n3)N4CC[C@@H]([C@@H](C4)F)OC)O,BOPSHQJEVUOWPS-IATRGZMQSA-N,ATP_site,True
+6duk_c_jbj_1103,6DUK,JBJ,c1cc(ccc1c2ccc3c(c2)C(=O)N(C3)[C@H](c4cc(ccc4O)F)C(=O)Nc5nccs5)N6CCNCC6,VHQVOTINPRYDAO-AREMUKBSSA-N,allosteric,False

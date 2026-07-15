@@ -5,7 +5,7 @@ abstract: >-
   Syndesis is a reproducible structure-based cheminformatics workflow that couples
   GNINA CNNscore to recovery of a target-native interaction prior on the same pose.
   It includes EGFR and CDK2 enrichment benchmarks, permutation and native-overlap
-  controls, deterministic analog audits, and replicated molecular-dynamics pose
+  controls, deterministic analog comparisons, and replicated molecular-dynamics pose
   stability tests.
 type: software
 authors:

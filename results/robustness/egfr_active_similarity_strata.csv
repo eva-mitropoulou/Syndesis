@@ -1,5 +1,0 @@
-similarity_stratum,n_actives,mean_max_native_ecfp4_tanimoto,gnina_actives_in_global_top1pct,coupled_actives_in_global_top1pct,global_top1pct_recovery_difference,gnina_ef1_with_all_decoys,coupled_ef1_with_all_decoys
-0.30-<0.50,163,0.36253568447572176,26,31,5,16.551711517010595,20.842895984383713
-0.50-<0.70,7,0.5824197239973083,0,3,3,0.0,42.87795918367347
-<0.30,369,0.2078561114963616,39,54,15,11.1045197740113,15.43799090533278
->=0.70,3,0.8452380952380952,0,1,1,0.0,33.34571428571429

@@ -1,7 +1,0 @@
-{
-  "seed": 807,
-  "n_bootstrap": 2000,
-  "n_permutations": 1000,
-  "native_prior": "ATP-site union from 1M17, 1XKK, 4HJO, and 5CAV; 6DUK/JBJ excluded",
-  "tie_handling": "stable descending mergesort inside enrichment_factor"
-}

@@ -1,7 +1,0 @@
-{
-  "seed": 807,
-  "n_permutations": 1000,
-  "n_bootstrap": 2000,
-  "ef_top_set_rounding": "round(N * fraction), minimum 1",
-  "tie_handling": "stable mergesort descending"
-}

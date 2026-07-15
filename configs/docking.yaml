@@ -1,7 +1,0 @@
-stage: docking
-status: planned
-docking_engine: gnina
-exhaustiveness: 16
-num_modes: 20
-gpu: true
-

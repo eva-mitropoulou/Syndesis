@@ -1,5 +1,0 @@
-receptor_id,docking_heavy_atom_count,prolif_heavy_atom_count,prolif_only_atoms,docking_only_atoms,residue_identity_mismatches,coordinate_matched_heavy_atoms,notes
-1fin_a_atp,2398,2398,0,0,0,2398,All retained docking heavy atoms coordinate-matched the ProLIF model within 0.05 A.
-2a4l_a_rrc,2308,2308,0,0,0,2308,All retained docking heavy atoms coordinate-matched the ProLIF model within 0.05 A.
-1aq1_a_stu,2230,2230,0,0,0,2230,All retained docking heavy atoms coordinate-matched the ProLIF model within 0.05 A.
-1pxn_a_ck6,2375,2366,0,9,0,2366,Nine PDBQT heavy atoms had no coordinate-matched ProLIF counterpart and were outside the retained ProLIF model.

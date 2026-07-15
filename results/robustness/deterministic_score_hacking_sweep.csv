@@ -1,4 +1,0 @@
-fidelity_drop_threshold,n_independent_hackers,gate_precision_vs_oracle,gate_recall_vs_oracle,tp,fp,fn,tn
-0.01,3,1.0,1.0,3,0,0,14
-0.02,1,0.333,1.0,1,2,0,14
-0.05,0,0.0,,0,3,0,14

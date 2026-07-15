@@ -1,5 +1,0 @@
-target,arm,n_ligands,top_fraction,n_top,n_actives_top,n_actives_total,ef1
-EGFR,gnina,35552,0.01,356,64,542,11.792197023093824
-EGFR,coupled,35552,0.01,356,88,542,16.21427090675401
-CDK2,gnina,28296,0.01,283,55,474,11.60173547434808
-CDK2,coupled,28296,0.01,283,71,474,14.97678579415843

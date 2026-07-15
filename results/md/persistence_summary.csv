@@ -1,0 +1,8 @@
+System,Role,Completed replicates,Stable replicates,Median ligand RMSD (A),Median key-contact occupancy,Classification
+C001,known_ligand_control,3,0,1.991886602316836,0.4328550010708931,md_unstable
+C002,known_ligand_control,3,3,1.7993667561354234,0.618048118797744,md_stable
+C003,known_ligand_control,3,3,2.163835663526988,0.6881559220389805,md_stable
+A004,deterministic_analog,3,2,1.8699032179957344,0.5190262011851218,md_stable
+A005,deterministic_analog,3,0,3.433757445493013,0.5499750124937531,md_unstable
+A006,deterministic_analog,3,3,2.2969182634294563,0.6436781609195402,md_stable
+N002,deliberately_misdocked_control,3,0,5.715971989491597,0.0077104304990361,md_unstable
