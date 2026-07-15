@@ -5,14 +5,16 @@ author:
   - name: "Evangelia Mitropoulou"
     email: "evangelia.mitr@gmail.com"
     affiliations:
-      - ref: unipatras
+      - ref: forth-ice
   - name: "Dimitris Giannopoulos"
     email: "dimit.giannopoulos@ac.upatras.gr"
     affiliations:
       - ref: unipatras
 affiliations:
+  - id: forth-ice
+    name: "Foundation for Research and Technology-Hellas (FORTH), Institute of Chemical Engineering Sciences (ICE)"
   - id: unipatras
-    name: "University of Patras, Greece"
+    name: "University of Patras"
 bibliography: references.bib
 reference-section-title: References
 format:
