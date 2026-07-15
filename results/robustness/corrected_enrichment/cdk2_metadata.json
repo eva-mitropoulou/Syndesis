@@ -1,0 +1,10 @@
+{
+  "target": "CDK2",
+  "n_rows": 141480,
+  "n_ligands": 28296,
+  "n_receptors": 5,
+  "native_union_size": 47,
+  "fingerprint_failures": 0,
+  "no_scored_pose_rows": 370,
+  "pose_graph_policy": "Prepared SDF molecular graph with strictly mapped docked coordinates"
+}

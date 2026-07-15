@@ -11,7 +11,7 @@
   "chembl_exclusion_applied": false,
   "rdkit_version": "2026.03.1",
   "verification": {
-    "existing_library": "data/external/prospective/prospective_library.parquet",
+    "existing_library": "/mnt/e/egfr_prospective/prospective_library.parquet",
     "exact_identity_and_order_match": true,
     "descriptor_drift": {
       "mw": {

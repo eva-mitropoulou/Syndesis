@@ -1,0 +1,13 @@
+{
+  "target": "EGFR",
+  "n_rows": 177760,
+  "n_ligands": 35552,
+  "n_receptors": 5,
+  "native_union_size": 62,
+  "excluded_native_receptors": [
+    "6duk_c_jbj_1103"
+  ],
+  "fingerprint_failures": 0,
+  "no_scored_pose_rows": 0,
+  "pose_graph_policy": "Prepared SDF molecular graph with strictly mapped docked coordinates"
+}

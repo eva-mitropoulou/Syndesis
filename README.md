@@ -34,13 +34,16 @@ The result was tested against three different 1,000-permutation nulls:
 
 Every leave-one-primary-receptor-out EGFR analysis preserved a positive paired effect. Excluding the exact-overlap FMM complex retained EF1% 15.29, and removing both duplicate AQ4 complexes together retained EF1% 15.66; both paired intervals excluded zero. Among the 369 actives with ECFP4 similarity below 0.30 to every distinct ATP-site native ligand, the coupled score recovered 54 in the global top 1%, compared with 39 for GNINA.
 
-CDK2 defined the boundary of the claim. Its primary receptor ensemble and
-native-interaction prior both exclude 1QMZ because the extracted receptor loses
-deposited phosphothreonine TPO160. Across 1FIN, 2A4L, 1AQ1, and 1PXN, the fixed
-rule increased EF1% from 11.39 to 13.50. Its paired EF1% difference was 2.109
-(95% CI -0.633 to 4.641; bootstrap proportion above zero 0.928), so the transfer
-result is favourable but unresolved. The five-receptor/five-native-complex
-1QMZ-inclusive analysis is retained only as a sensitivity.
+CDK2 tested target transfer. Its primary receptor ensemble and native-interaction
+prior both exclude 1QMZ because the prepared docking receptor lost deposited
+phosphothreonine TPO160. A highest-occupancy alternate-location correction was
+also applied to 1PXN before its targeted rerun, yielding an exact docking-to-ProLIF
+heavy-atom match. Across 1FIN, 2A4L, 1AQ1, and 1PXN, the fixed rule increased
+EF1% from 11.60 to 14.98, recovering 71 rather than 55 actives among the first
+283 ranked molecules. Its paired EF1% difference was 3.375 (95% CI 0.422 to
+5.695), indicating a positive but target- and ensemble-dependent transfer result.
+The altered five-receptor 1QMZ-inclusive analysis is retained only as a
+sensitivity.
 
 ## What Is Different
 
@@ -137,13 +140,16 @@ The complete docking campaigns require the source DUD-E and ZINC files described
 
 Please cite the frozen software and data snapshot until the ChemRxiv preprint is posted:
 
-> Mitropoulou E, Giannopoulos D. **Syndesis v1.1.11-paper: pose-coupled native-interaction weighting for kinase ensemble docking.** GitHub tagged repository snapshot, 2026.
+> Mitropoulou E, Giannopoulos D. **Syndesis v1.2.0-paper: pose-coupled native-interaction weighting for kinase ensemble docking.** GitHub tagged repository snapshot, 2026.
 
-Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff). The reproducibility package is frozen in the `v1.1.7-paper` GitHub tag. ChemRxiv preprint metadata will be added after posting.
+Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff). The reproducibility package is frozen in the [`v1.2.0-paper`](https://github.com/eva-mitropoulou/Syndesis/tree/v1.2.0-paper) tag. ChemRxiv preprint metadata will be added after posting.
 
 ## Authors
 
-**Evangelia Mitropoulou** and **Dimitris Giannopoulos**<br>
-Department of Chemistry, University of Patras, Greece
+**Evangelia Mitropoulou**<br>
+Foundation for Research and Technology--Hellas, Institute of Chemical Engineering Sciences (FORTH/ICE)
+
+**Dimitris Giannopoulos**<br>
+University of Patras
 
 Syndesis was developed as a research-grade computational chemistry project with emphasis on reproducibility, failure-aware engineering, and scientifically bounded interpretation.

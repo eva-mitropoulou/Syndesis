@@ -1,0 +1,5 @@
+target,contrast,metric,estimate,ci_lo,ci_hi,bootstrap_fraction_positive,n_bootstrap
+CDK2,coupled_minus_late_fusion,roc_auc,-0.0021246807993067,-0.0035647834091164,-0.0005518012791989,0.003,2000
+CDK2,coupled_minus_late_fusion,ef1,-1.4765845149170271,-3.7969316097866432,0.4218812899762927,0.044,2000
+CDK2,coupled_minus_late_fusion,ef5,-0.3796931609786647,-0.8015744509549592,0.0,0.0245,2000
+CDK2,coupled_minus_late_fusion,bedroc_80_5,-0.029214195460843,-0.0478073728193223,-0.0120237953534379,0.0,2000

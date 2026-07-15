@@ -44,7 +44,7 @@ def save(fig, name: str) -> None:
 
 
 def enrichment() -> None:
-    metrics_table = pd.read_csv(SHOWCASE / "submission_robustness" / "bootstrap_metric_intervals.csv")
+    metrics_table = pd.read_csv(SHOWCASE / "submission_robustness" / "manuscript_enrichment_plot_data.csv")
     targets = ["EGFR", "CDK2"]
     arms = ["gnina", "coupled"]
     labels = ["GNINA", "GNINA +\ninteraction"]
@@ -75,41 +75,8 @@ def enrichment() -> None:
 
 
 def paired_deltas() -> None:
-    final_dir = SHOWCASE / "submission_robustness" / "cdk2_four_receptor_four_prior"
-    deltas = pd.read_csv(final_dir / "paired_metric_effects.csv")
-    formula = pd.read_csv(final_dir / "interaction_formula_sensitivity.csv")
-    cdk2_prior = pd.read_csv(final_dir / "cdk2_native_prior_sensitivity.csv")
-    cdk2_gnina = pd.read_csv(
-        SHOWCASE / "submission_robustness" / "cdk2_late_fusion_metrics.csv"
-    )
-
-    # Display observed full-dataset differences. Paired-bootstrap draws provide
-    # the uncertainty intervals but their means are not substituted as points.
-    egfr_baseline = formula[
-        (formula.target == "EGFR")
-        & (formula.combination == "multiplicative")
-        & (formula.term == "recall")
-        & (formula["lambda"] == 0.0)
-    ].iloc[0]
-    egfr_coupled = formula[
-        (formula.target == "EGFR")
-        & (formula.combination == "multiplicative")
-        & (formula.term == "recall")
-        & (formula["lambda"] == 1.0)
-    ].iloc[0]
-    cdk2_coupled = cdk2_prior[
-        cdk2_prior.prior_definition == "primary_union_recall"
-    ].iloc[0]
-    cdk2_baseline = cdk2_gnina[cdk2_gnina.arm == "gnina"].set_index("metric")
-
-    observed = {
-        ("EGFR", "ef1"): egfr_coupled.ef1 - egfr_baseline.ef1,
-        ("EGFR", "bedroc_80_5"): egfr_coupled.bedroc - egfr_baseline.bedroc,
-        ("CDK2", "ef1"): cdk2_coupled.ef1 - cdk2_baseline.loc["ef1", "estimate"],
-        ("CDK2", "bedroc_80_5"): (
-            cdk2_coupled.bedroc - cdk2_baseline.loc["bedroc_80_5", "estimate"]
-        ),
-    }
+    deltas = pd.read_csv(SHOWCASE / "submission_robustness" / "paired_metric_effects.csv")
+    deltas = deltas[deltas["contrast"].eq("coupled_minus_gnina")].copy()
     fig, axes = plt.subplots(1, 2, figsize=(8.4, 3.6))
     panels = [("ef1", "EF1% difference"), ("bedroc", "BEDROC difference")]
     for ax, (metric, title) in zip(axes, panels):
@@ -117,13 +84,11 @@ def paired_deltas() -> None:
         for target in ("EGFR", "CDK2"):
             key = "bedroc_80_5" if metric == "bedroc" else metric
             row = deltas[(deltas.target == target) & (deltas.metric == key)].iloc[0]
-            # Use the observed full-dataset effect with the paired-bootstrap CI.
-            point = observed[(target, key)]
+            # Point estimates are full-dataset effects; intervals are paired
+            # class-stratified bootstrap percentile intervals.
+            point = row.estimate
             low = row.ci_lo
             high = row.ci_hi
-            if target == "CDK2" and key == "ef1":
-                low = cdk2_coupled.delta_ef1_ci_lo
-                high = cdk2_coupled.delta_ef1_ci_hi
             rows.append((target, point, low, high))
         points = [row[1] for row in rows]
         lows = [row[2] for row in rows]

@@ -1,4 +1,4 @@
-target,interaction_bit,native_count,native_frequency,in_primary_union,in_60pct_core,native_receptors_json
+target,interaction_bit,native_count,native_frequency,in_global_union,in_60pct_core,native_receptors_json
 EGFR,catalytic_glu:762:VdWContact,2,0.5,True,False,"[""1m17_a_aq4_999"", ""5cav_a_4zq_1101""]"
 EGFR,catalytic_lys:745:Hydrophobic,3,0.75,True,True,"[""1m17_a_aq4_999"", ""1xkk_a_fmm_91"", ""4hjo_a_aq4_1001""]"
 EGFR,catalytic_lys:745:ImplicitHBAcceptor,1,0.25,True,False,"[""5cav_a_4zq_1101""]"
