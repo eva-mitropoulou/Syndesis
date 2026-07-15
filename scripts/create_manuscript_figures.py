@@ -107,11 +107,20 @@ def paired_deltas() -> None:
         lows = [row[2] for row in rows]
         highs = [row[3] for row in rows]
         span = max(highs) - min(lows)
-        padding = max(span * 0.16, 0.015 if metric == "bedroc" else 0.25)
-        ax.set_xlim(min(lows) - padding, max(highs) + padding * 2.6)
+        padding = max(span * 0.12, 0.012 if metric == "bedroc" else 0.20)
+        ax.set_xlim(min(lows) - padding, max(highs) + padding)
         for y, (target, point, low, high) in enumerate(rows[::-1]):
             ax.errorbar(point, y, xerr=[[point - low], [high - point]], fmt="o", color=COLORS["combined"], capsize=4, lw=1.5)
-            ax.text(high + padding * 0.35, y, f"{point:+.3f}" if metric == "bedroc" else f"{point:+.2f}", va="center", fontsize=8)
+            ax.annotate(
+                f"{point:+.3f}" if metric == "bedroc" else f"{point:+.2f}",
+                xy=(point, y),
+                xytext=(7, 7),
+                textcoords="offset points",
+                ha="left",
+                va="bottom",
+                fontsize=8,
+                color="#172126",
+            )
         ax.axvline(0, color="#4a565c", lw=1, ls="--")
         ax.set_yticks(range(len(rows)), [row[0] for row in rows[::-1]])
         ax.set_title(title)
