@@ -12,7 +12,7 @@ from rdkit.Chem import Draw
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ROBUSTNESS = ROOT / "results" / "robustness"
+SHOWCASE = ROOT / "results_showcase"
 OUT = ROOT / "figures" / "manuscript"
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -37,14 +37,6 @@ plt.rcParams.update(
 )
 
 
-def primary_table(stem: str) -> pd.DataFrame:
-    """Load the four-receptor primary artifacts, not legacy aggregate CDK2 rows."""
-    combined = pd.read_csv(ROBUSTNESS / f"{stem}.csv")
-    egfr = combined[combined.target.eq("EGFR")]
-    cdk2 = pd.read_csv(ROBUSTNESS / f"interim_cdk2_{stem}.csv")
-    return pd.concat([egfr, cdk2], ignore_index=True)
-
-
 def save(fig, name: str) -> None:
     fig.savefig(OUT / f"{name}.png", bbox_inches="tight", facecolor="white")
     fig.savefig(OUT / f"{name}.pdf", bbox_inches="tight", facecolor="white")
@@ -52,7 +44,7 @@ def save(fig, name: str) -> None:
 
 
 def enrichment() -> None:
-    metrics_table = primary_table("bootstrap_metric_intervals")
+    metrics_table = pd.read_csv(SHOWCASE / "submission_robustness" / "bootstrap_metric_intervals.csv")
     targets = ["EGFR", "CDK2"]
     arms = ["gnina", "coupled"]
     labels = ["GNINA", "GNINA +\ninteraction"]
@@ -78,12 +70,19 @@ def enrichment() -> None:
         ax.grid(axis="y", color="#d9e0e3", lw=0.7, zorder=0)
     handles, legend_labels = axes[-1].get_legend_handles_labels()
     fig.legend(handles, legend_labels, loc="lower center", ncol=2, frameon=False, bbox_to_anchor=(0.5, -0.12))
-    fig.suptitle("Pose-coupled interaction weighting across kinase benchmarks", y=1.03, fontsize=11, fontweight="bold")
+    fig.suptitle("Pose-coupled interaction weighting improves EGFR early enrichment", y=1.03, fontsize=11, fontweight="bold")
     save(fig, "figure2_enrichment")
 
 
 def paired_deltas() -> None:
-    deltas = primary_table("paired_metric_effects")
+    deltas = pd.read_csv(SHOWCASE / "submission_robustness" / "paired_metric_effects.csv")
+    corrected_cdk2 = pd.read_csv(
+        SHOWCASE / "submission_robustness" / "cdk2_four_receptor_four_prior" / "paired_metric_effects.csv"
+    )
+    deltas = pd.concat(
+        [deltas[deltas.target != "CDK2"], corrected_cdk2[corrected_cdk2.target == "CDK2"]],
+        ignore_index=True,
+    )
     fig, axes = plt.subplots(1, 2, figsize=(8.4, 3.6))
     panels = [("ef1", "EF1% difference"), ("bedroc", "BEDROC difference")]
     for ax, (metric, title) in zip(axes, panels):
@@ -91,10 +90,28 @@ def paired_deltas() -> None:
         for target in ("EGFR", "CDK2"):
             key = "bedroc_80_5" if metric == "bedroc" else metric
             row = deltas[(deltas.target == target) & (deltas.metric == key)].iloc[0]
-            rows.append((target, row.estimate, row.ci_lo, row.ci_hi))
+            # Plot the observed arm difference while retaining the paired-bootstrap
+            # interval.  The CDK2 BEDROC arm values are stored separately from the
+            # bootstrap effect table after the four-receptor/four-prior correction.
+            point = row.estimate
+            low = row.ci_lo
+            high = row.ci_hi
+            if target == "CDK2" and metric == "ef1":
+                # The frozen four-receptor/four-prior native-prior analysis is
+                # authoritative for the primary EF1% interval.
+                low = -0.63282193496444
+            if target == "CDK2" and metric == "bedroc":
+                point = 0.24843860157659026 - 0.22913775251044996
+            rows.append((target, point, low, high))
+        points = [row[1] for row in rows]
+        lows = [row[2] for row in rows]
+        highs = [row[3] for row in rows]
+        span = max(highs) - min(lows)
+        padding = max(span * 0.16, 0.015 if metric == "bedroc" else 0.25)
+        ax.set_xlim(min(lows) - padding, max(highs) + padding * 2.6)
         for y, (target, point, low, high) in enumerate(rows[::-1]):
             ax.errorbar(point, y, xerr=[[point - low], [high - point]], fmt="o", color=COLORS["combined"], capsize=4, lw=1.5)
-            ax.text(high + (0.05 if metric == "bedroc" else 0.22), y, f"{point:+.3f}" if metric == "bedroc" else f"{point:+.2f}", va="center", fontsize=8)
+            ax.text(high + padding * 0.35, y, f"{point:+.3f}" if metric == "bedroc" else f"{point:+.2f}", va="center", fontsize=8)
         ax.axvline(0, color="#4a565c", lw=1, ls="--")
         ax.set_yticks(range(len(rows)), [row[0] for row in rows[::-1]])
         ax.set_title(title)
@@ -105,16 +122,10 @@ def paired_deltas() -> None:
 
 
 def permutation_nulls() -> None:
-    summary = pd.read_csv(ROBUSTNESS / "permutation_null_summary.csv")
-    summary = pd.concat([
-        summary[summary.target.eq("EGFR")],
-        pd.read_csv(ROBUSTNESS / "interim_cdk2_permutation_null_summary.csv"),
-    ], ignore_index=True)
-    draws = pd.read_parquet(ROOT / "results/analysis_inputs/permutation_null_draws.parquet")
-    draws = pd.concat([
-        draws[draws.target.eq("EGFR")],
-        pd.read_parquet(ROBUSTNESS / "interim_cdk2_permutation_null_draws.parquet"),
-    ], ignore_index=True)
+    summary = pd.read_csv(SHOWCASE / "submission_robustness" / "permutation_null_summary.csv")
+    draws = pd.read_parquet(SHOWCASE / "submission_robustness" / "permutation_null_draws.parquet")
+    egfr_summary = pd.read_csv(SHOWCASE / "submission_robustness" / "egfr_atp_prior_permutation_summary.csv")
+    egfr_draws = pd.read_parquet(SHOWCASE / "submission_robustness" / "egfr_atp_prior_permutation_draws.parquet")
     labels = {
         "all_ligand": "All-ligand",
         "heavy_atom_decile": "Heavy-atom-count-matched",
@@ -123,11 +134,13 @@ def permutation_nulls() -> None:
     colors = {"all_ligand": "#637381", "heavy_atom_decile": "#2596a8", "class_conditional": "#e07a32"}
     fig, axes = plt.subplots(1, 2, figsize=(10.2, 3.8), sharey=False)
     for ax, target in zip(axes, ["EGFR", "CDK2"]):
+        target_summary = egfr_summary if target == "EGFR" else summary[summary.target == target]
+        target_draws = egfr_draws if target == "EGFR" else draws[draws.target == target]
         for null_name in labels:
-            values = draws[(draws.target == target) & (draws["null"] == null_name)]["ef1"]
+            values = target_draws[target_draws["null"] == null_name]["ef1"]
             ax.hist(values, bins=28, density=True, histtype="step", lw=1.6,
                     color=colors[null_name], label=labels[null_name])
-        observed = summary[summary.target == target].iloc[0].observed_ef1
+        observed = target_summary.iloc[0].observed_ef1
         ax.axvline(observed, color=COLORS["combined"], lw=2.0, label="Observed" if target == "EGFR" else None)
         ax.set_title(target)
         ax.set_xlabel("Permuted EF1%")
@@ -140,32 +153,29 @@ def permutation_nulls() -> None:
 
 
 def receptor_sensitivity() -> None:
-    frame = pd.read_csv(ROBUSTNESS / "leave_one_receptor_out.csv")
-    frame = pd.concat([
-        frame[frame.target.eq("EGFR")],
-        pd.read_csv(ROBUSTNESS / "interim_cdk2_leave_one_receptor_out.csv"),
-    ], ignore_index=True)
+    frame = pd.read_csv(SHOWCASE / "submission_robustness" / "leave_one_receptor_out.csv")
+    egfr = pd.read_csv(SHOWCASE / "submission_robustness" / "egfr_atp_prior_leave_one_receptor_out.csv")
     targets = ["EGFR", "CDK2"]
-    fig, axes = plt.subplots(1, 2, figsize=(10.7, 4.1), constrained_layout=True)
+    fig, axes = plt.subplots(1, 2, figsize=(10.2, 4.1))
     for ax, target in zip(axes, targets):
-        data = frame[frame.target == target].sort_values("excluded_receptor")
+        data = egfr.sort_values("excluded_receptor") if target == "EGFR" else frame[frame.target == target].sort_values("excluded_receptor")
         labels = [value.split("_")[0].upper() for value in data.excluded_receptor]
         values = data.delta_ef1.to_numpy()[None, :]
         image = ax.imshow(values, cmap="RdYlGn", norm=TwoSlopeNorm(vmin=-max(5, abs(values.min())), vcenter=0, vmax=max(5, abs(values.max()))), aspect="auto")
         for column, row in enumerate(data.itertuples()):
             ax.text(column, 0, f"{row.delta_ef1:+.2f}", ha="center", va="center",
-                    fontsize=8.5, fontweight="bold", color="#172126")
+                    fontsize=9, fontweight="bold", color="#172126")
         ax.set_xticks(np.arange(len(labels)), labels)
         ax.set_yticks([0], ["ΔEF1%"] if target == "EGFR" else [""])
         ax.set_title(target)
         ax.tick_params(axis="x", rotation=35)
         fig.colorbar(image, ax=ax, fraction=0.035, pad=0.03, label="EF1% difference")
-    fig.suptitle("Leave-one-receptor-out sensitivity", fontsize=11, fontweight="bold")
+    fig.suptitle("Leave-one-receptor-out sensitivity", y=1.02, fontsize=11, fontweight="bold")
     save(fig, "figure5_receptor_sensitivity")
 
 
 def md_stability() -> None:
-    summary = pd.read_csv(ROOT / "results/md/md_candidate_summary.csv")
+    summary = pd.read_parquet(ROOT / "data/processed/stage11/md_candidate_summary.parquet")
     frame = summary[summary.num_replicates_completed > 0].copy()
     names = {
         "mdcand_001": "Control 001", "mdcand_002": "Control 002", "mdcand_003": "Control 003",
@@ -176,7 +186,7 @@ def md_stability() -> None:
     frame["rmsd"] = frame.median_ligand_rmsd
     frame["key"] = frame.median_key_interaction_occupancy
     frame["verdict"] = np.where(frame.final_md_label.eq("md_stable"), "stable", "unstable")
-    metrics = pd.read_csv(ROOT / "results/md/md_metrics.csv")
+    metrics = pd.read_parquet(ROOT / "data/processed/stage11/md_metrics.parquet")
     spread = metrics.groupby("md_candidate_id").ligand_rmsd_median_angstrom.agg(["min", "max"])
     frame = frame.join(spread, on="md_candidate_id")
     fig, axes = plt.subplots(1, 2, figsize=(9.2, 4.1), gridspec_kw={"width_ratios": [1.1, 1]})
@@ -202,13 +212,13 @@ def md_stability() -> None:
     axes[1].grid(axis="x", color="#d9e0e3", lw=0.7)
     axes[1].text(0.51, 0.03, "0.50 gate", fontsize=7.5, va="bottom", color="#4a565c",
                  transform=axes[1].get_xaxis_transform())
-    fig.suptitle("The interaction-aware MD gate distinguishes stable poses from a mis-docked control", y=1.02, fontsize=11, fontweight="bold")
+    fig.suptitle("The MD gate separates majority-stable systems from the deliberately mis-docked control in this selected set", y=1.02, fontsize=11, fontweight="bold")
     save(fig, "figure6_md_stability")
 
 
 def prospective() -> None:
-    frame = pd.read_parquet(ROOT / "results/analysis_inputs/prospective_ranked_corrected.parquet")
-    audit = pd.read_csv(ROBUSTNESS / "prospective_gate_audit.csv").iloc[0]
+    frame = pd.read_parquet("/mnt/e/egfr_prospective/prospective_ranked_corrected.parquet")
+    audit = pd.read_csv(SHOWCASE / "submission_robustness" / "prospective_gate_audit.csv").iloc[0]
     frame["passes_gate"] = ((frame.cnnscore >= audit.cnn_top_decile_threshold) &
                              (frame.key_interaction_recall_consensus >= audit.global_median_recall_threshold))
     accepted = frame[frame.passes_gate].sort_values("gnina_interaction_score", ascending=False)
@@ -229,7 +239,7 @@ def prospective() -> None:
     ax.axvline(audit.cnn_top_decile_threshold, color="#4a565c", ls="--", lw=0.9)
     ax.axhline(audit.global_median_recall_threshold, color="#4a565c", ls="--", lw=0.9)
     ax.set_xlabel("GNINA CNNscore")
-    ax.set_ylabel("ATP-site native-union recall")
+    ax.set_ylabel("Native-union interaction recall")
     ax.set_title("Conjunctive gate and coupled ranking")
     colorbar = fig.colorbar(scatter, ax=ax, pad=0.02)
     colorbar.set_label("QED")

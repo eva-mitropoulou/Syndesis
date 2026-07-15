@@ -37,6 +37,7 @@ def render(output: Path) -> None:
     fig.patch.set_facecolor("white")
     ax.set(xlim=(0, 1), ylim=(0, 1))
     ax.axis("off")
+
     ax.text(0.50, 0.966, "Pose-coupled interaction-aware ranking",
             ha="center", va="center", fontsize=17, weight="bold", color="#10263b")
     ax.text(0.50, 0.932,
@@ -49,12 +50,13 @@ def render(output: Path) -> None:
         box(ax, 0.570, "Union interaction prior  C", "#ccfbf1", fontsize=12.5),
         box(ax, 0.424, "Candidate docked independently into\nfour receptor states", "#e0f2fe", height=0.090, fontsize=12.5),
         box(ax, 0.278, "For each selected pose:\nCNNscore(i,r) and recall R(i,r)", "#fef3c7", height=0.090, fontsize=11.7),
-        box(ax, 0.143, "Same-pose coupled score\nCNNscore(i,r) × [1 + R(i,r)]", "#fde68a", height=0.090, fontsize=12.5),
+        box(ax, 0.162, "Same-pose coupled score\nCNNscore(i,r) × [1 + R(i,r)]", "#fde68a", height=0.090, fontsize=12.5),
         box(ax, 0.030, "Ligand ranking:\nmaximum coupled score across receptor states", "#bbf7d0", height=0.072, fontsize=10.8),
     ]
     for earlier, later in zip(stages, stages[1:]):
         arrow(ax, earlier[0], later[1])
-    ax.text(0.50, 0.118, "CNNscore and recall are never pooled across different poses.",
+
+    ax.text(0.50, 0.130, "CNNscore and recall are never pooled across different poses.",
             ha="center", va="center", fontsize=8.3, color="#7c4a03", style="italic")
 
     output.parent.mkdir(parents=True, exist_ok=True)
