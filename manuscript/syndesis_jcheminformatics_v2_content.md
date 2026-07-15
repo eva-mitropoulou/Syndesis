@@ -162,17 +162,21 @@ The combined gate also distinguished geometric retention from interaction persis
 
 These results assess the reproducibility and short-timescale persistence of the modeled poses under the stated simulation and analysis protocol (Figure 6). They do not establish binding affinity, binding free energy, target inhibition, or biological activity.
 
-**Table 4. Replicate-based classification of modeled-pose persistence during molecular dynamics.** Each numeric entry is the median across three independent 20 ns trajectories. RMSD is reported as median/95th percentile. Pocket-contact retention was 1.00 for every replicate and is descriptive rather than a gate. Failed-gate entries state the number of replicates failing MR (median RMSD), P95 (95th-percentile RMSD), H (hinge-contact occupancy), or K (mean key-contact occupancy). System-level stability required at least two stable replicates; candidate-level medians alone do not determine the decision.
+Table 4 reports the complete replicate-majority gate. Each numeric entry is the median across three independent 20 ns trajectories. Pocket-contact retention was 1.00 for every replicate and is descriptive rather than a gate. Failed-gate entries use MR (median RMSD), P95 (95th-percentile RMSD), H (hinge-contact occupancy), and K (mean key-contact occupancy); $\times n$ gives the number of failed replicates.
 
-| System | Stable reps | RMSD med/p95 (Å) | Hinge | Key contacts | Failed gates | Decision |
+**Table 4. Replicate-based molecular-dynamics pose-persistence classification.** Candidate-level medians summarize, but do not independently determine, the majority-replicate decision.
+
+| ID | Stable reps | RMSD med/P95 (Å) | Hinge | Key contacts | Failed gate(s) | Decision |
 |---|---:|---:|---:|---:|---|---|
-| Control 001 (known ligand) | 0/3 | 1.99/3.53 | 0.007 | 0.43 | 3/3 H; 3/3 K | Unstable |
-| Control 002 (known ligand; analog parent) | 3/3 | 1.80/2.44 | 0.77 | 0.62 | — | Stable |
-| Control 003 (known ligand) | 3/3 | 2.16/2.54 | 1.00 | 0.69 | — | Stable |
-| Analog 004 (Control 002; small-substituent scan) | 2/3 | 1.87/3.11 | 0.91 | 0.52 | 1/3 H; 1/3 K | Stable |
-| Analog 005 (Control 002; fluoroethynyl scan) | 0/3 | 3.43/4.07 | 0.94 | 0.55 | 2/3 MR; 1/3 P95; 1/3 K | Unstable |
-| Analog 006 (Control 002; chloroethynyl scan) | 3/3 | 2.30/3.00 | 0.47 | 0.64 | — | Stable |
-| Mis-docked Control 002 (translated/rotated) | 0/3 | 5.72/8.43 | 0.00 | 0.008 | 3/3 MR; 3/3 P95; 3/3 H; 3/3 K | Unstable |
+| C001 | 0/3 | 1.99/3.53 | 0.007 | 0.43 | H, K ×3 | Unstable |
+| C002 | 3/3 | 1.80/2.44 | 0.77 | 0.62 | — | Stable |
+| C003 | 3/3 | 2.16/2.54 | 1.00 | 0.69 | — | Stable |
+| A004 | 2/3 | 1.87/3.11 | 0.91 | 0.52 | H, K ×1 | Stable |
+| A005 | 0/3 | 3.43/4.07 | 0.94 | 0.55 | MR ×2; P95, K ×1 | Unstable |
+| A006 | 3/3 | 2.30/3.00 | 0.47 | 0.64 | — | Stable |
+| N002 | 0/3 | 5.72/8.43 | 0.00 | 0.008 | MR, P95, H, K ×3 | Unstable |
+
+System key: C001–C003, known-ligand controls; C002, parent of all analogs; A004, small-substituent scan of C002; A005, fluoroethynyl scan of C002; A006, chloroethynyl scan of C002; N002, translated-and-rotated mis-docked C002.
 
 ![The MD gate separates the majority-stable systems from the deliberately mis-docked control in this selected set. Points summarize system-level median ligand RMSD and key-contact occupancy across three independent 20 ns production trajectories. Horizontal RMSD error bars show the across-replicate range of replicate-level median ligand RMSD; colors indicate the predeclared majority-replicate decision.](figures/figure6_md_stability.png){#fig-md width=100% fig-alt="Ligand RMSD and interaction occupancy for replicated MD systems, distinguishing stable poses from the deliberately mis-docked control."}
 
