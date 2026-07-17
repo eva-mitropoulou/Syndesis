@@ -78,7 +78,7 @@ Please cite the ChemRxiv preprint:
 > 2026. https://doi.org/10.26434/chemrxiv.15006204/v1
 
 Citation metadata are provided in [CITATION.cff](CITATION.cff). The immutable
-paper snapshot is [v1.3.0-paper](https://github.com/eva-mitropoulou/Syndesis/tree/v1.3.0-paper).
+paper snapshot is [v1.3.1-paper](https://github.com/eva-mitropoulou/Syndesis/tree/v1.3.1-paper).
 
 ## License
 

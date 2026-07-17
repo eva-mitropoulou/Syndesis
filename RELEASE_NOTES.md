@@ -1,4 +1,4 @@
-# Syndesis v1.3.0-paper
+# Syndesis v1.3.1-paper
 
 Frozen reproducibility package for *Pose-coupled native-interaction weighting
 in kinase ensemble docking: EGFR enrichment and CDK2 transfer*.
