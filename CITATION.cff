@@ -27,8 +27,9 @@ keywords:
   - score hacking
 license: MIT
 version: 1.2.0
-date-released: "2026-07-15"
+date-released: "2026-07-17"
 url: "https://github.com/eva-mitropoulou/Syndesis/tree/v1.2.0-paper"
+doi: "10.26434/chemrxiv.15006204/v1"
 preferred-citation:
   type: article
   title: "Pose-coupled native-interaction weighting in kinase ensemble docking: EGFR enrichment and CDK2 transfer"
@@ -42,4 +43,6 @@ preferred-citation:
       affiliation: "University of Patras"
       email: "dimit.giannopoulos@ac.upatras.gr"
   year: 2026
-  notes: "Frozen GitHub paper package, v1.2.0-paper."
+  doi: "10.26434/chemrxiv.15006204/v1"
+  url: "https://doi.org/10.26434/chemrxiv.15006204/v1"
+  notes: "ChemRxiv preprint. Reproducibility package: v1.2.0-paper."

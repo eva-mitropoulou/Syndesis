@@ -63,10 +63,11 @@ CDK2 EF1% values and paired effects. It does not rerun docking, GNINA, or MD.
 
 ## Citation
 
-Please cite the frozen paper package:
+Please cite the ChemRxiv preprint:
 
-> Mitropoulou, E.; Giannopoulos, D. *Syndesis: Pose-coupled native-interaction
-> weighting in kinase ensemble docking.* GitHub paper package, 2026.
+> Mitropoulou, E.; Giannopoulos, D. *Pose-coupled native-interaction weighting
+> in kinase ensemble docking: EGFR enrichment and CDK2 transfer.* ChemRxiv,
+> 2026. https://doi.org/10.26434/chemrxiv.15006204/v1
 
 Citation metadata are provided in [CITATION.cff](CITATION.cff). The immutable
 paper snapshot is [v1.2.0-paper](https://github.com/eva-mitropoulou/Syndesis/tree/v1.2.0-paper).
