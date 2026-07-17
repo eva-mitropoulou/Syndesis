@@ -26,9 +26,9 @@ keywords:
   - molecular dynamics
   - score hacking
 license: MIT
-version: 1.2.0
+version: 1.3.0
 date-released: "2026-07-17"
-url: "https://github.com/eva-mitropoulou/Syndesis/tree/v1.2.0-paper"
+url: "https://github.com/eva-mitropoulou/Syndesis/tree/v1.3.0-paper"
 doi: "10.26434/chemrxiv.15006204/v1"
 preferred-citation:
   type: article
@@ -45,4 +45,4 @@ preferred-citation:
   year: 2026
   doi: "10.26434/chemrxiv.15006204/v1"
   url: "https://doi.org/10.26434/chemrxiv.15006204/v1"
-  notes: "ChemRxiv preprint. Reproducibility package: v1.2.0-paper."
+  notes: "ChemRxiv preprint. Reproducibility package: v1.3.0-paper."

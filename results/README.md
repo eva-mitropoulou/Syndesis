@@ -12,6 +12,9 @@ docking campaigns or molecular-dynamics trajectories.
   GNINA scores, and interaction fingerprints behind the CDK2 correction.
 - `md/persistence_summary.csv` contains the compact system-level summary used
   for the short-timescale modeled-pose persistence analysis.
+- `../analysis/pose_coupling_traceability/` contains the frozen tie-aware
+  late-fusion traceability audit, its per-ligand and subset tables, and the
+  deterministic EGFR representative-case poses and interaction data.
 
 The package is a frozen paper-analysis record. It is not a substitute for the
 third-party structural databases, DUD-E source files, docking executables, or

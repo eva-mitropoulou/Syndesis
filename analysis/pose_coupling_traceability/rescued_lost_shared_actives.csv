@@ -1,0 +1,7 @@
+target,group,n_actives,pose_nonrealizable_count,pose_nonrealizable_percent,median_gnina_rank,median_coupled_rank,median_late_fusion_rank,median_gnina_to_coupled_rank_change
+EGFR,rescued_actives,30,5,16.666666666666664,608.0,145.0,173.0,464.5
+EGFR,lost_actives,6,5,83.33333333333334,202.5,515.0,424.0,-267.0
+EGFR,shared_actives,59,17,28.8135593220339,130.0,63.0,72.0,34.0
+CDK2,rescued_actives,34,15,44.11764705882353,515.5,152.0,172.0,332.0
+CDK2,lost_actives,18,16,88.88888888888889,131.5,463.5,454.5,-368.5
+CDK2,shared_actives,37,10,27.027027027027028,78.0,50.0,75.0,15.0

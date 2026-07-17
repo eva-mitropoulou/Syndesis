@@ -25,6 +25,12 @@ molecules, compared with 65 for GNINA. EGFR was the method-development target.
 The fixed rule was then applied to CDK2, where the favorable result was more
 sensitive to receptor and prior composition.
 
+The pose-decoupled late-fusion comparator recovered 86 EGFR actives (EF1%
+15.85) and 78 CDK2 actives (EF1% 16.45). It is not structurally equivalent to
+same-pose coupling: 56.69% of EGFR and 62.02% of CDK2 late-fusion scores combine
+maxima from different receptor-specific poses. Coupling therefore preserves
+score provenance rather than universally maximizing enrichment.
+
 The EGFR analysis uses four ATP-site structures (1M17, 1XKK, 4HJO, and 5CAV)
 for both docking and the native-interaction reference. The CDK2 analysis uses
 1FIN, 2A4L, 1AQ1, and 1PXN. The corrected 1PXN preparation retains the
@@ -39,6 +45,8 @@ scripts/            one verification entry point
 data/               frozen pose-level benchmark input tables
 results/            frozen statistical and MD result tables
 figures/            publication figures
+manuscript/         Quarto source, references, figures, and rendered PDF
+analysis/            pose-coupling traceability audit and representative data
 tests/              unit tests for the interaction-prior calculations
 ```
 
@@ -70,7 +78,7 @@ Please cite the ChemRxiv preprint:
 > 2026. https://doi.org/10.26434/chemrxiv.15006204/v1
 
 Citation metadata are provided in [CITATION.cff](CITATION.cff). The immutable
-paper snapshot is [v1.2.0-paper](https://github.com/eva-mitropoulou/Syndesis/tree/v1.2.0-paper).
+paper snapshot is [v1.3.0-paper](https://github.com/eva-mitropoulou/Syndesis/tree/v1.3.0-paper).
 
 ## License
 

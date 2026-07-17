@@ -1,0 +1,4 @@
+target,coverage_scope,n_molecules,unique_max_cnn_count,tied_max_cnn_count,unique_max_recall_count,tied_max_recall_count,unique_max_coupled_count,tied_max_coupled_count
+EGFR,all_available,35552,35550,2,30647,4905,35551,1
+CDK2,all_available,28296,28293,3,23174,5122,28296,0
+CDK2,complete_four_receptor,27926,27923,3,22854,5072,27926,0
